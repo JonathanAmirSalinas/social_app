@@ -5,7 +5,7 @@ import 'package:social_app/pages/sub-navigation/bookmark_page.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
 import 'package:social_app/pages/main-navigation/home_page.dart';
-import 'package:social_app/pages/main-navigation/message_page.dart';
+import 'package:social_app/pages/main-navigation/server_page.dart';
 import 'package:social_app/pages/sub-navigation/profile_page.dart';
 import 'package:social_app/pages/responsive/main_page.dart';
 import 'package:social_app/pages/sub-navigation/settings_page.dart';
@@ -39,7 +39,7 @@ final GoRouter router = GoRouter(
     ),
     ShellRoute(
       builder: (context, state, child) {
-        return const MainPage();
+        return MainPage(child: child);
       },
       routes: [
         GoRoute(
@@ -61,11 +61,21 @@ final GoRouter router = GoRouter(
           },
         ),
         GoRoute(
-          path: '/message',
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(child: MessagePage());
-          },
-        ),
+            name: 'servers',
+            path: '/servers',
+            pageBuilder: (context, state) {
+              return const NoTransitionPage(child: ServerPage());
+            },
+            routes: [
+              GoRoute(
+                name: "sid",
+                path: ':sid',
+                pageBuilder: (context, state) {
+                  return NoTransitionPage(
+                      child: ServerPage(sid: state.params["sid"]!));
+                },
+              ),
+            ]),
       ],
     )
   ],

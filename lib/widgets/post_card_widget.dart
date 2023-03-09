@@ -140,12 +140,6 @@ class _BuildPostCardState extends State<BuildPostCard> {
                                   ),
                                   splashRadius: 16,
                                 ),
-                                const Text(
-                                  '0',
-                                  style: TextStyle(
-                                    color: Colors.white54,
-                                  ),
-                                ),
                                 SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * .02,

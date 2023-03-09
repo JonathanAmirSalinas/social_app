@@ -20,22 +20,23 @@ class MyApp extends StatelessWidget {
           appBarTheme: const AppBarTheme(
             backgroundColor: Color.fromARGB(255, 32, 32, 32),
           ),
+          indicatorColor: const Color.fromARGB(255, 217, 25, 55),
           drawerTheme: const DrawerThemeData(
               backgroundColor: Color.fromARGB(255, 32, 32, 32)),
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               backgroundColor: Color.fromARGB(255, 32, 32, 32),
-              selectedItemColor: Color.fromARGB(208, 113, 70, 55)),
-          primarySwatch: const MaterialColor(0xFF774A3A, {
-            50: Color.fromRGBO(113, 70, 55, .1),
-            100: Color.fromRGBO(113, 70, 55, .2),
-            200: Color.fromRGBO(113, 70, 55, .3),
-            300: Color.fromRGBO(113, 70, 55, .4),
-            400: Color.fromRGBO(113, 70, 55, .5),
-            500: Color.fromRGBO(113, 70, 55, .6),
-            600: Color.fromRGBO(113, 70, 55, .7),
-            700: Color.fromRGBO(113, 70, 55, .8),
-            800: Color.fromRGBO(113, 70, 55, .9),
-            900: Color.fromRGBO(113, 70, 55, 1),
+              selectedItemColor: Color.fromARGB(255, 217, 25, 55)),
+          primarySwatch: const MaterialColor(0xFFF71A3A, {
+            50: Color.fromRGBO(217, 25, 55, .1),
+            100: Color.fromRGBO(217, 25, 55, .2),
+            200: Color.fromRGBO(217, 25, 55, .3),
+            300: Color.fromRGBO(217, 25, 55, .4),
+            400: Color.fromRGBO(217, 25, 55, .5),
+            500: Color.fromRGBO(217, 25, 55, .6),
+            600: Color.fromRGBO(217, 25, 55, .7),
+            700: Color.fromRGBO(217, 25, 55, .8),
+            800: Color.fromRGBO(217, 25, 55, .9),
+            900: Color.fromRGBO(217, 25, 55, 1),
           })),
       routerConfig: router,
     );
