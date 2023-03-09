@@ -4,12 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
 import 'package:social_app/pages/main-navigation/home_page.dart';
-import 'package:social_app/pages/main-navigation/message_page.dart';
+import 'package:social_app/pages/main-navigation/server_page.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
 import 'package:social_app/widgets/nav_drawer_widget.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  Widget child;
+  MainPage({super.key, required this.child});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -32,7 +33,7 @@ class _MainPageState extends State<MainPage> {
         context.go('/activity');
         break;
       case 3:
-        context.go('/message');
+        context.go('/servers');
         break;
       default:
         context.go('/home');
@@ -56,17 +57,17 @@ class _MainPageState extends State<MainPage> {
           body: Row(
             children: [
               !bottomNav ? buildNavigationRail() : Container(),
-              Expanded(
-                child: IndexedStack(
+              Expanded(child: widget.child
+                  /*IndexedStack(
                   index: _index,
                   children: const [
                     HomePage(),
                     ExplorePage(),
                     ActivityPage(),
-                    MessagePage(),
+                    ServerPage(),
                   ],
-                ),
-              ),
+                ),*/
+                  ),
               constraints.maxWidth > 1280
                   ? const VerticalDivider(
                       thickness: 2,
@@ -77,6 +78,7 @@ class _MainPageState extends State<MainPage> {
               constraints.maxWidth > 1280 ? const SideMenuPage() : Container(),
             ],
           ),
+          floatingActionButton: generateFloatingActionButton(),
           bottomNavigationBar: bottomNav
               ? BottomNavigationBar(
                   currentIndex: _index,
@@ -96,7 +98,7 @@ class _MainPageState extends State<MainPage> {
                           icon: Icon(Icons.notifications_active_outlined),
                           label: "Activity"),
                       BottomNavigationBarItem(
-                          icon: Icon(Icons.space_dashboard), label: "Messages"),
+                          icon: Icon(Icons.space_dashboard), label: "Servers"),
                     ])
               : null,
         ),
@@ -237,10 +239,38 @@ class _MainPageState extends State<MainPage> {
               icon: Icon(Icons.notifications_active_rounded),
               label: Text("Activity")),
           NavigationRailDestination(
-              icon: Icon(Icons.space_dashboard), label: Text("Messages")),
+              icon: Icon(Icons.space_dashboard), label: Text("Servers")),
         ],
       ),
     );
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+// FloatingAction Button                                                     ///
+////////////////////////////////////////////////////////////////////////////////
+  generateFloatingActionButton() {
+    switch (_index) {
+      case 0:
+        {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * .06,
+            width: MediaQuery.of(context).size.height * .06,
+            child: FloatingActionButton(
+              onPressed: () {
+                //Navigator.of(context).pushNamed('/createpost');
+              },
+              tooltip: "Create Post",
+              backgroundColor: Theme.of(context).indicatorColor,
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: const Icon(Icons.add),
+            ),
+          );
+        }
+
+      default:
+        return null;
+    }
   }
 }
 
