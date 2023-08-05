@@ -1,27 +1,34 @@
-import 'dart:ui';
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/constants/constants.dart';
 
-class NewsPage extends StatefulWidget {
-  const NewsPage({super.key});
+@RoutePage(name: 'trending_tab')
+class TrendingTabPage extends StatefulWidget {
+  const TrendingTabPage({super.key});
 
   @override
-  State<NewsPage> createState() => _NewsPageState();
+  State<TrendingTabPage> createState() => _TrendingPageState();
 }
 
-class _NewsPageState extends State<NewsPage> {
-  PageController controller = PageController(viewportFraction: .8);
+class _TrendingPageState extends State<TrendingTabPage>
+    with AutomaticKeepAliveClientMixin<TrendingTabPage> {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                buildNewsHeadlines(),
-                buildTrendingNews(),
-                buildHotNewsTopics(),
+                buildHeadline(),
+                buildTrending(),
+                buildTrendingTopics(),
               ],
             ),
           ),
@@ -30,38 +37,31 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
-  // Builds PageView of Headlining News, from the use of a News API's
+  // Trending Headline, built from the most "#'s" & searched topic
   //////////////////////////////////////////////////////////////////////////////
-  buildNewsHeadlines() {
+  buildHeadline() {
     return Column(
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "   Headlines",
+            "   Headline",
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
           ),
         ),
-        SingleChildScrollView(
-          child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(
-                dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                },
-              ),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .5,
-                width: MediaQuery.of(context).size.width * .9,
-                child: PageView.builder(
-                    controller: controller,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 5,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildNewsHeadlineCard();
-                    }),
-              )),
+        Card(
+          color: fillColor,
+          child: Container(
+            height: MediaQuery.of(context).size.height * .4,
+            width: MediaQuery.of(context).size.width * .8,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            child: const Column(
+              children: [],
+            ),
+          ),
         ),
         SizedBox(
           height: MediaQuery.of(context).size.height * .02,
@@ -70,9 +70,9 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
-  // Builds List of Trending News, from the use of searched "#'s" or Keywords
+  // Trending Headlines, built from most "#'s" & searched topic in a week
   //////////////////////////////////////////////////////////////////////////////
-  buildTrendingNews() {
+  buildTrending() {
     return Column(
       children: [
         Align(
@@ -87,14 +87,16 @@ class _NewsPageState extends State<NewsPage> {
           height: MediaQuery.of(context).size.height * .9,
           width: MediaQuery.of(context).size.width * .8,
           child: ListView.builder(
-              itemCount: 10,
+              itemCount: 8,
               itemBuilder: ((context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Container(
-                    height: MediaQuery.of(context).size.height * .08,
+                    height: MediaQuery.of(context).size.height * .1,
                     alignment: Alignment.center,
-                    color: Theme.of(context).cardColor,
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        color: fillColor),
                     child: Text(index.toString()),
                   ),
                 );
@@ -107,15 +109,15 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
-  // Builds GridView of other news stories, from the use both Headlines and Trending
-  /////////////////////////////////////////////////////////////////////////////////
-  buildHotNewsTopics() {
+  // Built from under top 10 trending topics
+  //////////////////////////////////////////////////////////////////////////////
+  buildTrendingTopics() {
     return Column(
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "   Recent News Stories",
+            "   Trending Topics",
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
           ),
@@ -234,22 +236,6 @@ class _NewsPageState extends State<NewsPage> {
           height: MediaQuery.of(context).size.height * .02,
         )
       ],
-    );
-  }
-
-  // Builds News Headline UI Card
-  buildNewsHeadlineCard() {
-    return Card(
-      child: Container(
-        height: MediaQuery.of(context).size.height * .35,
-        width: MediaQuery.of(context).size.width * .7,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-        ),
-        child: Column(
-          children: const [],
-        ),
-      ),
     );
   }
 }

@@ -1,14 +1,20 @@
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/constants/constants.dart';
 
-class ServerPage extends StatefulWidget {
-  const ServerPage({super.key});
+@RoutePage(name: 'servers_tab')
+class ServersTabPage extends StatefulWidget {
+  const ServersTabPage({super.key});
 
   @override
-  State<ServerPage> createState() => _ServerPageState();
+  State<ServersTabPage> createState() => _ServersTabState();
 }
 
-class _ServerPageState extends State<ServerPage> {
+class _ServersTabState extends State<ServersTabPage>
+    with AutomaticKeepAliveClientMixin<ServersTabPage> {
+  @override
+  bool get wantKeepAlive => true;
   PageController trendingController = PageController(viewportFraction: .8);
   PageController popularController = PageController(viewportFraction: .8);
 
@@ -21,7 +27,9 @@ class _ServerPageState extends State<ServerPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -193,6 +201,7 @@ class _ServerPageState extends State<ServerPage> {
             const SnackBar(content: Text("Clicked on Server Banner")));
       },
       child: Card(
+        color: fillColor,
         child: SizedBox(
           height: MediaQuery.of(context).size.height * .28,
           child: Stack(
@@ -202,10 +211,9 @@ class _ServerPageState extends State<ServerPage> {
                 alignment: Alignment.topLeft,
                 child: Container(
                     height: MediaQuery.of(context).size.height * .5,
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4)),
-                        color: Theme.of(context).cardColor
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        color: fillColor
                         /*image: DecorationImage(
                           image: CachedNetworkImageProvider(
                               snap['serverBannerUrl']),
@@ -232,9 +240,9 @@ class _ServerPageState extends State<ServerPage> {
                   decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                       color: Colors.black38),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [Icon(Icons.group_sharp), Text("0")],
+                    children: [Icon(Icons.group_sharp), Text("0")],
                   ),
                 ),
               ),
@@ -248,9 +256,9 @@ class _ServerPageState extends State<ServerPage> {
                     height: MediaQuery.of(context).size.height * .07,
                     width: MediaQuery.of(context).size.width * .85,
                     decoration: const BoxDecoration(),
-                    child: Column(
+                    child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Server Name",
                           style: TextStyle(
@@ -309,6 +317,7 @@ class _ServerPageState extends State<ServerPage> {
             const SnackBar(content: Text("Clicked on Server Banner Grid")));
       },
       child: Card(
+        color: fillColor,
         child: SizedBox(
           height: MediaQuery.of(context).size.height * .20,
           child: Stack(
@@ -318,10 +327,9 @@ class _ServerPageState extends State<ServerPage> {
                 alignment: Alignment.topLeft,
                 child: Container(
                     height: MediaQuery.of(context).size.height * .3,
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4)),
-                        color: Theme.of(context).cardColor
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        color: fillColor
                         /*image: DecorationImage(
                           image: CachedNetworkImageProvider(
                               snap['serverBannerUrl']),
@@ -350,9 +358,9 @@ class _ServerPageState extends State<ServerPage> {
                     height: MediaQuery.of(context).size.height * .06,
                     width: MediaQuery.of(context).size.width * .65,
                     decoration: const BoxDecoration(),
-                    child: Column(
+                    child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Server Name",
                           style: TextStyle(

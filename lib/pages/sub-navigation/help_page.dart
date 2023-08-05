@@ -1,15 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-@RoutePage(name: 'bookmark')
-class BookmarkPage extends StatefulWidget {
-  const BookmarkPage({super.key});
+@RoutePage(name: 'help')
+class HelpPage extends StatefulWidget {
+  const HelpPage({super.key});
 
   @override
-  State<BookmarkPage> createState() => _BookmarkPageState();
+  State<HelpPage> createState() => _HelpPageState();
 }
 
-class _BookmarkPageState extends State<BookmarkPage> {
+class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,11 +20,11 @@ class _BookmarkPageState extends State<BookmarkPage> {
           },
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
-        title: const Text("Bookmark Page"),
+        title: const Text("Help Page"),
         centerTitle: true,
       ),
       body: const Center(
-        child: Text("Bookmark"),
+        child: Text("Help"),
       ),
     );
   }
