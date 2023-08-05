@@ -1,16 +1,23 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:social_app/constants/constants.dart';
 
-class MediaPage extends StatefulWidget {
-  const MediaPage({super.key});
+@RoutePage(name: 'media_tab')
+class MediaTabPage extends StatefulWidget {
+  const MediaTabPage({super.key});
 
   @override
-  State<MediaPage> createState() => _MediaPageState();
+  State<MediaTabPage> createState() => _MediaPageState();
 }
 
-class _MediaPageState extends State<MediaPage> {
+class _MediaPageState extends State<MediaTabPage>
+    with AutomaticKeepAliveClientMixin<MediaTabPage> {
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Center(
       child:
           Padding(padding: const EdgeInsets.all(8.0), child: buildMediaGrid()),
@@ -44,6 +51,7 @@ class _MediaPageState extends State<MediaPage> {
   mediaTile({required int index}) {
     return GridTile(
         child: Card(
+            color: fillColor,
             child: Container(
                 alignment: Alignment.center, child: Text(index.toString()))));
   }

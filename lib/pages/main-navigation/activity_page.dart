@@ -1,7 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/pages/constants/constants.dart';
+import 'package:social_app/constants/constants.dart';
+import 'package:social_app/router/app_router.dart';
 import 'package:social_app/widgets/sliver_appbar_widget.dart';
 
+@RoutePage(name: 'activity')
 class ActivityPage extends StatefulWidget {
   const ActivityPage({super.key});
 
@@ -14,6 +17,21 @@ class _ActivityPageState extends State<ActivityPage> {
 
   @override
   Widget build(BuildContext context) {
+    return AutoTabsRouter.tabBar(
+      routes: const [
+        Notification_tab(),
+        Mentions_tab(),
+      ],
+      builder: (context, child, tabController) {
+        final tabsRouter = AutoTabsRouter.of(context);
+        tabController.index = tabsRouter.activeIndex;
+        return buildActivityTabs(tabsRouter, child, tabController);
+      },
+    );
+  }
+
+  buildActivityTabs(
+      TabsRouter tabsRouter, Widget child, TabController tabController) {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -22,8 +40,10 @@ class _ActivityPageState extends State<ActivityPage> {
         setState(() {});
       },
       child: DefaultTabController(
+          initialIndex: tabsRouter.activeIndex,
           length: 2,
           child: Scaffold(
+            backgroundColor: backgroundColor,
             drawer: isSmallPage(context, "Drawer"),
             resizeToAvoidBottomInset: false,
             body: NestedScrollView(
@@ -35,10 +55,13 @@ class _ActivityPageState extends State<ActivityPage> {
                       pinned: true,
                       floating: true,
                       snap: true,
+                      scrolledUnderElevation: 0.0,
+                      backgroundColor: navBarColor,
                       leading: isSmallPage(
                         context,
                         "Leading IconButton",
                       ),
+                      centerTitle: true,
                       title: Text(
                         "Activity",
                         style: TextStyle(
@@ -52,10 +75,11 @@ class _ActivityPageState extends State<ActivityPage> {
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: SliverAppBarDelegate(
-                      const TabBar(
+                      TabBar(
+                        controller: tabController,
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.grey,
-                        tabs: [
+                        tabs: const [
                           Tab(text: "Notifications"),
                           Tab(text: "Messages"),
                         ],
@@ -64,16 +88,7 @@ class _ActivityPageState extends State<ActivityPage> {
                   )
                 ];
               },
-              body: const TabBarView(
-                children: [
-                  Center(
-                    child: Text("Notifications"),
-                  ),
-                  Center(
-                    child: Text("Messages"),
-                  ),
-                ],
-              ),
+              body: child,
             ),
           )),
     );

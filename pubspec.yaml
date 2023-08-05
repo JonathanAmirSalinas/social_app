@@ -31,7 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  go_router: ^6.2.0
+  auto_route: ^7.7.1
+  auto_route_generator: ^7.2.0
   flutter_staggered_grid_view: ^0.6.2
   
 
@@ -63,9 +64,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    #- lib/assets/user-icon-asset.png
+  
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

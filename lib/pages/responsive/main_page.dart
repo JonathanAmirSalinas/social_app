@@ -1,115 +1,97 @@
 import 'dart:ui';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:social_app/pages/main-navigation/activity_page.dart';
-import 'package:social_app/pages/main-navigation/explore_page.dart';
-import 'package:social_app/pages/main-navigation/home_page.dart';
-import 'package:social_app/pages/main-navigation/server_page.dart';
+import 'package:social_app/constants/constants.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
-import 'package:social_app/widgets/nav_drawer_widget.dart';
+import 'package:social_app/router/app_router.dart';
+import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
+@RoutePage(name: 'main')
 class MainPage extends StatefulWidget {
-  Widget child;
-  MainPage({super.key, required this.child});
+  const MainPage({
+    super.key,
+  });
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _index = 0;
-  late bool bottomNav;
   bool _extended = false;
-
-  void selectedIndex(int index) {
-    switch (index) {
-      case 0:
-        context.go('/home');
-        break;
-      case 1:
-        context.go('/explore');
-        break;
-      case 2:
-        context.go('/activity');
-        break;
-      case 3:
-        context.go('/servers');
-        break;
-      default:
-        context.go('/home');
-        break;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      constraints.maxWidth < 500 || constraints.maxWidth == 500
-          ? {bottomNav = true, _extended = false}
-          : bottomNav = false;
-
-      return GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
+      return AutoTabsRouter(
+        routes: [
+          const Home(),
+          const Explore(),
+          const Activity(),
+          Servers(),
+        ],
+        homeIndex: 0,
+        duration: Duration.zero,
+        builder: (context, child) {
+          final tabsRouter = AutoTabsRouter.of(context);
+          return buildRoute(tabsRouter, child, constraints.maxWidth);
         },
-        child: Scaffold(
-          drawer: const NavigationDrawer(),
-          body: Row(
-            children: [
-              !bottomNav ? buildNavigationRail() : Container(),
-              Expanded(child: widget.child
-                  /*IndexedStack(
-                  index: _index,
-                  children: const [
-                    HomePage(),
-                    ExplorePage(),
-                    ActivityPage(),
-                    ServerPage(),
-                  ],
-                ),*/
-                  ),
-              constraints.maxWidth > 1280
-                  ? const VerticalDivider(
-                      thickness: 2,
-                      indent: 30,
-                      endIndent: 30,
-                    )
-                  : Container(),
-              constraints.maxWidth > 1280 ? const SideMenuPage() : Container(),
-            ],
-          ),
-          floatingActionButton: generateFloatingActionButton(),
-          bottomNavigationBar: bottomNav
-              ? BottomNavigationBar(
-                  currentIndex: _index,
-                  type: BottomNavigationBarType.fixed,
-                  onTap: (index) {
-                    setState(() {
-                      _index = index;
-                      selectedIndex(index);
-                    });
-                  },
-                  items: const [
-                      BottomNavigationBarItem(
-                          icon: Icon(Icons.home), label: "Home"),
-                      BottomNavigationBarItem(
-                          icon: Icon(Icons.search), label: "Explore"),
-                      BottomNavigationBarItem(
-                          icon: Icon(Icons.notifications_active_outlined),
-                          label: "Activity"),
-                      BottomNavigationBarItem(
-                          icon: Icon(Icons.space_dashboard), label: "Servers"),
-                    ])
-              : null,
-        ),
       );
     });
+  }
+
+  Widget buildRoute(TabsRouter tabsRouter, Widget child, double constraints) {
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: primaryColor,
+        drawer: const SliverNavigationDrawer(),
+        body: Row(
+          children: [
+            !isMobileScreen(constraints)
+                ? buildNavigationRail(tabsRouter)
+                : Container(),
+            Expanded(child: child),
+            constraints > 1280
+                ? Container(
+                    height: double.infinity,
+                    width: 5,
+                    color: navBarColor,
+                  )
+                : Container(),
+            constraints > 1280 ? const SideMenuPage() : Container(),
+          ],
+        ),
+        floatingActionButton:
+            isMobileScreen(constraints) ? generateFloatingActionButton() : null,
+        bottomNavigationBar: isMobileScreen(constraints)
+            ? BottomNavigationBar(
+                currentIndex: tabsRouter.activeIndex,
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: Colors.white,
+                backgroundColor: navBarColor,
+                onTap: tabsRouter.setActiveIndex,
+                items: const [
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.home), label: "Home"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.search), label: "Explore"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.notifications_active_outlined),
+                        label: "Activity"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.space_dashboard), label: "Servers"),
+                  ])
+            : null,
+      ),
+    );
   }
 
 //////////////////////////////////////////////////////////////////////////////////
 //// NAVIGATION RAIL
 ////////////////////////////////////////////////////////////////////////////////
-  buildNavigationRail() {
+  buildNavigationRail(TabsRouter tabsRouter) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -117,11 +99,11 @@ class _MainPageState extends State<MainPage> {
         });
       },
       child: NavigationRail(
-        selectedIndex: _index,
+        selectedIndex: tabsRouter.activeIndex,
         extended: _extended,
         elevation: 2,
         // NAVIGATION RAIL UI
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: navBarColor,
         selectedIconTheme: Theme.of(context).primaryIconTheme,
         selectedLabelTextStyle: TextStyle(
             color: Theme.of(context).primaryIconTheme.color,
@@ -169,7 +151,7 @@ class _MainPageState extends State<MainPage> {
                                     ),
                                   ),
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 2),
                               child: const ExtendedSubMenuRail(
                                 onlyOnExtended: false,
                                 menuItemIcon: Icons.account_box_rounded,
@@ -178,16 +160,16 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 2),
                               child: const ExtendedSubMenuRail(
                                 onlyOnExtended: false,
-                                menuItemIcon: Icons.bookmark_outlined,
-                                menuLabel: "Bookmarked",
-                                itemRoute: '/bookmark',
+                                menuItemIcon: Icons.workspaces_filled,
+                                menuLabel: "Premium",
+                                itemRoute: '/premium',
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 2),
                               child: const ExtendedSubMenuRail(
                                 onlyOnExtended: false,
                                 menuItemIcon: Icons.settings,
@@ -201,7 +183,7 @@ class _MainPageState extends State<MainPage> {
                                 onlyOnExtended: true,
                                 menuItemIcon: Icons.help_center,
                                 menuLabel: "Help",
-                                itemRoute: '/profile',
+                                itemRoute: '/help',
                               ),
                             ),
                             Container(
@@ -210,7 +192,7 @@ class _MainPageState extends State<MainPage> {
                                 onlyOnExtended: true,
                                 menuItemIcon: Icons.logout_rounded,
                                 menuLabel: "Logout",
-                                itemRoute: '/profile',
+                                itemRoute: 'profile',
                               ),
                             ),
                           ],
@@ -222,24 +204,26 @@ class _MainPageState extends State<MainPage> {
 
         // MAIN NAVIAGTION FUNCTIONALITY
         onDestinationSelected: (int index) {
-          setState(() {
-            _index = index;
-            selectedIndex(index);
-          });
+          tabsRouter.setActiveIndex(index);
         },
         // NAVIGATION BUTTONS
         destinations: const [
           NavigationRailDestination(
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.symmetric(vertical: 4),
               icon: Icon(Icons.home),
               label: Text("Home")),
           NavigationRailDestination(
-              icon: Icon(Icons.search), label: Text("Explore")),
+              padding: EdgeInsets.symmetric(vertical: 4),
+              icon: Icon(Icons.search),
+              label: Text("Explore")),
           NavigationRailDestination(
+              padding: EdgeInsets.symmetric(vertical: 4),
               icon: Icon(Icons.notifications_active_rounded),
               label: Text("Activity")),
           NavigationRailDestination(
-              icon: Icon(Icons.space_dashboard), label: Text("Servers")),
+              padding: EdgeInsets.symmetric(vertical: 4),
+              icon: Icon(Icons.space_dashboard),
+              label: Text("Servers")),
         ],
       ),
     );
@@ -249,28 +233,20 @@ class _MainPageState extends State<MainPage> {
 // FloatingAction Button                                                     ///
 ////////////////////////////////////////////////////////////////////////////////
   generateFloatingActionButton() {
-    switch (_index) {
-      case 0:
-        {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * .06,
-            width: MediaQuery.of(context).size.height * .06,
-            child: FloatingActionButton(
-              onPressed: () {
-                //Navigator.of(context).pushNamed('/createpost');
-              },
-              tooltip: "Create Post",
-              backgroundColor: Theme.of(context).indicatorColor,
-              shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: const Icon(Icons.add),
-            ),
-          );
-        }
-
-      default:
-        return null;
-    }
+    return SizedBox(
+      height: 50,
+      width: 50,
+      child: FloatingActionButton(
+        onPressed: () {
+          //Navigator.of(context).pushNamed('/createpost');
+        },
+        tooltip: "Create Post",
+        backgroundColor: navBarColor,
+        shape:
+            ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
 
@@ -294,8 +270,8 @@ class LeadingExtendedRail extends StatelessWidget {
                 height: 50,
                 width: 50,
                 padding: EdgeInsets.symmetric(
-                  horizontal: lerpDouble(0, 6, animation.value)!,
-                  vertical: lerpDouble(0, 6, animation.value)!,
+                  horizontal: lerpDouble(0, 7, animation.value)!,
+                  vertical: lerpDouble(0, 7, animation.value)!,
                 ),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -308,55 +284,63 @@ class LeadingExtendedRail extends StatelessWidget {
                 alignment: AlignmentDirectional.centerStart,
                 widthFactor: animation.value,
                 child: Container(
-                  height: 150,
-                  width: 250,
-                  padding: const EdgeInsetsDirectional.only(start: 10, top: 10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
+                    height: 160,
+                    width: 240,
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10),
+                      ),
                     ),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    fit: StackFit.loose,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Column(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
                               height: 80,
                               width: 80,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
+                              decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
+                                  color: secondaryColor),
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              child: Text(
-                                "Name",
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge!
-                                        .fontSize),
-                              ),
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.donut_large_rounded,
+                                      color: secondaryColor,
+                                    )),
+                                IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.account_circle_rounded,
+                                      color: secondaryColor,
+                                    )),
+                              ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              child: const Text(" @username"),
-                            )
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                        Text(
+                          'Name',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .fontSize),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: const Text('@username'),
+                        ),
+                      ],
+                    )),
               );
       },
     );
@@ -387,7 +371,7 @@ class ExtendedSubMenuRail extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         // The extended fab has a shorter height than the regular fab.
         return Container(
-          height: 56,
+          height: 60,
           padding: EdgeInsets.symmetric(
             vertical: lerpDouble(6, 6, animation.value)!,
           ),
@@ -395,7 +379,7 @@ class ExtendedSubMenuRail extends StatelessWidget {
               ? !onlyOnExtended
                   ? IconButton(
                       onPressed: () {
-                        context.go(itemRoute);
+                        context.router.pushNamed(itemRoute);
                       },
                       icon: Icon(
                         menuItemIcon,
@@ -406,13 +390,13 @@ class ExtendedSubMenuRail extends StatelessWidget {
               : Align(
                   alignment: AlignmentDirectional.centerStart,
                   widthFactor: animation.value,
-                  child: SizedBox(
-                    height: 80,
+                  child: Container(
                     width: 200,
                     child: ListTile(
                       onTap: () {
-                        context.go(itemRoute);
+                        context.router.pushNamed(itemRoute);
                       },
+                      titleAlignment: ListTileTitleAlignment.titleHeight,
                       leading: Icon(menuItemIcon),
                       title: Text(menuLabel),
                     ),
@@ -440,7 +424,7 @@ class ExtendedRailController extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         // The extended fab has a shorter height than the regular fab.
         return Container(
-          height: 56,
+          height: 50,
           padding: EdgeInsets.symmetric(
             vertical: lerpDouble(0, 6, animation.value)!,
           ),

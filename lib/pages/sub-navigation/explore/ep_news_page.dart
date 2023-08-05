@@ -1,25 +1,35 @@
+import 'dart:ui';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/constants/constants.dart';
 
-class TrendingPage extends StatefulWidget {
-  const TrendingPage({super.key});
+@RoutePage(name: 'news_tab')
+class NewsTabPage extends StatefulWidget {
+  const NewsTabPage({super.key});
 
   @override
-  State<TrendingPage> createState() => _TrendingPageState();
+  State<NewsTabPage> createState() => _NewsPageState();
 }
 
-class _TrendingPageState extends State<TrendingPage> {
+class _NewsPageState extends State<NewsTabPage>
+    with AutomaticKeepAliveClientMixin<NewsTabPage> {
+  @override
+  bool get wantKeepAlive => true;
+  PageController controller = PageController(viewportFraction: .8);
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                buildHeadline(),
-                buildTrending(),
-                buildTrendingTopics(),
+                buildNewsHeadlines(),
+                buildTrendingNews(),
+                buildHotNewsTopics(),
               ],
             ),
           ),
@@ -28,30 +38,38 @@ class _TrendingPageState extends State<TrendingPage> {
     );
   }
 
-  // Trending Headline, built from the most "#'s" & searched topic
+  // Builds PageView of Headlining News, from the use of a News API's
   //////////////////////////////////////////////////////////////////////////////
-  buildHeadline() {
+  buildNewsHeadlines() {
     return Column(
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "   Headline",
+            "   Headlines",
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
           ),
         ),
-        Card(
-          child: Container(
-            height: MediaQuery.of(context).size.height * .35,
-            width: MediaQuery.of(context).size.width * .8,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Column(
-              children: const [],
-            ),
-          ),
+        SingleChildScrollView(
+          child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },
+              ),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * .5,
+                width: MediaQuery.of(context).size.width * .9,
+                child: PageView.builder(
+                    controller: controller,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 5,
+                    itemBuilder: (BuildContext context, int index) {
+                      return buildNewsHeadlineCard();
+                    }),
+              )),
         ),
         SizedBox(
           height: MediaQuery.of(context).size.height * .02,
@@ -60,9 +78,9 @@ class _TrendingPageState extends State<TrendingPage> {
     );
   }
 
-  // Trending Headlines, built from most "#'s" & searched topic in a week
+  // Builds List of Trending News, from the use of searched "#'s" or Keywords
   //////////////////////////////////////////////////////////////////////////////
-  buildTrending() {
+  buildTrendingNews() {
     return Column(
       children: [
         Align(
@@ -77,17 +95,14 @@ class _TrendingPageState extends State<TrendingPage> {
           height: MediaQuery.of(context).size.height * .9,
           width: MediaQuery.of(context).size.width * .8,
           child: ListView.builder(
-              itemCount: 8,
+              itemCount: 10,
               itemBuilder: ((context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Container(
-                    height: MediaQuery.of(context).size.height * .1,
+                    height: MediaQuery.of(context).size.height * .08,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4)),
-                        color: Theme.of(context).cardColor),
+                    color: fillColor,
                     child: Text(index.toString()),
                   ),
                 );
@@ -100,15 +115,15 @@ class _TrendingPageState extends State<TrendingPage> {
     );
   }
 
-  // Built from under top 10 trending topics
-  //////////////////////////////////////////////////////////////////////////////
-  buildTrendingTopics() {
+  // Builds GridView of other news stories, from the use both Headlines and Trending
+  /////////////////////////////////////////////////////////////////////////////////
+  buildHotNewsTopics() {
     return Column(
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "   Trending Topics",
+            "   Recent News Stories",
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
           ),
@@ -227,6 +242,22 @@ class _TrendingPageState extends State<TrendingPage> {
           height: MediaQuery.of(context).size.height * .02,
         )
       ],
+    );
+  }
+
+  // Builds News Headline UI Card
+  buildNewsHeadlineCard() {
+    return Card(
+      child: Container(
+        height: MediaQuery.of(context).size.height * .35,
+        width: MediaQuery.of(context).size.width * .7,
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            color: fillColor),
+        child: const Column(
+          children: [],
+        ),
+      ),
     );
   }
 }

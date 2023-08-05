@@ -1,74 +1,142 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:social_app/constants/constants.dart';
+import 'package:social_app/router/app_router.dart';
+import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
-class ServerPage extends StatefulWidget {
-  final String? sid;
-  const ServerPage({super.key, this.sid});
+@RoutePage(name: 'servers')
+class ServersPage extends StatefulWidget {
+  final String? sid; // <- Get from provider
+  const ServersPage({super.key, this.sid});
 
   @override
-  State<ServerPage> createState() => _ServerPageState();
+  State<ServersPage> createState() => _ServersPageState();
 }
 
-class _ServerPageState extends State<ServerPage> {
+class _ServersPageState extends State<ServersPage> {
   late String serverRailController;
-  List sid = ["first1212121212", "second54454554", "third3434434343434"];
+  TextEditingController searchDrawerController = TextEditingController();
+  List sid = [
+    "first",
+    "second",
+    "third",
+    "first",
+    "second",
+    "third",
+    "first",
+    "second",
+    "third",
+    "first",
+    "second",
+    "third",
+    "first",
+    "second",
+    "third",
+    "first",
+    "second",
+    "third"
+  ];
 
   @override
   void initState() {
-    if (widget.sid == null) {
-      serverRailController = 'main';
-    } else {
-      serverRailController = widget.sid!;
-    }
+    serverRailController = sid[0];
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildServerRail(),
-          buildSelectedServer(serverRailController),
-        ],
-      ),
+    return AutoTabsRouter.tabBar(
+      routes: [
+        const Server_home(),
+        const Server_messages(),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+        Server_chatroom(sid: sid[0]),
+        Server_chatroom(sid: sid[1]),
+        Server_chatroom(sid: sid[2]),
+      ],
+      animatePageTransition: false,
+      builder: (context, child, tabController) {
+        final tabsRouter = AutoTabsRouter.of(context);
+        tabController.index = tabsRouter.activeIndex;
+        return buildServerRoom(tabsRouter, child, tabController);
+      },
     );
+  }
+
+  buildServerRoom(
+      TabsRouter tabsRouter, Widget child, TabController tabController) {
+    return GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+
+          setState(() {});
+        },
+        child: Row(
+          children: [buildServerRail(tabsRouter), Expanded(child: child)],
+        ));
   }
 
   //////////////////////////////////////////////////////////////////////////////
   /// Builds The Server Navigation Rail
   //////////////////////////////////////////////////////////////////////////////
-  buildServerRail() {
+  buildServerRail(TabsRouter tabsRouter) {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: 60,
-      color: Theme.of(context).cardColor,
+      color: navServerBar,
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
         child: SingleChildScrollView(
           child: Column(children: [
             // Server Home Menu
-            Container(
-              height: 50,
-              width: 50,
-              margin: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
+            GestureDetector(
+              onTap: () {
+                tabsRouter.setActiveIndex(0);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                margin: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
                 ),
+                child: const Icon(Icons.dashboard),
               ),
-              child: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      serverRailController = "main";
-                      context.go("/servers");
-                    });
-                  },
-                  tooltip: "Home",
-                  splashRadius: 20,
-                  icon: const Icon(Icons.view_comfortable_rounded)),
+            ),
+            GestureDetector(
+              onTap: () {
+                tabsRouter.setActiveIndex(1);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                margin: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
+                child: const Icon(Icons.message),
+              ),
             ),
             const Divider(
               thickness: 3,
@@ -86,19 +154,17 @@ class _ServerPageState extends State<ServerPage> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        setState(() {
-                          serverRailController = sid[index];
-                          context.goNamed("sid", params: {"sid": sid[index]});
-                        });
+                        tabsRouter.setActiveIndex(index + 2);
                       },
                       child: Container(
                         height: 50,
                         width: 50,
-                        margin: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
                         decoration: const BoxDecoration(
-                          color: Colors.deepOrange,
+                          color: secondaryColor,
                           borderRadius: BorderRadius.all(
-                            Radius.circular(10),
+                            Radius.circular(8),
                           ),
                         ),
                       ),
@@ -128,23 +194,6 @@ class _ServerPageState extends State<ServerPage> {
                   splashRadius: 20,
                   icon: const Icon(Icons.add)),
             ),
-
-            Container(
-              height: 50,
-              width: 50,
-              margin: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
-              ),
-              child: IconButton(
-                  onPressed: () {},
-                  tooltip: "Share Server",
-                  splashRadius: 20,
-                  icon: const Icon(Icons.account_tree_rounded)),
-            ),
           ]),
         ),
       ),
@@ -168,15 +217,30 @@ class _ServerPageState extends State<ServerPage> {
   buildServerChat(String sid) {
     return Expanded(
       child: Scaffold(
+          endDrawer: buildServerChatEndDrawer(context, searchDrawerController),
           appBar: AppBar(
             elevation: 0,
             backgroundColor: Theme.of(context).cardColor,
+            leading: Container(),
             title: Text(
               sid,
               style: TextStyle(
                   fontSize:
                       Theme.of(context).textTheme.headlineSmall!.fontSize),
             ),
+            actions: [
+              Builder(builder: (context) {
+                return Container(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: IconButton(
+                        onPressed: () {
+                          Scaffold.of(context).openEndDrawer();
+                        },
+                        splashRadius: 25,
+                        iconSize: 25,
+                        icon: const Icon(Icons.view_list_rounded)));
+              })
+            ],
           ),
           body: SingleChildScrollView(
             child: Column(
