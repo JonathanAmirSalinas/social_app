@@ -14,6 +14,7 @@ const navBarColor = Color.fromARGB(255, 51, 51, 51);
 const navServerBar = Color.fromARGB(255, 63, 63, 63);
 const primaryColor = Color.fromARGB(125, 0, 0, 0);
 const secondaryColor = Color.fromARGB(255, 225, 170, 255);
+const secondaryColorFaded = Color.fromARGB(199, 225, 170, 255);
 const backgroundColor = Color.fromARGB(125, 0, 0, 0);
 const fillColor = Color.fromARGB(255, 85, 85, 85);
 const cardColor = Color.fromARGB(255, 255, 0, 0);

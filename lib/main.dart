@@ -1,8 +1,26 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/router/app_router.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+      apiKey: "AIzaSyDF4lga6yGbYdLXR_VlQKHEdnTSOPp4jJ8",
+      appId: "1:65377742477:web:bb2d53af2efc9fec3d3cc4",
+      //authDomain: "social-media-app-f7e66.firebaseapp.com",
+      messagingSenderId: "65377742477",
+      projectId: "social-media-app-f7e66",
+      storageBucket: "social-media-app-f7e66.appspot.com",
+    ));
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(MyApp());
 }
 
@@ -29,48 +47,39 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-  });
+// Intial App Controller (IF use is Signed In or not & IF user is has Internet Connection)
+@RoutePage(name: 'auth')
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("MyHomePage"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return SafeArea(
+      child: Scaffold(
+        body: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.hasData) {
+                context.router.root.pushNamed('/');
+              } else {
+                context.router.root.pushNamed('/main');
+              }
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("System Error"));
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.blueAccent),
+              );
+            }
+            return MyApp();
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
