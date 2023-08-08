@@ -15,6 +15,24 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
+    Auth.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AuthPage(),
+      );
+    },
+    Login.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const LoginPage(),
+      );
+    },
+    Register.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const RegisterPage(),
+      );
+    },
     Activity.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -92,22 +110,16 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const TrendingTabPage(),
       );
     },
+    Help.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const HelpPage(),
+      );
+    },
     Profile.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const ProfilePage(),
-      );
-    },
-    Setting.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const SettingsPage(),
-      );
-    },
-    Server_home.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const ServerHomePage(),
       );
     },
     Server_chatroom.name: (routeData) {
@@ -122,31 +134,67 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    Server_home.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ServerHomePage(),
+      );
+    },
     Server_messages.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const ServerMessagesPage(),
       );
     },
-    Login.name: (routeData) {
+    Setting.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const LoginPage(),
-      );
-    },
-    Register.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const RegisterPage(),
-      );
-    },
-    Help.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const HelpPage(),
+        child: const SettingsPage(),
       );
     },
   };
+}
+
+/// generated route for
+/// [AuthPage]
+class Auth extends PageRouteInfo<void> {
+  const Auth({List<PageRouteInfo>? children})
+      : super(
+          Auth.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Auth';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [LoginPage]
+class Login extends PageRouteInfo<void> {
+  const Login({List<PageRouteInfo>? children})
+      : super(
+          Login.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Login';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [RegisterPage]
+class Register extends PageRouteInfo<void> {
+  const Register({List<PageRouteInfo>? children})
+      : super(
+          Register.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Register';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -341,6 +389,20 @@ class Trending_tab extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [HelpPage]
+class Help extends PageRouteInfo<void> {
+  const Help({List<PageRouteInfo>? children})
+      : super(
+          Help.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Help';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [ProfilePage]
 class Profile extends PageRouteInfo<void> {
   const Profile({List<PageRouteInfo>? children})
@@ -350,34 +412,6 @@ class Profile extends PageRouteInfo<void> {
         );
 
   static const String name = 'Profile';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [SettingsPage]
-class Setting extends PageRouteInfo<void> {
-  const Setting({List<PageRouteInfo>? children})
-      : super(
-          Setting.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Setting';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [ServerHomePage]
-class Server_home extends PageRouteInfo<void> {
-  const Server_home({List<PageRouteInfo>? children})
-      : super(
-          Server_home.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Server_home';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -422,6 +456,20 @@ class Server_chatroomArgs {
 }
 
 /// generated route for
+/// [ServerHomePage]
+class Server_home extends PageRouteInfo<void> {
+  const Server_home({List<PageRouteInfo>? children})
+      : super(
+          Server_home.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Server_home';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [ServerMessagesPage]
 class Server_messages extends PageRouteInfo<void> {
   const Server_messages({List<PageRouteInfo>? children})
@@ -436,43 +484,15 @@ class Server_messages extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [LoginPage]
-class Login extends PageRouteInfo<void> {
-  const Login({List<PageRouteInfo>? children})
+/// [SettingsPage]
+class Setting extends PageRouteInfo<void> {
+  const Setting({List<PageRouteInfo>? children})
       : super(
-          Login.name,
+          Setting.name,
           initialChildren: children,
         );
 
-  static const String name = 'Login';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [RegisterPage]
-class Register extends PageRouteInfo<void> {
-  const Register({List<PageRouteInfo>? children})
-      : super(
-          Register.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Register';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [HelpPage]
-class Help extends PageRouteInfo<void> {
-  const Help({List<PageRouteInfo>? children})
-      : super(
-          Help.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Help';
+  static const String name = 'Setting';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

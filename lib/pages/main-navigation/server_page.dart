@@ -46,35 +46,37 @@ class _ServersPageState extends State<ServersPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AutoTabsRouter.tabBar(
-      routes: [
-        const Server_home(),
-        const Server_messages(),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-        Server_chatroom(sid: sid[0]),
-        Server_chatroom(sid: sid[1]),
-        Server_chatroom(sid: sid[2]),
-      ],
-      animatePageTransition: false,
-      builder: (context, child, tabController) {
-        final tabsRouter = AutoTabsRouter.of(context);
-        tabController.index = tabsRouter.activeIndex;
-        return buildServerRoom(tabsRouter, child, tabController);
-      },
+    return SafeArea(
+      child: AutoTabsRouter.tabBar(
+        routes: [
+          const Server_home(),
+          const Server_messages(),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+          Server_chatroom(sid: sid[0]),
+          Server_chatroom(sid: sid[1]),
+          Server_chatroom(sid: sid[2]),
+        ],
+        animatePageTransition: false,
+        builder: (context, child, tabController) {
+          final tabsRouter = AutoTabsRouter.of(context);
+          tabController.index = tabsRouter.activeIndex;
+          return buildServerRoom(tabsRouter, child, tabController);
+        },
+      ),
     );
   }
 

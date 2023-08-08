@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/main.dart';
 import 'package:social_app/pages/auth/login_page.dart';
 import 'package:social_app/pages/auth/register_page.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
@@ -27,15 +28,18 @@ part 'app_router.gr.dart';
 class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
-        // Auth Routes /////////////////////////////////////////////////////////
+        // Inital Route
+        RedirectRoute(path: '/', redirectTo: '/login'),
         AutoRoute(
-          page: Login.page,
-          path: '/login',
+          page: Auth.page,
+          path: '/auth',
           initial: true,
         ),
+        // Auth Routes /////////////////////////////////////////////////////////
+        AutoRoute(page: Login.page, path: '/login'),
         AutoRoute(page: Register.page, path: '/register'),
         // Main Routes /////////////////////////////////////////////////////////
-        AutoRoute(page: Main.page, path: '/', children: [
+        AutoRoute(page: Main.page, path: '/main', children: [
           // Home
           CustomRoute(
               page: Home.page,
@@ -66,6 +70,7 @@ class AppRouter extends _$AppRouter {
               path: ':sid',
             ),
           ]),
+          RedirectRoute(path: '*', redirectTo: ''),
         ]),
         // Profile /////////////////////////////////////////////////////////////
         AutoRoute(page: Profile.page, path: '/profile'),
