@@ -1,8 +1,15 @@
 import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constants/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
@@ -18,25 +25,51 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   bool _extended = false;
+  bool loadingState = false;
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  getData() async {
+    setState(() {
+      loadingState = true;
+    });
+    try {
+      UserProvider userProvider = Provider.of(context, listen: false);
+      await userProvider.refreshUser();
+    } catch (e) {
+      print(e);
+    }
+    setState(() {
+      loadingState = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return AutoTabsRouter(
-        routes: [
-          const Home(),
-          const Explore(),
-          const Activity(),
-          Servers(),
-        ],
-        homeIndex: 0,
-        duration: Duration.zero,
-        builder: (context, child) {
-          final tabsRouter = AutoTabsRouter.of(context);
-          return buildRoute(tabsRouter, child, constraints.maxWidth);
-        },
-      );
-    });
+    return loadingState
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : LayoutBuilder(builder: (context, constraints) {
+            return AutoTabsRouter(
+              routes: [
+                const Home(),
+                const Explore(),
+                const Activity(),
+                Servers(),
+              ],
+              homeIndex: 0,
+              duration: Duration.zero,
+              builder: (context, child) {
+                final tabsRouter = AutoTabsRouter.of(context);
+                return buildRoute(tabsRouter, child, constraints.maxWidth);
+              },
+            );
+          });
   }
 
   Widget buildRoute(TabsRouter tabsRouter, Widget child, double constraints) {
@@ -192,7 +225,7 @@ class _MainPageState extends State<MainPage> {
                                 onlyOnExtended: true,
                                 menuItemIcon: Icons.logout_rounded,
                                 menuLabel: "Logout",
-                                itemRoute: 'profile',
+                                itemRoute: '',
                               ),
                             ),
                           ],
@@ -259,6 +292,7 @@ class LeadingExtendedRail extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    UserModel userProvider = Provider.of<UserProvider>(context).getUser;
     final Animation<double> animation =
         NavigationRail.extendedAnimation(context);
     return AnimatedBuilder(
@@ -273,9 +307,13 @@ class LeadingExtendedRail extends StatelessWidget {
                   horizontal: lerpDouble(0, 7, animation.value)!,
                   vertical: lerpDouble(0, 7, animation.value)!,
                 ),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: CachedNetworkImageProvider(
+                        userProvider.profileUrl,
+                      ),
+                      fit: BoxFit.cover),
+                  borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
                 ),
@@ -304,10 +342,15 @@ class LeadingExtendedRail extends StatelessWidget {
                             Container(
                               height: 80,
                               width: 80,
-                              decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  color: secondaryColor),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                image: DecorationImage(
+                                    image: CachedNetworkImageProvider(
+                                      userProvider.profileUrl,
+                                    ),
+                                    fit: BoxFit.cover),
+                              ),
                             ),
                             Row(
                               children: [
@@ -328,7 +371,7 @@ class LeadingExtendedRail extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'Name',
+                          userProvider.name,
                           style: TextStyle(
                               fontSize: Theme.of(context)
                                   .textTheme
@@ -337,7 +380,7 @@ class LeadingExtendedRail extends StatelessWidget {
                         ),
                         Container(
                           padding: const EdgeInsets.only(left: 4),
-                          child: const Text('@username'),
+                          child: Text(userProvider.username),
                         ),
                       ],
                     )),
@@ -378,8 +421,19 @@ class ExtendedSubMenuRail extends StatelessWidget {
           child: animation.value == 0
               ? !onlyOnExtended
                   ? IconButton(
-                      onPressed: () {
-                        context.router.pushNamed(itemRoute);
+                      onPressed: () async {
+                        if (menuLabel == 'Logout') {
+                          FirebaseAuth.instance.signOut();
+                          SharedPreferences pref =
+                              await SharedPreferences.getInstance();
+                          pref.clear();
+                          context.router.navigateNamed('/');
+                        } else if (menuLabel == 'Profile') {
+                          context.router.pushNamed(
+                              '/profile/${FirebaseAuth.instance.currentUser!.uid}');
+                        } else {
+                          context.router.pushNamed(itemRoute);
+                        }
                       },
                       icon: Icon(
                         menuItemIcon,
@@ -390,11 +444,23 @@ class ExtendedSubMenuRail extends StatelessWidget {
               : Align(
                   alignment: AlignmentDirectional.centerStart,
                   widthFactor: animation.value,
-                  child: Container(
+                  child: SizedBox(
                     width: 200,
                     child: ListTile(
-                      onTap: () {
-                        context.router.pushNamed(itemRoute);
+                      onTap: () async {
+                        // Logout
+                        if (menuLabel == 'Logout') {
+                          FirebaseAuth.instance.signOut();
+                          SharedPreferences pref =
+                              await SharedPreferences.getInstance();
+                          pref.clear();
+                          context.router.navigateNamed('/');
+                        } else if (menuLabel == 'Profile') {
+                          context.router.pushNamed(
+                              '/profile/${FirebaseAuth.instance.currentUser!.uid}');
+                        } else {
+                          context.router.pushNamed(itemRoute);
+                        }
                       },
                       titleAlignment: ListTileTitleAlignment.titleHeight,
                       leading: Icon(menuItemIcon),

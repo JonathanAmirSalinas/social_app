@@ -21,6 +21,7 @@ import 'package:social_app/pages/sub-navigation/server/svr_chatroom_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_home_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_message_page.dart';
 import 'package:social_app/pages/sub-navigation/settings_page.dart';
+import 'package:social_app/router/app_router_guard.dart';
 
 part 'app_router.gr.dart';
 
@@ -29,53 +30,94 @@ class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
         // Inital Route
-        RedirectRoute(path: '/', redirectTo: '/login'),
+        RedirectRoute(path: '/', redirectTo: '/main'),
+        RedirectRoute(path: '/login', redirectTo: '/auth'),
         AutoRoute(
           page: Auth.page,
           path: '/auth',
           initial: true,
         ),
         // Auth Routes /////////////////////////////////////////////////////////
-        AutoRoute(page: Login.page, path: '/login'),
-        AutoRoute(page: Register.page, path: '/register'),
+        AutoRoute(page: Login.page, path: '/login', maintainState: false),
+        AutoRoute(page: Register.page, path: '/register', maintainState: false),
         // Main Routes /////////////////////////////////////////////////////////
-        AutoRoute(page: Main.page, path: '/main', children: [
-          // Home
-          CustomRoute(
-              page: Home.page,
-              path: 'home',
-              transitionsBuilder: TransitionsBuilders.noTransition),
-          // Explore
-          CustomRoute(
-              page: Explore.page,
-              path: 'explore',
-              transitionsBuilder: TransitionsBuilders.noTransition,
-              children: [
-                AutoRoute(page: Trending_tab.page, path: 'trending'),
-                AutoRoute(page: News_tab.page, path: 'news'),
-                AutoRoute(page: Media_tab.page, path: 'media'),
-                AutoRoute(page: Servers_tab.page, path: 'servers')
+        AutoRoute(
+            page: Main.page,
+            path: '/main',
+            guards: [AuthGuard()],
+            keepHistory: true,
+            children: [
+              // Home
+              CustomRoute(
+                  page: Home.page,
+                  path: 'home',
+                  guards: [AuthGuard()],
+                  transitionsBuilder: TransitionsBuilders.noTransition),
+              // Explore
+              CustomRoute(
+                  page: Explore.page,
+                  path: 'explore',
+                  guards: [AuthGuard()],
+                  transitionsBuilder: TransitionsBuilders.noTransition,
+                  children: [
+                    AutoRoute(
+                      page: Trending_tab.page,
+                      path: 'trending',
+                    ),
+                    AutoRoute(
+                      page: News_tab.page,
+                      path: 'news',
+                    ),
+                    AutoRoute(
+                      page: Media_tab.page,
+                      path: 'media',
+                    ),
+                    AutoRoute(
+                      page: Servers_tab.page,
+                      path: 'servers',
+                    )
+                  ]),
+              // Activity
+              AutoRoute(page: Activity.page, path: 'activity', guards: [
+                AuthGuard()
+              ], children: [
+                AutoRoute(
+                  page: Notification_tab.page,
+                  path: 'notifications',
+                ),
+                AutoRoute(
+                  page: Mentions_tab.page,
+                  path: 'mentions',
+                ),
               ]),
-          // Activity
-          AutoRoute(page: Activity.page, path: 'activity', children: [
-            AutoRoute(page: Notification_tab.page, path: 'notifications'),
-            AutoRoute(page: Mentions_tab.page, path: 'mentions'),
-          ]),
-          // Servers
-          AutoRoute(page: Servers.page, path: 'servers', children: [
-            AutoRoute(page: Server_home.page, path: 'home'),
-            AutoRoute(page: Server_messages.page, path: 'messages'),
-            AutoRoute(
-              page: Server_chatroom.page,
-              path: ':sid',
-            ),
-          ]),
-          RedirectRoute(path: '*', redirectTo: ''),
-        ]),
+              // Servers
+              AutoRoute(page: Servers.page, path: 'servers', children: [
+                AutoRoute(
+                  page: Server_home.page,
+                  path: 'home',
+                ),
+                AutoRoute(
+                  page: Server_messages.page,
+                  path: 'messages',
+                ),
+                AutoRoute(
+                  page: Server_chatroom.page,
+                  path: ':sid',
+                ),
+              ]),
+              RedirectRoute(path: '*', redirectTo: ''),
+            ]),
         // Profile /////////////////////////////////////////////////////////////
-        AutoRoute(page: Profile.page, path: '/profile'),
+        AutoRoute(
+          page: Profile.page,
+          path: '/profile/:uid',
+        ),
         // Bookmark ////////////////////////////////////////////////////////////
-        AutoRoute(page: Bookmark.page, path: '/bookmark'),
+        AutoRoute(
+          page: Bookmark.page,
+          path: '/bookmark',
+          keepHistory: false,
+        ),
         // Settings ////////////////////////////////////////////////////////////
         AutoRoute(page: Setting.page, path: '/settings'),
         // Help ////////////////////////////////////////////////////////////
