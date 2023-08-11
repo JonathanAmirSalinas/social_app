@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/constants/constants.dart';
+import 'package:social_app/services/auth_services.dart';
 
 @RoutePage(name: 'register')
 class RegisterPage extends StatefulWidget {
@@ -18,21 +20,51 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  late int _index = 0;
+  int _index = 0;
   final _formOneKey = GlobalKey<FormState>();
   final _formTwoKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final accountSetUpFormKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
-  String name = "";
+  String name = '';
   final usernameController = TextEditingController();
-  late String username;
-  File? imageGal;
+  String username = '';
+  File? imageGal; // Mobile
+  Uint8List? imageBytes; // Web
 
-  Future pickImage() async {
+  // Web Image/File Picker using Uint8List bytes
+  Future pickWebImage() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'png', 'webm'],
+          allowMultiple: false);
+
+      Uint8List bytes;
+
+      if (result != null) {
+        bytes = result.files.first.bytes!;
+        imageBytes = bytes;
+        setState(() {
+          //imageGal = imagee;
+          imageBytes = bytes;
+        });
+
+        //imagee = await _cropWebImage(image: file);
+      } else {
+        // User canceled the picker
+        return;
+      }
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  // Mobile Image/File Picker using File
+  Future pickMobileImage() async {
+    try {
+      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return;
 
       File imageTemp = File(image.path);
@@ -44,10 +76,26 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  // Might not implement since Web Image/File is in bytes and has no path
+  Future<File> _cropWebImage({required File image}) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [
+          WebUiSettings(
+            context: context,
+          )
+        ]);
+    if (croppedImage == null) return image;
+    return File(croppedImage.path);
+  }
+
+  // Mobile Image Cropper
   Future<File> _cropImage({required File image}) async {
     CroppedFile? croppedImage = await ImageCropper().cropImage(
         sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3));
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
     if (croppedImage == null) return image;
     return File(croppedImage.path);
   }
@@ -93,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                       icon: const Icon(Icons.arrow_back_rounded));
                 }),
-                title: const Text("Account Setup"),
+                title: Text(MediaQuery.of(context).size.width.toString()),
               ),
         body: registerForm(),
       ),
@@ -118,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
 // First register Step (Email, Password)
   Widget registerFormOne() {
     return LayoutBuilder(builder: (context, constraints) {
-      return constraints.maxWidth > mobileScreenSize
+      return constraints.maxWidth > 830
           ? buildWebRegisterFormOne()
           : buildMobileRegisterFormOne();
     });
@@ -235,7 +283,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text("Already have an account?"),
                     TextButton(
-                      onPressed: () => context.router.pushNamed('/login'),
+                      onPressed: () => context.router.navigateNamed('/'),
                       child: const Text(
                         "Log In",
                         style: TextStyle(
@@ -322,115 +370,119 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Mobile Register Form One (Email, Password)
   buildMobileRegisterFormOne() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _formOneKey,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Social App',
-                style: TextStyle(
-                    fontSize:
-                        Theme.of(context).textTheme.headlineLarge!.fontSize),
-              ),
-              const SizedBox(
-                height: 120,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (email) =>
-                              email != null && !EmailValidator.validate(email)
-                                  ? 'Enter a valid email'
-                                  : null,
-                          controller: emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
+    return Center(
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formOneKey,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Social App',
+                  style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.headlineLarge!.fontSize),
+                ),
+                const SizedBox(
+                  height: 120,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          child: TextFormField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (email) =>
+                                email != null && !EmailValidator.validate(email)
+                                    ? 'Enter a valid email'
+                                    : null,
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
-                      ),
-                    ]),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: passwordController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: ((password) =>
-                              password != null && password.length < 6
-                                  ? 'Password must be at least be 6 characters'
-                                  : null),
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
+                      ]),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          child: TextFormField(
+                            controller: passwordController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: ((password) => password != null &&
+                                    password.length < 6
+                                ? 'Password must be at least be 6 characters'
+                                : null),
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Password',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
-                      ),
-                    ]),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  shape: const ContinuousRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4))),
-                  minimumSize: const Size.fromHeight(50),
+                      ]),
                 ),
-                icon: const Icon(Icons.align_horizontal_right_sharp),
-                label: const Text(
-                  "Sign Up",
-                  style: TextStyle(fontSize: 20),
+                const SizedBox(
+                  height: 20,
                 ),
-                onPressed: () {
-                  if (_formOneKey.currentState!.validate()) {
-                    setState(() {
-                      _index = 1;
-                    });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(4),
-                                topRight: Radius.circular(4))),
-                        backgroundColor: Colors.red,
-                        content: Text(
-                          'Input Error... Please check the Email and Password provided',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        )));
-                  }
-                },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Already have an account?"),
-                  TextButton(
-                    onPressed: () => context.router.pushNamed('/login'),
-                    child: const Text(
-                      "Log In",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline, fontSize: 16),
-                    ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4))),
+                    minimumSize: const Size.fromHeight(50),
                   ),
-                ],
-              )
-            ],
+                  icon: const Icon(Icons.align_horizontal_right_sharp),
+                  label: const Text(
+                    "Sign Up",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onPressed: () {
+                    if (_formOneKey.currentState!.validate()) {
+                      setState(() {
+                        _index = 1;
+                      });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          shape: BeveledRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(4),
+                                  topRight: Radius.circular(4))),
+                          backgroundColor: Colors.red,
+                          content: Text(
+                            'Input Error... Please check the Email and Password provided',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          )));
+                    }
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Already have an account?"),
+                    TextButton(
+                      onPressed: () => context.router.pushNamed('/login'),
+                      child: const Text(
+                        "Log In",
+                        style: TextStyle(
+                            decoration: TextDecoration.underline, fontSize: 16),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -439,7 +491,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   registerFormTwo() {
     return LayoutBuilder(builder: (context, constraints) {
-      return constraints.maxWidth > mobileScreenSize
+      return constraints.maxWidth > 830
           ? buildWebRegisterFormTwo()
           : buildMobileRegisterFormTwo();
     });
@@ -467,21 +519,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 200,
                   width: 250,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    /*image: DecorationImage(
-                      image: imageGal != null
-                          ? FileImage(imageGal!) as ImageProvider
-                          : const AssetImage('lib/assets/account.jpg'),
-                      fit: BoxFit.cover),*/
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    image: imageBytes != null
+                        ? DecorationImage(
+                            image: MemoryImage(imageBytes!), fit: BoxFit.cover)
+                        : const DecorationImage(
+                            image: AssetImage('lib/assets/default.png'),
+                            fit: BoxFit.contain),
                     color: Colors.white,
-                  ),
-                  child: Text(
-                    name.isEmpty ? '' : name[0].toUpperCase(),
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize:
-                            Theme.of(context).textTheme.displayLarge!.fontSize),
                   ),
                 ),
                 Row(
@@ -492,13 +538,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: TextButton(
                         child: const Text("Change profile picture"),
                         onPressed: () {
-                          pickImage();
+                          pickWebImage();
                         },
                       ),
                     )
                   ],
                 ),
-                // Name TextField
+                // Web Name TextField
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                   child: Row(
@@ -527,7 +573,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ]),
                 ),
-                // Username TextField
+                // Web Username TextField
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                   child: Row(
@@ -576,9 +622,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: TextStyle(fontSize: 20),
                   ),
                   onPressed: () async {
-                    //completeAccountSetup();
-                    // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User is Signed In")));
-                    context.router.root.pushNamed('/main');
+                    completeAccountSetup();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("User account was created")));
+                    // Return AuthScreen (Login)
+                    context.router.root.pushNamed('/');
                   },
                 ),
               ],
@@ -616,24 +664,18 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: 200,
                               width: 250,
                               alignment: Alignment.center,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                /*image: DecorationImage(
-                            image: imageGal != null
-                                ? FileImage(imageGal!) as ImageProvider
-                                : const AssetImage('lib/assets/account.jpg'),
-                            fit: BoxFit.cover),*/
+                                    const BorderRadius.all(Radius.circular(10)),
+                                image: imageBytes != null
+                                    ? DecorationImage(
+                                        image: MemoryImage(imageBytes!),
+                                        fit: BoxFit.cover)
+                                    : const DecorationImage(
+                                        image: AssetImage(
+                                            'lib/assets/default.png'),
+                                        fit: BoxFit.contain),
                                 color: Colors.white,
-                              ),
-                              child: Text(
-                                name.isEmpty ? '' : name[0].toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .displayLarge!
-                                        .fontSize),
                               ),
                             ),
                             Text(
@@ -647,7 +689,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             Text(
                               usernameController.text.isEmpty
                                   ? '@username'
-                                  : username,
+                                  : '@$username',
                               style: TextStyle(
                                   fontSize: Theme.of(context)
                                       .textTheme
@@ -713,15 +755,19 @@ class _RegisterPageState extends State<RegisterPage> {
             children: <Widget>[
               Text(emailController.text),
               Container(
-                height: 250,
-                width: 300,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  /*image: DecorationImage(
-                      image: imageGal != null
-                          ? FileImage(imageGal!) as ImageProvider
-                          : const AssetImage('lib/assets/account.jpg'),
-                      fit: BoxFit.cover),*/
+                height: 200,
+                width: 250,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  image: imageBytes != null
+                      ? DecorationImage(
+                          image: MemoryImage(imageBytes!), fit: BoxFit.cover)
+                      : imageGal != null
+                          ? DecorationImage(
+                              image: FileImage(imageGal!), fit: BoxFit.cover)
+                          : const DecorationImage(
+                              image: AssetImage('lib/assets/default.png'),
+                              fit: BoxFit.contain),
                   color: Colors.white,
                 ),
               ),
@@ -732,13 +778,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
                     child: TextButton(
                       child: const Text("Change profile picture"),
-                      onPressed: () {
-                        pickImage();
+                      onPressed: () async {
+                        pickMobileImage();
                       },
                     ),
                   )
                 ],
               ),
+              // Mobile Name TextField
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                 child: Row(
@@ -766,6 +813,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ]),
               ),
+              // Mobile Username TextField
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                 child: Row(
@@ -820,6 +868,7 @@ class _RegisterPageState extends State<RegisterPage> {
   /// Completes the Account Setup Process //////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
   Future<void> completeAccountSetup() async {
+    // Validate that data isNotEmpty and that the username is not taken
     //final isValid = accountSetUpFormKey.currentState!.validate();
     //if (!isValid) return;
 
@@ -830,106 +879,17 @@ class _RegisterPageState extends State<RegisterPage> {
               child: CircularProgressIndicator(),
             ));
     try {
-      /*await FBAuth().userSignUp(
-          email: emailTextEditingController.text,
-          password: passwordTextEditingController.text,
+      await AuthServices().registerUser(
+          email: emailController.text,
+          password: passwordController.text,
           name: nameController.text,
           username: usernameController.text,
-          imageFile: imageGal!);*/
+          imageFile: imageGal,
+          imageBytes: imageBytes);
+      // Logout after account has been created
+      await FirebaseAuth.instance.signOut();
     } on FirebaseException catch (e) {
       print(e);
     }
   }
 }
-
-/* Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (email) =>
-                              email != null && !EmailValidator.validate(email)
-                                  ? 'Enter a valid email'
-                                  : null,
-                          controller: emailTextEditingController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ]),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: passwordTextEditingController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: ((password) =>
-                              password != null && password.length < 6
-                                  ? 'Password must be at least be 6 characters'
-                                  : null),
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ]),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  shape: const ContinuousRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4))),
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                icon: const Icon(Icons.align_horizontal_right_sharp),
-                label: const Text(
-                  "Sign Up",
-                  style: TextStyle(fontSize: 20),
-                ),
-                onPressed: () {
-                  if (_formOneKey.currentState!.validate()) {
-                    setState(() {
-                      _index = 1;
-                    });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(4),
-                                topRight: Radius.circular(4))),
-                        backgroundColor: Colors.red,
-                        content: Text(
-                          'Input Error... Please check the Email and Password provided',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        )));
-                  }
-                },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Already have an account?"),
-                  TextButton(
-                    onPressed: () => context.router.pushNamed('/login'),
-                    child: const Text(
-                      "Log In",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ) */

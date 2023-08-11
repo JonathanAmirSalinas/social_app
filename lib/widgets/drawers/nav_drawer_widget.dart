@@ -1,3 +1,5 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +155,10 @@ class SliverNavigationDrawer extends StatelessWidget {
                 "Logout",
                 style: TextStyle(fontSize: 18),
               ),
-              onTap: () {},
+              onTap: () {
+                FirebaseAuth.instance.signOut();
+                context.router.root.pushNamed('/');
+              },
             ),
           )
         ],

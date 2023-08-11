@@ -22,9 +22,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Login.name: (routeData) {
+      final args = routeData.argsAs<LoginArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const LoginPage(),
+        child: LoginPage(
+          key: args.key,
+          onResult: args.onResult,
+        ),
       );
     },
     Register.name: (routeData) {
@@ -117,9 +121,15 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Profile.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<ProfileArgs>(
+          orElse: () => ProfileArgs(uid: pathParams.getString('uid')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const ProfilePage(),
+        child: ProfilePage(
+          key: args.key,
+          uid: args.uid,
+        ),
       );
     },
     Server_chatroom.name: (routeData) {
@@ -171,16 +181,39 @@ class Auth extends PageRouteInfo<void> {
 
 /// generated route for
 /// [LoginPage]
-class Login extends PageRouteInfo<void> {
-  const Login({List<PageRouteInfo>? children})
-      : super(
+class Login extends PageRouteInfo<LoginArgs> {
+  Login({
+    Key? key,
+    required dynamic Function(bool?) onResult,
+    List<PageRouteInfo>? children,
+  }) : super(
           Login.name,
+          args: LoginArgs(
+            key: key,
+            onResult: onResult,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'Login';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<LoginArgs> page = PageInfo<LoginArgs>(name);
+}
+
+class LoginArgs {
+  const LoginArgs({
+    this.key,
+    required this.onResult,
+  });
+
+  final Key? key;
+
+  final dynamic Function(bool?) onResult;
+
+  @override
+  String toString() {
+    return 'LoginArgs{key: $key, onResult: $onResult}';
+  }
 }
 
 /// generated route for
@@ -404,16 +437,40 @@ class Help extends PageRouteInfo<void> {
 
 /// generated route for
 /// [ProfilePage]
-class Profile extends PageRouteInfo<void> {
-  const Profile({List<PageRouteInfo>? children})
-      : super(
+class Profile extends PageRouteInfo<ProfileArgs> {
+  Profile({
+    Key? key,
+    required String uid,
+    List<PageRouteInfo>? children,
+  }) : super(
           Profile.name,
+          args: ProfileArgs(
+            key: key,
+            uid: uid,
+          ),
+          rawPathParams: {'uid': uid},
           initialChildren: children,
         );
 
   static const String name = 'Profile';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<ProfileArgs> page = PageInfo<ProfileArgs>(name);
+}
+
+class ProfileArgs {
+  const ProfileArgs({
+    this.key,
+    required this.uid,
+  });
+
+  final Key? key;
+
+  final String uid;
+
+  @override
+  String toString() {
+    return 'ProfileArgs{key: $key, uid: $uid}';
+  }
 }
 
 /// generated route for

@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constants/constants.dart';
 
 @RoutePage(name: 'login')
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final Function(bool?) onResult;
+  const LoginPage({super.key, required this.onResult});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -14,6 +16,30 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  // Login Function
+  Future logIn() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ));
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim());
+      // Save Auth State in pref
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setBool('authenticated', true);
+      // Nav
+      widget.onResult.call(true);
+    } on FirebaseException catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message!)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   onPressed: () async {
                     logIn();
-                    //Navigator.of(context).pushReplacementNamed('/');
+                    context.router.pushNamed('/main');
                   }),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -256,8 +282,8 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(fontSize: 20),
                     ),
                     onPressed: () {
-                      //logIn();
-                      //Navigator.of(context).pushReplacementNamed('/');
+                      logIn();
+                      context.router.pushNamed('/main');
                     }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -282,113 +308,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  // Login Function
-  Future logIn() async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-              child: CircularProgressIndicator(),
-            ));
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim());
-    } on FirebaseException catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message!)));
-    }
-  }
 }
-
-/*Scaffold(
-      body: Center(
-        child: Container(
-          height: double.infinity,
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Social App',
-                style: TextStyle(
-                    fontSize:
-                        Theme.of(context).textTheme.headlineLarge!.fontSize),
-              ),
-              const SizedBox(
-                height: 120,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ]),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ]),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    shape: const ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(4))),
-                    minimumSize: const Size.fromHeight(60),
-                  ),
-                  icon: const Icon(Icons.align_horizontal_right_sharp),
-                  label: const Text(
-                    "Sign In",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onPressed: () async {
-                    logIn();
-                    //Navigator.of(context).pushReplacementNamed('/');
-                  }),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("No Account?"),
-                  TextButton(
-                    onPressed: () {
-                      context.router.pushNamed('/register');
-                    },
-                    child: const Text(
-                      "Signup",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline, fontSize: 16),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    ); */

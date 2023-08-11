@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 
 void main() async {
@@ -21,29 +24,42 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+//final navigatorKey = GlobalKey<NavigatorState>();
 
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // Autorouter
   final appRouter = AppRouter();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Social App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        //canvasColor: const Color.fromARGB(208, 113, 70, 55),
-        //cardColor: const Color.fromARGB(208, 113, 70, 55),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 32, 32, 32),
-        ),
-      ),
-      routerConfig: appRouter.config(),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<UserProvider>(
+              create: (context) => UserProvider()),
+        ],
+        child: MaterialApp.router(
+          title: 'Social App',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            //canvasColor: const Color.fromARGB(208, 113, 70, 55),
+            //cardColor: const Color.fromARGB(208, 113, 70, 55),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color.fromARGB(255, 32, 32, 32),
+            ),
+          ),
+          routerConfig: appRouter.config(),
+        ));
   }
 }
 
@@ -57,6 +73,12 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  setSharedPreference() async {
+    // Save Auth State in pref
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('authenticated', true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -66,9 +88,8 @@ class _AuthPageState extends State<AuthPage> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.active) {
               if (snapshot.hasData) {
-                context.router.root.pushNamed('/');
-              } else {
-                context.router.root.pushNamed('/main');
+                //setSharedPreference();
+                context.router.pushNamed('/');
               }
             } else if (snapshot.hasError) {
               return const Center(child: Text("System Error"));
@@ -77,7 +98,7 @@ class _AuthPageState extends State<AuthPage> {
                 child: CircularProgressIndicator(color: Colors.blueAccent),
               );
             }
-            return MyApp();
+            return const MyApp();
           },
         ),
       ),
