@@ -9,6 +9,8 @@ import 'package:social_app/constants/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
+import 'package:social_app/pages/sub-navigation/post/create_post_page.dart';
+import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
@@ -40,6 +42,8 @@ class _MainPageState extends State<MainPage> {
     try {
       UserProvider userProvider = Provider.of(context, listen: false);
       await userProvider.refreshUser();
+      FeedProvider feedProvider = Provider.of(context, listen: false);
+      await feedProvider.getUserFeed();
     } catch (e) {
       print(e);
     }
@@ -78,7 +82,7 @@ class _MainPageState extends State<MainPage> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        backgroundColor: primaryColor,
+        backgroundColor: backgroundColor,
         drawer: const SliverNavigationDrawer(),
         body: Row(
           children: [
@@ -271,7 +275,11 @@ class _MainPageState extends State<MainPage> {
       width: 50,
       child: FloatingActionButton(
         onPressed: () {
-          //Navigator.of(context).pushNamed('/createpost');
+          showDialog(
+              context: context,
+              builder: ((context) {
+                return const CreatePostPage();
+              }));
         },
         tooltip: "Create Post",
         backgroundColor: navBarColor,

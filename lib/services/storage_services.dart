@@ -10,13 +10,17 @@ class StorageServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<String> uploadImageFileToStorage(
-      String fileLocation, File file) async {
-    Reference ref =
-        storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+      String fileLocation, File file, String pid) async {
+    Reference ref = storage
+        .ref()
+        .child(fileLocation)
+        .child(_auth.currentUser!.uid); //// Change too Unique user/server ID
 
     // File Organization
     if (fileLocation == 'user_post_images') {
       String pid = const Uuid().v1();
+      ref = ref.child(pid);
+    } else if (fileLocation == 'user_media') {
       ref = ref.child(pid);
     }
 
@@ -30,13 +34,17 @@ class StorageServices {
   }
 
   Future<String> uploadImageBytesToStorage(
-      String fileLocation, Uint8List file) async {
-    Reference ref =
-        storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+      String fileLocation, Uint8List file, String pid) async {
+    Reference ref = storage
+        .ref()
+        .child(fileLocation)
+        .child(_auth.currentUser!.uid); //// Change too Unique user/server ID
 
     // File Organization
     if (fileLocation == 'user_post_images') {
-      String pid = const Uuid().v1();
+      String uUid = const Uuid().v1();
+      ref = ref.child(uUid);
+    } else if (fileLocation == 'user_media') {
       ref = ref.child(pid);
     }
 

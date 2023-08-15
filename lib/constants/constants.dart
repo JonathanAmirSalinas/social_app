@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
@@ -15,7 +16,7 @@ const navServerBar = Color.fromARGB(255, 63, 63, 63);
 const primaryColor = Color.fromARGB(125, 0, 0, 0);
 const secondaryColor = Color.fromARGB(255, 225, 170, 255);
 const secondaryColorFaded = Color.fromARGB(199, 225, 170, 255);
-const backgroundColor = Color.fromARGB(125, 0, 0, 0);
+const backgroundColor = Color.fromARGB(160, 0, 0, 0);
 const fillColor = Color.fromARGB(255, 85, 85, 85);
 const cardColor = Color.fromARGB(255, 255, 0, 0);
 
@@ -79,4 +80,136 @@ Widget? isSmallPage(BuildContext context, String widgetName) {
   } else {
     return Container();
   }
+}
+
+buildProfileImage(BuildContext context, String url) {
+  return Container(
+    height: 55,
+    width: 55,
+    margin: const EdgeInsets.only(right: 6),
+    decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        image: DecorationImage(
+            image: CachedNetworkImageProvider(url), fit: BoxFit.cover)),
+  );
+}
+
+buildUserTile(
+    BuildContext context, String name, String username, int timestamp) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                ),
+              ),
+              Text(
+                ' \u2022 Date',
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                ),
+              )
+            ],
+          ),
+          Text(
+            username,
+            style: TextStyle(
+                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+buildIconSection(BuildContext context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Like Icon
+          IconButton(
+            onPressed: () {},
+            padding: const EdgeInsets.symmetric(horizontal: 1),
+            constraints: const BoxConstraints(),
+            icon: const Icon(
+              Icons.favorite_outline_rounded,
+              size: 16,
+              color: Colors.white54,
+            ),
+            splashRadius: 16,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              '0',
+              style: TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * .02,
+          ),
+          // Comment Icon
+          IconButton(
+            onPressed: () {},
+            padding: const EdgeInsets.symmetric(horizontal: 1),
+            constraints: const BoxConstraints(),
+            icon: const Icon(
+              Icons.insert_comment_outlined,
+              size: 16,
+              color: Colors.white54,
+            ),
+            splashRadius: 16,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              '0',
+              style: TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * .02,
+          ),
+          IconButton(
+            onPressed: () {},
+            padding: const EdgeInsets.symmetric(horizontal: 1),
+            constraints: const BoxConstraints(),
+            icon: const Icon(
+              Icons.share,
+              size: 16,
+              color: Colors.white54,
+            ),
+            splashRadius: 16,
+          ),
+        ],
+      ),
+      IconButton(
+        onPressed: () {},
+        constraints: const BoxConstraints(),
+        icon: const Icon(
+          Icons.bookmark_border_outlined,
+          size: 16,
+          color: Colors.white54,
+        ),
+        splashRadius: 16,
+      ),
+    ],
+  );
 }
