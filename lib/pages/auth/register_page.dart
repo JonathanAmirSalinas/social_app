@@ -77,7 +77,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   // Might not implement since Web Image/File is in bytes and has no path
-  Future<File> _cropWebImage({required File image}) async {
+  /*Future<File> _cropWebImage({required File image}) async {
     CroppedFile? croppedImage = await ImageCropper().cropImage(
         sourcePath: image.path,
         aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
@@ -88,7 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ]);
     if (croppedImage == null) return image;
     return File(croppedImage.path);
-  }
+  }*/
 
   // Mobile Image Cropper
   Future<File> _cropImage({required File image}) async {
@@ -526,7 +526,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             image: MemoryImage(imageBytes!), fit: BoxFit.cover)
                         : const DecorationImage(
                             image: AssetImage('lib/assets/default.png'),
-                            fit: BoxFit.contain),
+                            fit: BoxFit.cover),
                     color: Colors.white,
                   ),
                 ),

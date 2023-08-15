@@ -45,11 +45,11 @@ class AuthServices {
       if (imageFile != null) {
         // Mobile File Image
         profileUrl = await StorageServices()
-            .uploadImageFileToStorage("user_profile_images", imageFile);
+            .uploadImageFileToStorage("user_profile_images", imageFile, "");
       } else {
         // Web Bytes image
         profileUrl = await StorageServices()
-            .uploadImageBytesToStorage("user_profile_images", imageBytes!);
+            .uploadImageBytesToStorage("user_profile_images", imageBytes!, "");
       }
       // Add User Account to database
       UserModel user = UserModel(

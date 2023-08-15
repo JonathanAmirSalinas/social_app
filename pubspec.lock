@@ -744,6 +744,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  loadmore_listview:
+    dependency: "direct main"
+    description:
+      name: loadmore_listview
+      sha256: abb299d8ec515eff9fc884669fa3c93f58013636c188189a2e048a343cf17073
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.7"
   logging:
     dependency: transitive
     description:

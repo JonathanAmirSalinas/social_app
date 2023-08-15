@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
         user = userProfile;
       });
     } on Exception catch (e) {
-      // TODO
+      print(e);
     }
     setState(() {
       loading = false;

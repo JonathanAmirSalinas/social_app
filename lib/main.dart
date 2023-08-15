@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 
@@ -46,6 +49,8 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider<UserProvider>(
               create: (context) => UserProvider()),
+          ChangeNotifierProvider<FeedProvider>(
+              create: (context) => FeedProvider()),
         ],
         child: MaterialApp.router(
           title: 'Social App',
@@ -57,6 +62,15 @@ class _MyAppState extends State<MyApp> {
             appBarTheme: const AppBarTheme(
               backgroundColor: Color.fromARGB(255, 32, 32, 32),
             ),
+          ),
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            scrollbars: false,
+            dragDevices: {
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.touch,
+              PointerDeviceKind.stylus,
+              PointerDeviceKind.unknown
+            },
           ),
           routerConfig: appRouter.config(),
         ));
@@ -88,7 +102,7 @@ class _AuthPageState extends State<AuthPage> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.active) {
               if (snapshot.hasData) {
-                //setSharedPreference();
+                setSharedPreference();
                 context.router.pushNamed('/');
               }
             } else if (snapshot.hasError) {
