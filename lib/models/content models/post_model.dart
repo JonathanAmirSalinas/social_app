@@ -9,7 +9,7 @@ class PostModel {
   final String postUrl;
   final bool hasMedia;
   final List likes;
-  final List comments;
+  final List<String> comments;
 
   const PostModel({
     required this.contentOwnerID,
@@ -35,7 +35,7 @@ class PostModel {
         'comments': comments,
       };
 
-  static PostModel dataFromSnap(DocumentSnapshot snap) {
+  static PostModel dataFromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
 
     return PostModel(

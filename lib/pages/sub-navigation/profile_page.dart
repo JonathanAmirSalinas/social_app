@@ -46,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: ((context, constraints) {
-      if (constraints.maxWidth <= webScreenSize) {
+      if (constraints.maxWidth <= mobileScreenSize) {
         return buildMobileProfilePage(constraints.maxWidth);
       } else {
         return buildWebProfilePage(constraints.maxWidth);

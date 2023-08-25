@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:social_app/models/post_model.dart';
+import 'package:social_app/models/content%20models/comment_model.dart';
+import 'package:social_app/models/content%20models/post_model.dart';
+import 'package:social_app/models/content%20models/repost_model.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/services/activity_services.dart';
 import 'package:social_app/services/storage_services.dart';
@@ -128,12 +130,13 @@ class ContentServices {
 
   //////////////////////////////////////////////////////////// Post Services ///
   /// Post With Media
-  Future<void> uploadMediaPost(
-      String statement, File? file, Uint8List bytes) async {
+  Future<void> uploadMediaPost(String statement, File? file, Uint8List bytes,
+      String contentType, String? ref) async {
     try {
       String postUrl;
       int time = DateTime.now().millisecondsSinceEpoch;
-      String pid = '${time}_${const Uuid().v1()}';
+      //String pid = '${time}_${const Uuid().v1()}';
+      String pid = 'p-${const Uuid().v1()}'; // 'p' Post collection indicator
 
       // Chacks if uploaded image is file or bytes format
       if (file == null) {
@@ -143,19 +146,47 @@ class ContentServices {
         postUrl = await StorageServices()
             .uploadImageFileToStorage('user_media', file, pid);
       }
+      switch (contentType) {
+        case 'post':
+          {
+            PostModel post = PostModel(
+                contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+                contentID: pid,
+                type: contentType,
+                statement: statement,
+                timestamp: time,
+                postUrl: postUrl,
+                hasMedia: true,
+                likes: [],
+                comments: []);
+            // Sets to post into the Users's posts collection
+            await _firestore.collection('posts').doc(pid).set(post.toJson());
+            break;
+          }
+        case 're_post':
+          {
+            RePostModel post = RePostModel(
+              contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+              contentID: pid,
+              referenceID: ref!,
+              type: contentType,
+              statement: statement,
+              timestamp: time,
+              postUrl: postUrl,
+              hasMedia: true,
+              likes: [],
+              comments: [],
+            );
 
-      PostModel post = PostModel(
-          contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
-          contentID: pid,
-          type: 'post',
-          statement: statement,
-          timestamp: time,
-          postUrl: postUrl,
-          hasMedia: true,
-          likes: [],
-          comments: []);
-      // Sets to post into the Users's posts collection
-      await _firestore.collection('posts').doc(pid).set(post.toJson());
+            // Sets to post into the Users's posts collection
+            await _firestore.collection('posts').doc(pid).set(post.toJson());
+            break;
+          }
+
+        default:
+          print('Post Error');
+      }
+
       // Adds new post into user's posts list
       await addPost(FirebaseAuth.instance.currentUser!.uid, pid);
     } catch (e) {
@@ -164,25 +195,54 @@ class ContentServices {
   }
 
   // Post Without Media
-  Future<void> uploadMessagePost(String statement) async {
+  Future<void> uploadMessagePost(
+      String statement, String contentType, String? ref) async {
     try {
       try {
         int time = DateTime.now().millisecondsSinceEpoch;
         // Used for quering
-        String pid = '${time}_${const Uuid().v1()}';
-        PostModel post = PostModel(
-            contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
-            contentID: pid,
-            type: 'post',
-            statement: statement,
-            timestamp: time,
-            postUrl: "",
-            hasMedia: false,
-            likes: [],
-            comments: []);
-        // Sets to post into the  posts collection
-        await _firestore.collection('posts').doc(pid).set(post.toJson());
-        //
+        //String pid = '${time}_${const Uuid().v1()}';
+        String pid = 'p-${const Uuid().v1()}'; // 'p' Post collection indicator
+        switch (contentType) {
+          case 'post':
+            {
+              PostModel post = PostModel(
+                  contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+                  contentID: pid,
+                  type: contentType,
+                  statement: statement,
+                  timestamp: time,
+                  postUrl: "",
+                  hasMedia: false,
+                  likes: [],
+                  comments: []);
+              // Sets to post into the Users's posts collection
+              await _firestore.collection('posts').doc(pid).set(post.toJson());
+              break;
+            }
+          case 're_post':
+            {
+              RePostModel post = RePostModel(
+                contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+                contentID: pid,
+                referenceID: ref!,
+                type: contentType,
+                statement: statement,
+                timestamp: time,
+                postUrl: "",
+                hasMedia: false,
+                likes: [],
+                comments: [],
+              );
+
+              // Sets to post into the Users's posts collection
+              await _firestore.collection('posts').doc(pid).set(post.toJson());
+              break;
+            }
+
+          default:
+            print('Post Error');
+        }
         await addPost(FirebaseAuth.instance.currentUser!.uid, pid);
       } catch (e) {
         print(e);
@@ -204,33 +264,61 @@ class ContentServices {
   }
 
   Future<void> deletePost() async {}
-  Future<void> likePost(String sender, String receiver, String pid) async {
-    bool isLiked = await postIsLiked(sender, receiver, pid);
+  // Like Post
+  Future<void> likePost(
+      String sender, String receiver, String pid, String type) async {
+    bool isLiked = await postIsLiked(sender, receiver, pid, type);
     try {
-      if (isLiked) {
-        await _firestore.collection('posts').doc(pid).update({
-          'likes': FieldValue.arrayRemove([sender])
-        });
+      if (type == 'comment') {
+        if (isLiked) {
+          await _firestore.collection('comments').doc(pid).update({
+            'likes': FieldValue.arrayRemove([sender])
+          });
+        } else {
+          await _firestore.collection('comments').doc(pid).update({
+            'likes': FieldValue.arrayUnion([sender])
+          });
+          // Send Notification of who like the user post
+          await ActivityServices()
+              .likeNotification(sender, receiver, pid, 'liked_post');
+        }
       } else {
-        await _firestore.collection('posts').doc(pid).update({
-          'likes': FieldValue.arrayUnion([sender])
-        });
-        // Send Notification of who like the user post
-        await ActivityServices()
-            .likeNotification(sender, receiver, pid, 'liked_post');
+        if (isLiked) {
+          await _firestore.collection('posts').doc(pid).update({
+            'likes': FieldValue.arrayRemove([sender])
+          });
+        } else {
+          await _firestore.collection('posts').doc(pid).update({
+            'likes': FieldValue.arrayUnion([sender])
+          });
+          // Send Notification of who like the user post
+          await ActivityServices()
+              .likeNotification(sender, receiver, pid, 'liked_post');
+        }
       }
     } catch (e) {
       print(e);
     }
   }
 
-  Future<bool> postIsLiked(String sender, String receiver, String pid) async {
+  // Checks if Post is Liked
+  Future<bool> postIsLiked(
+      String sender, String receiver, String pid, String type) async {
     try {
-      DocumentSnapshot snap =
-          await _firestore.collection('posts').doc(pid).get();
-      List likes = (snap.data()! as dynamic)['likes'];
-      if (likes.contains(sender)) {
-        return true;
+      if (type == 'comment') {
+        DocumentSnapshot snap =
+            await _firestore.collection('comments').doc(pid).get();
+        List likes = (snap.data()! as dynamic)['likes'];
+        if (likes.contains(sender)) {
+          return true;
+        }
+      } else {
+        DocumentSnapshot snap =
+            await _firestore.collection('posts').doc(pid).get();
+        List likes = (snap.data()! as dynamic)['likes'];
+        if (likes.contains(sender)) {
+          return true;
+        }
       }
     } catch (e) {
       print(e);
@@ -240,7 +328,109 @@ class ContentServices {
 
   Future<void> bookmarkPost() async {}
   ///////////////////////////////////////////////////////// Comment Services ///
-  Future<void> uploadComment() async {}
+  Future<void> uploadMediaComment(String referenceOwner, String referencePostID,
+      String type, String statement, File? file, Uint8List bytes) async {
+    try {
+      String commentUrl;
+      int time = DateTime.now().millisecondsSinceEpoch;
+      //String pid = '${time}_${const Uuid().v1()}';
+      String cid = 'c-${const Uuid().v1()}';
+
+      // Chacks if uploaded image is file or bytes format
+      if (file == null) {
+        commentUrl = await StorageServices()
+            .uploadImageBytesToStorage('user_media', bytes, cid);
+      } else {
+        commentUrl = await StorageServices()
+            .uploadImageFileToStorage('user_media', file, cid);
+      }
+      CommentModel comment = CommentModel(
+          contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+          contentID: cid,
+          referenceOwnerID: referenceOwner,
+          referenceID: referencePostID,
+          type: 'comment',
+          statement: statement,
+          timestamp: time,
+          commentUrl: commentUrl,
+          hasMedia: true,
+          likes: [],
+          comments: []);
+      // Sets to post into the Users's posts collection
+      await _firestore.collection('comments').doc(cid).set(comment.toJson());
+      // Adds comment id into target comment's list
+      if (type == 'comment') {
+        await _firestore.collection('comments').doc(referencePostID).update({
+          'comments': FieldValue.arrayUnion([cid])
+        });
+      } else {
+        await _firestore.collection('posts').doc(referencePostID).update({
+          'comments': FieldValue.arrayUnion([cid])
+        });
+        // Sends Notification that a user has commented on their post
+        await ActivityServices().commentNotification(
+            FirebaseAuth.instance.currentUser!.uid,
+            cid,
+            referenceOwner,
+            referencePostID,
+            'commented_post',
+            time);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> uploadMessageComment(
+    String referenceOwner,
+    String referencePostID,
+    String type,
+    String statement,
+  ) async {
+    try {
+      int time = DateTime.now().millisecondsSinceEpoch;
+      //String pid = '${time}_${const Uuid().v1()}';
+      String cid = 'c-${const Uuid().v1()}';
+
+      // Chacks if uploaded image is file or bytes format
+      CommentModel comment = CommentModel(
+          contentOwnerID: FirebaseAuth.instance.currentUser!.uid,
+          contentID: cid,
+          referenceOwnerID: referenceOwner,
+          referenceID: referencePostID,
+          type: 'comment',
+          statement: statement,
+          timestamp: time,
+          commentUrl: "",
+          hasMedia: false,
+          likes: [],
+          comments: []);
+      // Sets to post into the Users's posts collection
+      await _firestore.collection('comments').doc(cid).set(comment.toJson());
+      // Adds comment id into target comment's list
+      if (type == 'comment') {
+        await _firestore.collection('comments').doc(referencePostID).update({
+          'comments': FieldValue.arrayUnion([cid])
+        });
+      } else {
+        await _firestore.collection('posts').doc(referencePostID).update({
+          'comments': FieldValue.arrayUnion([cid])
+        });
+        // Sends Notification that a user has commented on their post
+        await ActivityServices().commentNotification(
+          FirebaseAuth.instance.currentUser!.uid,
+          cid,
+          referenceOwner,
+          referencePostID,
+          'commented_post',
+          time,
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> deleteComment() async {}
   Future<void> likeComment() async {}
   Future<void> bookmarkComment() async {}

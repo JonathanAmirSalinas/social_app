@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'Social Media App',
                           style: TextStyle(
-                              color: secondaryColorFaded,
+                              color: secondaryColor,
                               fontSize: Theme.of(context)
                                   .textTheme
                                   .headlineLarge!
@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'View, Chat, and Explore',
                             style: TextStyle(
-                                color: secondaryColorFaded,
+                                color: secondaryColor,
                                 fontSize: Theme.of(context)
                                     .textTheme
                                     .headlineMedium!
@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'version: 1',
                     style: TextStyle(
-                        color: secondaryColorFaded,
+                        color: secondaryColor,
                         fontSize:
                             Theme.of(context).textTheme.labelLarge!.fontSize,
                         fontStyle: FontStyle.italic),

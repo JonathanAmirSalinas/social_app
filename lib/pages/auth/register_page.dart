@@ -317,7 +317,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Text(
                             'Register',
                             style: TextStyle(
-                                color: secondaryColorFaded,
+                                color: secondaryColor,
                                 fontSize: Theme.of(context)
                                     .textTheme
                                     .headlineLarge!
@@ -330,7 +330,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Text(
                               'and View, Chat, and Explore with friends',
                               style: TextStyle(
-                                  color: secondaryColorFaded,
+                                  color: secondaryColor,
                                   fontSize: Theme.of(context)
                                       .textTheme
                                       .headlineMedium!
@@ -353,7 +353,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Text(
                       'version: 1',
                       style: TextStyle(
-                          color: secondaryColorFaded,
+                          color: secondaryColor,
                           fontSize:
                               Theme.of(context).textTheme.labelLarge!.fontSize,
                           fontStyle: FontStyle.italic),
@@ -646,7 +646,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Text(
                         'Preview',
                         style: TextStyle(
-                            color: secondaryColorFaded,
+                            color: secondaryColor,
                             fontSize: Theme.of(context)
                                 .textTheme
                                 .headlineMedium!
@@ -727,7 +727,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text(
                         'version: 1',
                         style: TextStyle(
-                            color: secondaryColorFaded,
+                            color: secondaryColor,
                             fontSize: Theme.of(context)
                                 .textTheme
                                 .labelLarge!

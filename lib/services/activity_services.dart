@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social_app/models/notification_model.dart';
+import 'package:social_app/models/content%20models/notification_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ActivityServices {
@@ -35,7 +35,30 @@ class ActivityServices {
   }
 
   // Comment Notification
-  Future<void> commentNotification() async {}
+  Future<void> commentNotification(String sender, String commentID,
+      String receiver, String referenceID, String type, int time) async {
+    try {
+      String nid = const Uuid().v1();
+      CommentNotificationModel notification = CommentNotificationModel(
+        cid: commentID,
+        nid: nid,
+        pid: referenceID,
+        receiver: receiver,
+        sender: sender,
+        seen: false,
+        type: type, // Type
+        timestamp: time,
+      );
+      // Sends Notification of a Comment
+      _firestore
+          .collection('users')
+          .doc(receiver)
+          .collection('notifications')
+          .doc(nid)
+          .set(notification.toJson());
+    } catch (e) {}
+  }
+
   // Mention Notification
   Future<void> mentionNotification() async {}
   // Friend Request Notification
@@ -43,7 +66,31 @@ class ActivityServices {
   // Accepted Friend Request Notification
   Future<void> acceptedFriendRequestNotification() async {}
   // New Follower Notification
-  Future<void> followNotification() async {}
+  Future<void> followNotification(
+    String receiver,
+    String pid,
+    String sender,
+  ) async {
+    try {
+      String nid = const Uuid().v1();
+      FollowNotificationModel notification = FollowNotificationModel(
+        nid: nid,
+        receiver: receiver,
+        sender: sender,
+        seen: false,
+        type: 'follow', // Type
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+      // Sends Notification of a follow
+      _firestore
+          .collection('users')
+          .doc(receiver)
+          .collection('notifications')
+          .doc(nid)
+          .set(notification.toJson());
+    } catch (e) {}
+  }
+
   // Message Notification
   Future<void> messageNotification() async {}
 }

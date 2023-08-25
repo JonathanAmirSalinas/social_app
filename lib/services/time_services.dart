@@ -15,11 +15,11 @@ String timeAgoSinceDate(int timestamp, {bool numericDates = true}) {
   } else if (difference.inHours <= 1) {
     return (numericDates) ? '1 hour ago' : 'An hour ago';
   } else if (difference.inHours < 24) {
-    return '${difference.inHours}h';
+    return '${difference.inHours} hours ago';
   } else if (difference.inDays <= 1) {
     return (numericDates) ? '1 day ago' : 'Yesterday';
   } else if (difference.inDays < 6) {
-    return '${difference.inDays}d';
+    return '${difference.inDays} days ago';
   } else if ((difference.inDays / 7).ceil() <= 1) {
     return (numericDates) ? '1 week ago' : 'Last week';
   } else if ((difference.inDays / 7).ceil() < 4) {
