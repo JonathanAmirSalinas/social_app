@@ -3,17 +3,20 @@ import 'package:social_app/services/content_services.dart';
 
 class FeedProvider with ChangeNotifier {
   List<Map<String, dynamic>> _feed = [];
+  //List<Map<String, dynamic>> _ref = [];
   late int topTimestamp;
   late int bottomTimestamp;
   bool hasMore = true;
 
   List<Map<String, dynamic>> get getFeed => _feed;
+  //List<Map<String, dynamic>> get getRef => _ref;
 
   // ?
   Future<void> setFeed() async {}
 
   //////////////////////////////////////////// Gets initial user feed (50 posts)
   Future<void> getUserFeed() async {
+    _feed.clear();
     _feed = await ContentServices().getUserFeed();
     topTimestamp = _feed[0]['timestamp']; // First Post timestamp
     bottomTimestamp =
@@ -21,12 +24,17 @@ class FeedProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> refreshPost(Map<String, dynamic> post) async {
-    int index = _feed.indexOf(post);
-    Map<String, dynamic> updatedPost =
-        await ContentServices().getUpdatedPost(post['id_content']);
+  Future<void> refreshPost(String pid) async {
+    for (int i = 0; i < _feed.length; i++) {
+      if (pid == _feed[i]['id_content']) {
+        Map<String, dynamic> updatedPost =
+            await ContentServices().getUpdatedPost(pid);
+        _feed[i] = updatedPost;
+        notifyListeners();
+        break;
+      }
+    }
 
-    _feed[index] = updatedPost;
     notifyListeners();
   }
 
@@ -47,7 +55,7 @@ class FeedProvider with ChangeNotifier {
     //
     _feed = newPost + newFeed + _feed;
     // refresh top timestamp
-    topTimestamp = _feed[0]['timestamp']; // First Post timestamp
+    topTimestamp = _feed[1]['timestamp']; // First Post timestamp
     notifyListeners();
   }
 

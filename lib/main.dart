@@ -49,8 +49,7 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider<UserProvider>(
               create: (context) => UserProvider()),
-          ChangeNotifierProvider<FeedProvider>(
-              create: (context) => FeedProvider()),
+          ChangeNotifierProvider<FeedProvider>.value(value: FeedProvider()),
         ],
         child: MaterialApp.router(
           title: 'Social App',

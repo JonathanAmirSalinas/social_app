@@ -164,7 +164,7 @@ class _ServersPageState extends State<ServersPage> {
                         margin: const EdgeInsets.symmetric(
                             horizontal: 4, vertical: 2),
                         decoration: const BoxDecoration(
-                          color: secondaryColor,
+                          color: secondaryColorSolid,
                           borderRadius: BorderRadius.all(
                             Radius.circular(8),
                           ),

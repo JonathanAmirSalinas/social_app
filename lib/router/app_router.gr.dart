@@ -162,6 +162,18 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const SettingsPage(),
       );
     },
+    View_content.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<View_contentArgs>(
+          orElse: () => View_contentArgs(pid: pathParams.getString('pid')));
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewContentPage(
+          key: args.key,
+          pid: args.pid,
+        ),
+      );
+    },
   };
 }
 
@@ -552,4 +564,43 @@ class Setting extends PageRouteInfo<void> {
   static const String name = 'Setting';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ViewContentPage]
+class View_content extends PageRouteInfo<View_contentArgs> {
+  View_content({
+    Key? key,
+    required String pid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          View_content.name,
+          args: View_contentArgs(
+            key: key,
+            pid: pid,
+          ),
+          rawPathParams: {'pid': pid},
+          initialChildren: children,
+        );
+
+  static const String name = 'View_content';
+
+  static const PageInfo<View_contentArgs> page =
+      PageInfo<View_contentArgs>(name);
+}
+
+class View_contentArgs {
+  const View_contentArgs({
+    this.key,
+    required this.pid,
+  });
+
+  final Key? key;
+
+  final String pid;
+
+  @override
+  String toString() {
+    return 'View_contentArgs{key: $key, pid: $pid}';
+  }
 }

@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
@@ -11,18 +13,20 @@ import 'package:social_app/pages/sub-navigation/explore/ep_trending_page.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
 // Colors
-const navBarColor = Color.fromARGB(255, 51, 51, 51);
-const navServerBar = Color.fromARGB(255, 63, 63, 63);
+const navBarColor = Color.fromARGB(255, 20, 20, 20);
+const navServerBar = Color.fromARGB(255, 40, 40, 40);
 const primaryColor = Color.fromARGB(125, 0, 0, 0);
-const secondaryColor = Color.fromARGB(255, 225, 170, 255);
-const secondaryColorFaded = Color.fromARGB(199, 225, 170, 255);
-const backgroundColor = Color.fromARGB(160, 0, 0, 0);
+const secondaryColor = Color.fromARGB(255, 230, 200, 250);
+const secondaryColorSolid = Color.fromARGB(255, 245, 230, 253);
+const backgroundColor = Color.fromARGB(165, 0, 0, 0);
+const backgroundColorSolid = Color.fromARGB(255, 0, 0, 0);
 const fillColor = Color.fromARGB(255, 85, 85, 85);
-const cardColor = Color.fromARGB(255, 255, 0, 0);
+const cardColor = Color.fromARGB(255, 5, 5, 5);
+const errorColor = Color.fromARGB(255, 255, 75, 75);
 
 // Screen
-const mobileScreenSize = 500;
-const webScreenSize = 900;
+const double mobileScreenSize = 600;
+const double webScreenSize = 900;
 //Window width: ${MediaQuery.of(context).size.width.toString()
 
 // Bool true if Screen Size is meets Mobile Constraints
@@ -82,134 +86,119 @@ Widget? isSmallPage(BuildContext context, String widgetName) {
   }
 }
 
-buildProfileImage(BuildContext context, String url) {
-  return Container(
-    height: 55,
-    width: 55,
-    margin: const EdgeInsets.only(right: 6),
-    decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        image: DecorationImage(
-            image: CachedNetworkImageProvider(url), fit: BoxFit.cover)),
+buildProfileImage(BuildContext context) {
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .snapshots(),
+    builder: (context,
+        AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+      if (snapshot.hasData) {
+        var user = snapshot.data!.data()!;
+        return GestureDetector(
+          onTap: () {},
+          child: Container(
+            height: 55,
+            width: 55,
+            margin: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: CachedNetworkImageProvider(user['profile_image']),
+                  fit: BoxFit.cover),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+          ),
+        );
+      } else {
+        return Container();
+      }
+    },
   );
 }
 
 buildUserTile(
-    BuildContext context, String name, String username, int timestamp) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  BuildContext context,
+) {
+  return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .snapshots(),
+      builder: (context,
+          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+        if (snapshot.hasData) {
+          var user = snapshot.data!.data()!;
+          return Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        user['name'],
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.titleLarge!.fontSize,
+                        ),
+                      ),
+                      Text(
+                        ' \u2022 Date',
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.titleSmall!.fontSize,
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(
+                    user['username'],
+                    style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.labelLarge!.fontSize,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ],
               ),
-              Text(
-                ' \u2022 Date',
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                ),
-              )
             ],
-          ),
-          Text(
-            username,
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    ],
-  );
+          );
+        } else {
+          return Container();
+        }
+      });
 }
 
-buildIconSection(BuildContext context) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Like Icon
-          IconButton(
-            onPressed: () {},
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            constraints: const BoxConstraints(),
-            icon: const Icon(
-              Icons.favorite_outline_rounded,
-              size: 16,
-              color: Colors.white54,
-            ),
-            splashRadius: 16,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.0),
-            child: Text(
-              '0',
-              style: TextStyle(
-                color: Colors.white54,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * .02,
-          ),
-          // Comment Icon
-          IconButton(
-            onPressed: () {},
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            constraints: const BoxConstraints(),
-            icon: const Icon(
-              Icons.insert_comment_outlined,
-              size: 16,
-              color: Colors.white54,
-            ),
-            splashRadius: 16,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.0),
-            child: Text(
-              '0',
-              style: TextStyle(
-                color: Colors.white54,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * .02,
-          ),
-          IconButton(
-            onPressed: () {},
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            constraints: const BoxConstraints(),
-            icon: const Icon(
-              Icons.share,
-              size: 16,
-              color: Colors.white54,
-            ),
-            splashRadius: 16,
-          ),
-        ],
-      ),
-      IconButton(
-        onPressed: () {},
-        constraints: const BoxConstraints(),
-        icon: const Icon(
-          Icons.bookmark_border_outlined,
-          size: 16,
-          color: Colors.white54,
-        ),
-        splashRadius: 16,
-      ),
-    ],
-  );
+/*
+// Mobile Image/File Picker using File
+Future<File?> pickMobileImage(BuildContext context) async {
+  try {
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return null;
+    } else {
+      File imageTemp = File(image.path);
+      imageTemp = await _cropImage(context, image: imageTemp);
+
+      return imageTemp;
+    }
+  } on PlatformException catch (e) {
+    print('Failed to pick image: $e');
+  }
 }
+
+// Mobile Image Cropper
+Future<File> _cropImage(BuildContext context, {required File image}) async {
+  CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+      uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
+  if (croppedImage == null) return image;
+  return File(croppedImage.path);
+}
+*/

@@ -29,6 +29,14 @@ class _MainPageState extends State<MainPage> {
   bool _extended = false;
   bool loadingState = false;
 
+  checkExtended(double constraint) {
+    setState(() {
+      if (constraint < webScreenSize) {
+        _extended = false;
+      }
+    });
+  }
+
   @override
   void initState() {
     getData();
@@ -54,6 +62,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    checkExtended(MediaQuery.of(context).size.width);
     return loadingState
         ? const Center(
             child: CircularProgressIndicator(),
@@ -132,7 +141,9 @@ class _MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _extended = !_extended;
+          if (MediaQuery.of(context).size.width > webScreenSize) {
+            _extended = !_extended;
+          }
         });
       },
       child: NavigationRail(
@@ -366,13 +377,13 @@ class LeadingExtendedRail extends StatelessWidget {
                                     onPressed: () {},
                                     icon: const Icon(
                                       Icons.donut_large_rounded,
-                                      color: secondaryColor,
+                                      color: secondaryColorSolid,
                                     )),
                                 IconButton(
                                     onPressed: () {},
                                     icon: const Icon(
                                       Icons.account_circle_rounded,
-                                      color: secondaryColor,
+                                      color: secondaryColorSolid,
                                     )),
                               ],
                             ),

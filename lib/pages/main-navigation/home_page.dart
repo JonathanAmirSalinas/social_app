@@ -1,14 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:loadmore_listview/loadmore_listview.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/sub-navigation/post/create_post_page.dart';
-import 'package:social_app/providers/feed_provider.dart';
+import 'package:social_app/widgets/content/re_post_widget.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/widgets/post_widget.dart';
+import 'package:social_app/widgets/content/post_widget.dart';
 
 @RoutePage(name: 'home')
 class HomePage extends StatefulWidget {
@@ -19,78 +18,96 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ScrollController feedController = ScrollController();
-  String scrollPostion = "";
-  late List<Map<String, dynamic>> feed;
-
-  @override
-  void initState() {
-    //feedController.addListener(_feedController);
-    super.initState();
-  }
-
-  /*void _feedController() {
-    if (feedController.position.pixels ==
-        feedController.position.maxScrollExtent) {
-      scrollPostion = 'bottom';
-      print('Bottom');
-    } else if (feedController.position.pixels ==
-        feedController.position.minScrollExtent) {
-      scrollPostion = 'top';
-      print('Top');
-    }
-  }*/
-
   @override
   Widget build(BuildContext context) {
     UserModel userProvider = Provider.of<UserProvider>(context).getUser;
-    FeedProvider feedProvider = Provider.of<FeedProvider>(context);
+    //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
-      drawer: isSmallPage(context, "Drawer"),
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        leading: isSmallPage(context, "Leading IconButton"),
-        backgroundColor: navBarColor,
-        centerTitle: true,
-        title: Text(
-          userProvider.name,
-          style: TextStyle(
-              fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-        ),
-        actions: [
-          isMobileScreen(MediaQuery.of(context).size.width)
-              ? Container()
-              : Container(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: IconButton(
-                      onPressed: () {
-                        buildCreatePostDialog(userProvider);
-                      },
-                      icon: const Icon(Icons.add))),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: LoadMoreListView.builder(
-                shrinkWrap: true,
-                hasMoreItem: true,
-                refreshEdgeOffset: 40,
-                padding: const EdgeInsets.only(bottom: 16),
-                onLoadMore: feedProvider.refreshBottomFeed,
-                onRefresh: () => feedProvider.refreshTopFeed(false),
-                itemCount: feedProvider.getFeed.length,
-                itemBuilder: (context, index) {
-                  //String pid = feedProvider.getFeed[index]['id_content'];
-                  //return PostWidget(pid: pid);
-                  var snap = feedProvider.getFeed[index];
-                  return BuildPostCard(snap: snap);
-                }),
+        backgroundColor: backgroundColorSolid,
+        drawer: isSmallPage(context, "Drawer"),
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          leading: isSmallPage(context, "Leading IconButton"),
+          backgroundColor: navBarColor,
+          centerTitle: true,
+          title: Text(
+            '${userProvider.name} ${MediaQuery.of(context).size.width}',
+            style: TextStyle(
+                fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
           ),
-        ],
-      ),
-    );
+          actions: [
+            isMobileScreen(MediaQuery.of(context).size.width)
+                ? Container()
+                : Container(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                        onPressed: () {
+                          buildCreatePostDialog(userProvider);
+                        },
+                        icon: const Icon(Icons.add))),
+          ],
+        ),
+        body: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('posts')
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context,
+                AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                case ConnectionState.active:
+                  return ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: snapshot.data!.docs.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        var content = snapshot.data!.docs[index].data();
+                        switch (content['type']) {
+                          case 'post':
+                            return BuildPostContent(content: content);
+                          case 're_post':
+                            return BuildRePostContent(content: content);
+                          case 'ad':
+                            return Container();
+                          case 'server_link':
+                            return Container();
+                          case 'server_post':
+                            return Container();
+                          default:
+                            return Container();
+                        }
+                      });
+
+                case ConnectionState.done:
+                  return ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        var content = snapshot.data!.docs[index].data();
+                        switch (content['type']) {
+                          case 'post':
+                            return BuildPostContent(content: content);
+                          case 're_post':
+                            return BuildRePostContent(content: content);
+                          case 'ad':
+                            return Container();
+                          case 'server_link':
+                            return Container();
+                          case 'server_post':
+                            return Container();
+                          default:
+                            return Container();
+                        }
+                      });
+              }
+            }));
   }
 
   // Creates a Dialog Used to create a Post
@@ -104,25 +121,113 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class PostWidget extends StatelessWidget {
-  final String pid;
-  const PostWidget({super.key, required this.pid});
+/* Expanded(
+              child: LoadMoreListView.builder(
+                  shrinkWrap: true,
+                  hasMoreItem: true,
+                  addAutomaticKeepAlives: true,
+                  refreshEdgeOffset: 40,
+                  padding: const EdgeInsets.only(bottom: 16),
+                  onLoadMore: feedProvider.refreshBottomFeed,
+                  onRefresh: () => feedProvider.refreshTopFeed(false),
+                  itemCount: feedProvider.getFeed.length,
+                  itemBuilder: (context, index) {
+                    String content = feedProvider.getFeed[index]['type'];
+                    switch (content) {
+                      case 'post':
+                        return BuildPostContent(
+                            content: feedProvider.getFeed[index]);
+                      case 're_post':
+                        return BuildRePostContent(
+                            content: feedProvider.getFeed[index]);
+                      case 'ad':
+                        return Container();
+                      case 'server_link':
+                        return Container();
+                      case 'server_post':
+                        return Container();
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream:
-            FirebaseFirestore.instance.collection('posts').doc(pid).snapshots(),
-        builder: (context,
-            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          var post = snapshot.data!.data();
-          return BuildPostCard(snap: post!);
-        });
-  }
-}
+                      default:
+                        return Container();
+                    }
+                  }),
+            ), */
+
+/* String content = feed.getFeed[index]['type'];
+              switch (content) {
+                case 'post':
+                  return BuildPostContent(content: feed.getFeed[index]);
+                case 're_post':
+                  return BuildRePostContent(content: feed.getFeed[index]);
+                case 'ad':
+                  return Container();
+                case 'server_link':
+                  return Container();
+                case 'server_post':
+                  return Container();
+
+                default:
+                  return Container();
+              } */
+
+/*StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('posts')
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.active:
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      var content = snapshot.data!.docs[index].data();
+                      switch (content['type']) {
+                        case 'post':
+                          return BuildPostContent(content: content);
+                        case 're_post':
+                          return BuildRePostContent(content: content);
+                        case 'ad':
+                          return Container();
+                        case 'server_link':
+                          return Container();
+                        case 'server_post':
+                          return Container();
+
+                        default:
+                          return Container();
+                      }
+                    });
+
+              case ConnectionState.done:
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      var content = snapshot.data!.docs[index].data();
+                      switch (content['type']) {
+                        case 'post':
+                          return BuildPostContent(content: content);
+
+                        default:
+                          return Container();
+                      }
+                    });
+            }
+          }), */
+
+
+
 
 /*StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: FirebaseFirestore.instance

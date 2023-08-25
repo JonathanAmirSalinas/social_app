@@ -16,6 +16,7 @@ import 'package:social_app/pages/sub-navigation/explore/ep_news_page.dart';
 import 'package:social_app/pages/sub-navigation/explore/ep_server_page.dart';
 import 'package:social_app/pages/sub-navigation/explore/ep_trending_page.dart';
 import 'package:social_app/pages/sub-navigation/help_page.dart';
+import 'package:social_app/pages/sub-navigation/post/view_content_page.dart';
 import 'package:social_app/pages/sub-navigation/profile_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_chatroom_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_home_page.dart';
@@ -111,6 +112,12 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: Profile.page,
           path: '/profile/:uid',
+        ),
+        // View Post /////////////////////////////////////////////////////////////
+        AutoRoute(
+          page: View_content.page,
+          path: '/content/:pid',
+          usesPathAsKey: true,
         ),
         // Bookmark ////////////////////////////////////////////////////////////
         AutoRoute(
