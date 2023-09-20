@@ -85,7 +85,6 @@ class _ServersPageState extends State<ServersPage> {
     return GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
-
           setState(() {});
         },
         child: Row(

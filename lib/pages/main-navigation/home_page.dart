@@ -1,12 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:social_app/constants/constants.dart';
-import 'package:social_app/models/user_model.dart';
-import 'package:social_app/pages/sub-navigation/post/create_post_page.dart';
+import 'package:social_app/pages/sub-navigation/content/create_post_page.dart';
 import 'package:social_app/widgets/content/re_post_widget.dart';
-import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/widgets/content/post_widget.dart';
 
 @RoutePage(name: 'home')
@@ -20,7 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    UserModel userProvider = Provider.of<UserProvider>(context).getUser;
     //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
     return Scaffold(
         backgroundColor: backgroundColorSolid,
@@ -31,7 +27,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: navBarColor,
           centerTitle: true,
           title: Text(
-            '${userProvider.name} ${MediaQuery.of(context).size.width}',
+            '${MediaQuery.of(context).size.width}',
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
           ),
@@ -42,7 +38,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.only(right: 8),
                     child: IconButton(
                         onPressed: () {
-                          buildCreatePostDialog(userProvider);
+                          buildCreatePostDialog();
                         },
                         icon: const Icon(Icons.add))),
           ],
@@ -111,7 +107,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Creates a Dialog Used to create a Post
-  buildCreatePostDialog(UserModel userProvider) {
+  buildCreatePostDialog() {
     return showDialog(
       context: context,
       builder: (context) {

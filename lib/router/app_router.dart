@@ -16,11 +16,14 @@ import 'package:social_app/pages/sub-navigation/explore/ep_news_page.dart';
 import 'package:social_app/pages/sub-navigation/explore/ep_server_page.dart';
 import 'package:social_app/pages/sub-navigation/explore/ep_trending_page.dart';
 import 'package:social_app/pages/sub-navigation/help_page.dart';
-import 'package:social_app/pages/sub-navigation/post/view_content_page.dart';
-import 'package:social_app/pages/sub-navigation/profile_page.dart';
+import 'package:social_app/pages/sub-navigation/content/view_content_page.dart';
+import 'package:social_app/pages/sub-navigation/settings/account/settings_account_page.dart';
+import 'package:social_app/pages/sub-navigation/profile/profile_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_chatroom_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_home_page.dart';
 import 'package:social_app/pages/sub-navigation/server/svr_message_page.dart';
+import 'package:social_app/pages/sub-navigation/settings/settings_privacy_and_saftety_page.dart';
+import 'package:social_app/pages/sub-navigation/settings/settings_profiles_page.dart';
 import 'package:social_app/pages/sub-navigation/settings_page.dart';
 import 'package:social_app/router/app_router_guard.dart';
 
@@ -46,6 +49,7 @@ class AppRouter extends _$AppRouter {
             page: Main.page,
             path: '/main',
             guards: [AuthGuard()],
+            usesPathAsKey: true,
             keepHistory: true,
             children: [
               // Home
@@ -112,6 +116,7 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: Profile.page,
           path: '/profile/:uid',
+          usesPathAsKey: true,
         ),
         // View Post /////////////////////////////////////////////////////////////
         AutoRoute(
@@ -126,7 +131,25 @@ class AppRouter extends _$AppRouter {
           keepHistory: false,
         ),
         // Settings ////////////////////////////////////////////////////////////
-        AutoRoute(page: Setting.page, path: '/settings'),
+        AutoRoute(
+          page: Settings.page,
+          path: '/settings',
+        ),
+        AutoRoute(
+          page: Settings_Account.page,
+          path: '/settings/account',
+          usesPathAsKey: true,
+        ),
+        AutoRoute(
+          page: Settings_Profiles.page,
+          path: '/settings/profiles',
+          usesPathAsKey: true,
+        ),
+        AutoRoute(
+          page: Settings_Privacy_And_Safety.page,
+          path: '/settings/privacyandsafety',
+          usesPathAsKey: true,
+        ),
         // Help ////////////////////////////////////////////////////////////
         AutoRoute(page: Help.page, path: '/help'),
       ];

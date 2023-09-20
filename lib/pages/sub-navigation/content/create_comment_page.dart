@@ -7,84 +7,29 @@ import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/constants/constants.dart';
+import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/services/content_services.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/view_content.dart';
 
-// TO-DO ////////////////////////////////////////////////////////////// TO-DO //
-// 1: Make sure user cant spam post button while post is loading
-// 2: Make sure user cant post with empty values, message or image needed
-// 3: Make sure Mobile UI is similar to Web UI
-// 4: Make sure all input widgets are disabled while Post is loading
-// 5: Make sure when feed is refreshed current user post is on top (Important)
-// 6: Add Filter/PageView option to scroll between create (post/story/server)
-
-class CreateRePostPage extends StatefulWidget {
+class CreateCommentPage extends StatefulWidget {
   final Map<String, dynamic> content;
-  const CreateRePostPage({super.key, required this.content});
+  const CreateCommentPage({super.key, required this.content});
 
   @override
-  State<CreateRePostPage> createState() => _CreateRePostPageState();
+  State<CreateCommentPage> createState() => _CreateCommentPageState();
 }
 
-class _CreateRePostPageState extends State<CreateRePostPage> {
+class _CreateCommentPageState extends State<CreateCommentPage> {
   // Create Post Variables
   bool loadingPost = false;
   TextEditingController createPostCaptionController = TextEditingController();
   File? imageFile;
   Uint8List? imageBytes;
 
-  // Web Image/File Picker using Uint8List bytes
-  Future pickWebImage() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['jpg', 'png', 'webm'],
-          allowMultiple: false);
-
-      Uint8List bytes;
-
-      if (result != null) {
-        bytes = result.files.first.bytes!;
-        imageBytes = bytes;
-        setState(() {
-          //imageGal = imagee;
-          imageBytes = bytes;
-        });
-
-        //imagee = await _cropWebImage(image: file);
-      } else {
-        // User canceled the picker
-        return;
-      }
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
-  // Mobile Image/File Picker using File
-  Future pickMobileImage() async {
-    try {
-      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (image == null) return;
-
-      File imageTemp = File(image.path);
-      imageTemp = await _cropImage(image: imageTemp);
-
-      setState(() => imageFile = imageTemp);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
-  // Mobile Image Cropper
-  Future<File> _cropImage({required File image}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
-        uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
-    if (croppedImage == null) return image;
-    return File(croppedImage.path);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -99,17 +44,14 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: backgroundColor,
       body: Center(
         child: Container(
           width: mobileScreenSize,
-          padding: const EdgeInsets.all(24),
           child: Container(
-            padding: const EdgeInsets.all(4),
             decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(6)),
                 color: backgroundColorSolid),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -119,10 +61,8 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      child: buildRePostBar(),
-                    ),
-                    // Loading Indicator
+                        padding: const EdgeInsets.all(8),
+                        child: buildCommentBar()),
                     loadingPost
                         ? const Padding(
                             padding: EdgeInsets.fromLTRB(0, 4, 0, 2),
@@ -132,7 +72,6 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                             thickness: 4,
                             color: navBarColor,
                           ),
-                    // Body
                     Flexible(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -141,9 +80,13 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              buildRepostBody(),
-                              buildReferenceDivider(),
                               buildReferenceContent(),
+                              buildReferenceDivider(),
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: buildCommentBody(),
+                              ),
                             ],
                           ),
                         ),
@@ -159,8 +102,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
     );
   }
 
-  // Repost Dialog Bar
-  buildRePostBar() {
+  buildCommentBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,39 +164,41 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                   if (imageFile != null ||
                       imageBytes != null ||
                       createPostCaptionController.text.isNotEmpty) {
-                    //
+                    // Todo 1: Get values need for Function
                     if (imageFile == null && imageBytes == null) {
                       setState(() {
                         loadingPost = true;
                       });
-                      await ContentServices().uploadMessagePost(
-                          createPostCaptionController.text,
-                          're_post',
-                          widget.content['id_content']);
-                      //await feedProvider.getUserFeed();
+                      await ContentServices().uploadMessageComment(
+                        widget.content['id_content_owner'],
+                        widget.content['id_content'],
+                        widget.content['type'],
+                        createPostCaptionController.text,
+                      );
+                      //await feedProvider.refreshPost(widget.content['id_content']);
                       //await feedProvider.refreshTopFeed(true);
                       setState(() {
                         loadingPost = false;
                       });
-                      // Pops CreatePostWidget
                     } else {
                       // Starts Loading State
                       setState(() {
                         loadingPost = true;
                       });
-                      await ContentServices().uploadMediaPost(
+                      await ContentServices().uploadMediaComment(
+                        widget.content['id_content_owner'],
+                        widget.content['id_content'],
                         createPostCaptionController.text,
+                        widget.content['type'],
                         imageFile,
                         imageBytes!,
-                        're_post',
-                        widget.content['id_content'],
                       );
+                      //await feedProvider.refreshPost(widget.content['id_content']);
+                      //await feedProvider.refreshTopFeed(true);
                       // Ends Loading State
                       setState(() {
                         loadingPost = false;
                       });
-                      // Refreshes User's Feed with this new post
-                      //await feedProvider.refreshTopFeed(true);
                     }
                     // Pops CreatePostWidget
                     completed(true);
@@ -284,7 +228,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                             borderRadius: BorderRadius.zero,
                             side: BorderSide()))),
                 child: Text(
-                  'Repost',
+                  'Comment',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.titleMedium!.fontSize),
@@ -295,18 +239,16 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
     );
   }
 
-  // Main Body (Input)
-  buildRepostBody() {
+  // Main Content Body
+  buildCommentBody() {
     return Card(
       color: cardColor,
       shape: const ContinuousRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(6)),
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(6))),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -316,7 +258,6 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                 buildProfileImage(context),
                 Expanded(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // User Identification
                       Row(
@@ -344,7 +285,6 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                         children: [
                           Expanded(
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 GestureDetector(
                                   onTap: () async {
@@ -357,11 +297,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                                   // Has Image
                                   child: imageBytes != null || imageFile != null
                                       ? Container(
-                                          clipBehavior: Clip.antiAlias,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              .25,
+                                          height: 300,
                                           decoration: BoxDecoration(
                                               image: DecorationImage(
                                                   image:
@@ -395,16 +331,18 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
     );
   }
 
-  // Divider Indicator
+  // Content Divider
   buildReferenceDivider() {
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       child: Row(
         children: [
           Container(
             height: 3,
             width: 55,
-            margin: const EdgeInsets.symmetric(horizontal: 4),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
             color: Colors.white54,
           ),
           const Icon(
@@ -412,18 +350,19 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
             size: 18,
             color: Colors.white54,
           ),
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: const Text("Referencing Post")),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text('Commenting'),
+          ),
         ],
       ),
     );
   }
 
-  // Reference Post Content
+  // Builds Reference Content
   buildReferenceContent() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
         color: cardColor,
         shape: const ContinuousRectangleBorder(
@@ -533,5 +472,107 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
         ),
       ),
     );
+  }
+
+  ///////////////////////////////////////////////////////////////////// Function
+  ///
+  // Web Image/File Picker using Uint8List bytes
+  Future pickWebImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'png', 'webm'],
+          allowMultiple: false);
+
+      Uint8List bytes;
+
+      if (result != null) {
+        bytes = result.files.first.bytes!;
+        imageBytes = bytes;
+        setState(() {
+          //imageGal = imagee;
+          imageBytes = bytes;
+        });
+
+        //imagee = await _cropWebImage(image: file);
+      } else {
+        // User canceled the picker
+        return;
+      }
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  // Mobile Image/File Picker using File
+  Future pickMobileImage() async {
+    try {
+      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      File imageTemp = File(image.path);
+      imageTemp = await _cropImage(image: imageTemp);
+
+      setState(() => imageFile = imageTemp);
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  // Might not implement since Web Image/File is in bytes and has no path
+  Future<File> _cropWebImage({required File image}) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [
+          WebUiSettings(
+            context: context,
+          )
+        ]);
+    if (croppedImage == null) return image;
+    return File(croppedImage.path);
+  }
+
+  // Mobile Image Cropper
+  Future<File> _cropImage({required File image}) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
+    if (croppedImage == null) return image;
+    return File(croppedImage.path);
+  }
+
+  postMessage(FeedProvider feedProvider) async {
+    // Starts Loading State
+    setState(() {
+      loadingPost = true;
+    });
+    await ContentServices()
+        .uploadMessagePost(createPostCaptionController.text, 'post', '');
+    await feedProvider.getUserFeed();
+    //await feedProvider.refreshTopFeed(true);
+    // Refreshes User's Feed with this new post
+    //await feedProvider.refreshTopFeed(true);
+    // Ends Loading State
+    setState(() {
+      loadingPost = false;
+    });
+  }
+
+  postMedia(FeedProvider feedProvider) async {
+    // Starts Loading State
+    setState(() {
+      loadingPost = true;
+    });
+    await ContentServices().uploadMediaPost(
+        createPostCaptionController.text, imageFile, imageBytes!, 'post', '');
+    await feedProvider.getUserFeed();
+    // Refreshes User's Feed with this new post
+    await feedProvider.refreshTopFeed(true);
+    // Ends Loading State
+    setState(() {
+      loadingPost = false;
+    });
   }
 }
