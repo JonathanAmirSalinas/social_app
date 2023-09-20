@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -23,26 +25,29 @@ class SliverNavigationDrawer extends StatelessWidget {
       );
 
   Widget buildHeader(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 150,
-            width: MediaQuery.of(context).size.width * .6,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .snapshots(),
+      builder: (context,
+          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+        if (snapshot.hasData) {
+          var user = snapshot.data!.data()!;
+          return Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
             ),
-            child: Stack(
-              alignment: Alignment.center,
-              fit: StackFit.loose,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
+                Container(
+                  height: 155,
+                  width: MediaQuery.of(context).size.width * .6,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -50,31 +55,47 @@ class SliverNavigationDrawer extends StatelessWidget {
                         height: 80,
                         width: 80,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                  user['profile_image']),
+                              fit: BoxFit.cover),
                           borderRadius: const BorderRadius.all(
                             Radius.circular(10),
                           ),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(2),
-                        child: const Text(
-                          "Name",
-                          style: TextStyle(fontSize: 16),
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Text(
+                          user['name'],
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall!
+                                  .fontSize),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(2),
-                        child: const Text("Username"),
-                      )
+                        padding: const EdgeInsets.only(left: 12),
+                        child: Text(
+                          user['username'],
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .fontSize),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 
@@ -124,6 +145,7 @@ class SliverNavigationDrawer extends StatelessWidget {
                 ),
                 onTap: () {}),
           ),
+          Divider(),
           Card(
             child: ListTile(
                 leading: const Icon(Icons.help_center),
@@ -157,7 +179,7 @@ class SliverNavigationDrawer extends StatelessWidget {
               ),
               onTap: () {
                 FirebaseAuth.instance.signOut();
-                context.router.root.pushNamed('/');
+                context.router.pushNamed('/');
               },
             ),
           )

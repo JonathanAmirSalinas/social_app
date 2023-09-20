@@ -120,18 +120,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const HelpPage(),
       );
     },
-    Profile.name: (routeData) {
-      final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<ProfileArgs>(
-          orElse: () => ProfileArgs(uid: pathParams.getString('uid')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: ProfilePage(
-          key: args.key,
-          uid: args.uid,
-        ),
-      );
-    },
     Server_chatroom.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<Server_chatroomArgs>(
@@ -156,7 +144,7 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const ServerMessagesPage(),
       );
     },
-    Setting.name: (routeData) {
+    Settings.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const SettingsPage(),
@@ -172,6 +160,36 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           pid: args.pid,
         ),
+      );
+    },
+    Profile.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<ProfileArgs>(
+          orElse: () => ProfileArgs(uid: pathParams.getString('uid')));
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ProfilePage(
+          key: args.key,
+          uid: args.uid,
+        ),
+      );
+    },
+    Settings_Privacy_And_Safety.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const PrivacyAndSafetySettingsPage(),
+      );
+    },
+    Settings_Account.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AccountSettingsPage(),
+      );
+    },
+    Settings_Profiles.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ProfileSettingsPage(),
       );
     },
   };
@@ -448,44 +466,6 @@ class Help extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [ProfilePage]
-class Profile extends PageRouteInfo<ProfileArgs> {
-  Profile({
-    Key? key,
-    required String uid,
-    List<PageRouteInfo>? children,
-  }) : super(
-          Profile.name,
-          args: ProfileArgs(
-            key: key,
-            uid: uid,
-          ),
-          rawPathParams: {'uid': uid},
-          initialChildren: children,
-        );
-
-  static const String name = 'Profile';
-
-  static const PageInfo<ProfileArgs> page = PageInfo<ProfileArgs>(name);
-}
-
-class ProfileArgs {
-  const ProfileArgs({
-    this.key,
-    required this.uid,
-  });
-
-  final Key? key;
-
-  final String uid;
-
-  @override
-  String toString() {
-    return 'ProfileArgs{key: $key, uid: $uid}';
-  }
-}
-
-/// generated route for
 /// [ServerChatroomPage]
 class Server_chatroom extends PageRouteInfo<Server_chatroomArgs> {
   Server_chatroom({
@@ -554,14 +534,14 @@ class Server_messages extends PageRouteInfo<void> {
 
 /// generated route for
 /// [SettingsPage]
-class Setting extends PageRouteInfo<void> {
-  const Setting({List<PageRouteInfo>? children})
+class Settings extends PageRouteInfo<void> {
+  const Settings({List<PageRouteInfo>? children})
       : super(
-          Setting.name,
+          Settings.name,
           initialChildren: children,
         );
 
-  static const String name = 'Setting';
+  static const String name = 'Settings';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -603,4 +583,84 @@ class View_contentArgs {
   String toString() {
     return 'View_contentArgs{key: $key, pid: $pid}';
   }
+}
+
+/// generated route for
+/// [ProfilePage]
+class Profile extends PageRouteInfo<ProfileArgs> {
+  Profile({
+    Key? key,
+    required String uid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Profile.name,
+          args: ProfileArgs(
+            key: key,
+            uid: uid,
+          ),
+          rawPathParams: {'uid': uid},
+          initialChildren: children,
+        );
+
+  static const String name = 'Profile';
+
+  static const PageInfo<ProfileArgs> page = PageInfo<ProfileArgs>(name);
+}
+
+class ProfileArgs {
+  const ProfileArgs({
+    this.key,
+    required this.uid,
+  });
+
+  final Key? key;
+
+  final String uid;
+
+  @override
+  String toString() {
+    return 'ProfileArgs{key: $key, uid: $uid}';
+  }
+}
+
+/// generated route for
+/// [PrivacyAndSafetySettingsPage]
+class Settings_Privacy_And_Safety extends PageRouteInfo<void> {
+  const Settings_Privacy_And_Safety({List<PageRouteInfo>? children})
+      : super(
+          Settings_Privacy_And_Safety.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Settings_Privacy_And_Safety';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [AccountSettingsPage]
+class Settings_Account extends PageRouteInfo<void> {
+  const Settings_Account({List<PageRouteInfo>? children})
+      : super(
+          Settings_Account.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Settings_Account';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ProfileSettingsPage]
+class Settings_Profiles extends PageRouteInfo<void> {
+  const Settings_Profiles({List<PageRouteInfo>? children})
+      : super(
+          Settings_Profiles.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Settings_Profiles';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }

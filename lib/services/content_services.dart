@@ -264,67 +264,6 @@ class ContentServices {
   }
 
   Future<void> deletePost() async {}
-  // Like Post
-  Future<void> likePost(
-      String sender, String receiver, String pid, String type) async {
-    bool isLiked = await postIsLiked(sender, receiver, pid, type);
-    try {
-      if (type == 'comment') {
-        if (isLiked) {
-          await _firestore.collection('comments').doc(pid).update({
-            'likes': FieldValue.arrayRemove([sender])
-          });
-        } else {
-          await _firestore.collection('comments').doc(pid).update({
-            'likes': FieldValue.arrayUnion([sender])
-          });
-          // Send Notification of who like the user post
-          await ActivityServices()
-              .likeNotification(sender, receiver, pid, 'liked_post');
-        }
-      } else {
-        if (isLiked) {
-          await _firestore.collection('posts').doc(pid).update({
-            'likes': FieldValue.arrayRemove([sender])
-          });
-        } else {
-          await _firestore.collection('posts').doc(pid).update({
-            'likes': FieldValue.arrayUnion([sender])
-          });
-          // Send Notification of who like the user post
-          await ActivityServices()
-              .likeNotification(sender, receiver, pid, 'liked_post');
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  // Checks if Post is Liked
-  Future<bool> postIsLiked(
-      String sender, String receiver, String pid, String type) async {
-    try {
-      if (type == 'comment') {
-        DocumentSnapshot snap =
-            await _firestore.collection('comments').doc(pid).get();
-        List likes = (snap.data()! as dynamic)['likes'];
-        if (likes.contains(sender)) {
-          return true;
-        }
-      } else {
-        DocumentSnapshot snap =
-            await _firestore.collection('posts').doc(pid).get();
-        List likes = (snap.data()! as dynamic)['likes'];
-        if (likes.contains(sender)) {
-          return true;
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-    return false;
-  }
 
   Future<void> bookmarkPost() async {}
   ///////////////////////////////////////////////////////// Comment Services ///
@@ -439,4 +378,96 @@ class ContentServices {
   Future<void> deleteServerPost() async {}
   Future<void> likeServerPost() async {}
   Future<void> bookmarkServer() async {}
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Like Post
+  Future<void> likePost(
+      String sender, String receiver, String pid, String type) async {
+    bool isLiked = await postIsLiked(sender, receiver, pid, type);
+    try {
+      if (type == 'comment') {
+        if (isLiked) {
+          await _firestore.collection('comments').doc(pid).update({
+            'likes': FieldValue.arrayRemove([sender])
+          });
+        } else {
+          await _firestore.collection('comments').doc(pid).update({
+            'likes': FieldValue.arrayUnion([sender])
+          });
+          // Send Notification of who like the user post
+          await ActivityServices()
+              .likeNotification(sender, receiver, pid, 'liked_post');
+        }
+      } else {
+        if (isLiked) {
+          await _firestore.collection('posts').doc(pid).update({
+            'likes': FieldValue.arrayRemove([sender])
+          });
+        } else {
+          await _firestore.collection('posts').doc(pid).update({
+            'likes': FieldValue.arrayUnion([sender])
+          });
+          // Send Notification of who like the user post
+          await ActivityServices()
+              .likeNotification(sender, receiver, pid, 'liked_post');
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Checks if Post is Liked
+  Future<bool> postIsLiked(
+      String sender, String receiver, String pid, String type) async {
+    try {
+      if (type == 'comment') {
+        DocumentSnapshot snap =
+            await _firestore.collection('comments').doc(pid).get();
+        List likes = (snap.data()! as dynamic)['likes'];
+        if (likes.contains(sender)) {
+          return true;
+        }
+      } else {
+        DocumentSnapshot snap =
+            await _firestore.collection('posts').doc(pid).get();
+        List likes = (snap.data()! as dynamic)['likes'];
+        if (likes.contains(sender)) {
+          return true;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
+
+  // User Follow/Unfolloe
+  Future<void> followUser(String user, String currentUser) async {
+    try {
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(user).get();
+      List following = (snap.data()! as dynamic)['following'];
+
+      if (following.contains(currentUser)) {
+        // UNFOLLOWS currentUser
+        await _firestore.collection('users').doc(currentUser).update({
+          'followers': FieldValue.arrayRemove([user])
+        });
+        await _firestore.collection('users').doc(user).update({
+          'following': FieldValue.arrayRemove([currentUser])
+        });
+      } else {
+        // FOLLOWS currentUser
+        await _firestore.collection('users').doc(currentUser).update({
+          'followers': FieldValue.arrayUnion([user])
+        });
+        await _firestore.collection('users').doc(user).update({
+          'following': FieldValue.arrayUnion([currentUser])
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

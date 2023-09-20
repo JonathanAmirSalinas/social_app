@@ -7,29 +7,84 @@ import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/constants/constants.dart';
-import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/services/content_services.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/view_content.dart';
 
-class CreateCommentPage extends StatefulWidget {
+// TO-DO ////////////////////////////////////////////////////////////// TO-DO //
+// 1: Make sure user cant spam post button while post is loading
+// 2: Make sure user cant post with empty values, message or image needed
+// 3: Make sure Mobile UI is similar to Web UI
+// 4: Make sure all input widgets are disabled while Post is loading
+// 5: Make sure when feed is refreshed current user post is on top (Important)
+// 6: Add Filter/PageView option to scroll between create (post/story/server)
+
+class CreateRePostPage extends StatefulWidget {
   final Map<String, dynamic> content;
-  const CreateCommentPage({super.key, required this.content});
+  const CreateRePostPage({super.key, required this.content});
 
   @override
-  State<CreateCommentPage> createState() => _CreateCommentPageState();
+  State<CreateRePostPage> createState() => _CreateRePostPageState();
 }
 
-class _CreateCommentPageState extends State<CreateCommentPage> {
+class _CreateRePostPageState extends State<CreateRePostPage> {
   // Create Post Variables
   bool loadingPost = false;
   TextEditingController createPostCaptionController = TextEditingController();
   File? imageFile;
   Uint8List? imageBytes;
 
-  @override
-  void initState() {
-    super.initState();
+  // Web Image/File Picker using Uint8List bytes
+  Future pickWebImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'png', 'webm'],
+          allowMultiple: false);
+
+      Uint8List bytes;
+
+      if (result != null) {
+        bytes = result.files.first.bytes!;
+        imageBytes = bytes;
+        setState(() {
+          //imageGal = imagee;
+          imageBytes = bytes;
+        });
+
+        //imagee = await _cropWebImage(image: file);
+      } else {
+        // User canceled the picker
+        return;
+      }
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  // Mobile Image/File Picker using File
+  Future pickMobileImage() async {
+    try {
+      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      File imageTemp = File(image.path);
+      imageTemp = await _cropImage(image: imageTemp);
+
+      setState(() => imageFile = imageTemp);
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  // Mobile Image Cropper
+  Future<File> _cropImage({required File image}) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
+    if (croppedImage == null) return image;
+    return File(croppedImage.path);
   }
 
   @override
@@ -44,15 +99,16 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
 
   @override
   Widget build(BuildContext context) {
+    //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       body: Center(
         child: Container(
+          padding: const EdgeInsets.all(4),
           width: mobileScreenSize,
-          padding: const EdgeInsets.all(16),
           child: Container(
             decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(6)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
                 color: backgroundColorSolid),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -62,8 +118,10 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                        padding: const EdgeInsets.all(8),
-                        child: buildCommentBar()),
+                      padding: const EdgeInsets.all(8),
+                      child: buildRePostBar(),
+                    ),
+                    // Loading Indicator
                     loadingPost
                         ? const Padding(
                             padding: EdgeInsets.fromLTRB(0, 4, 0, 2),
@@ -73,6 +131,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                             thickness: 4,
                             color: navBarColor,
                           ),
+                    // Body
                     Flexible(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -81,13 +140,9 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              buildReferenceContent(),
+                              buildRepostBody(),
                               buildReferenceDivider(),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: buildCommentBody(),
-                              ),
+                              buildReferenceContent(),
                             ],
                           ),
                         ),
@@ -103,7 +158,8 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     );
   }
 
-  buildCommentBar() {
+  // Repost Dialog Bar
+  buildRePostBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -120,6 +176,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
             icon: const Icon(Icons.arrow_back_ios_new)),
         // Create Post Function
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
                 onPressed: () {},
@@ -165,41 +222,39 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                   if (imageFile != null ||
                       imageBytes != null ||
                       createPostCaptionController.text.isNotEmpty) {
-                    // Todo 1: Get values need for Function
+                    //
                     if (imageFile == null && imageBytes == null) {
                       setState(() {
                         loadingPost = true;
                       });
-                      await ContentServices().uploadMessageComment(
-                        widget.content['id_content_owner'],
-                        widget.content['id_content'],
-                        widget.content['type'],
-                        createPostCaptionController.text,
-                      );
-                      //await feedProvider.refreshPost(widget.content['id_content']);
+                      await ContentServices().uploadMessagePost(
+                          createPostCaptionController.text,
+                          're_post',
+                          widget.content['id_content']);
+                      //await feedProvider.getUserFeed();
                       //await feedProvider.refreshTopFeed(true);
                       setState(() {
                         loadingPost = false;
                       });
+                      // Pops CreatePostWidget
                     } else {
                       // Starts Loading State
                       setState(() {
                         loadingPost = true;
                       });
-                      await ContentServices().uploadMediaComment(
-                        widget.content['id_content_owner'],
-                        widget.content['id_content'],
+                      await ContentServices().uploadMediaPost(
                         createPostCaptionController.text,
-                        widget.content['type'],
                         imageFile,
                         imageBytes!,
+                        're_post',
+                        widget.content['id_content'],
                       );
-                      //await feedProvider.refreshPost(widget.content['id_content']);
-                      //await feedProvider.refreshTopFeed(true);
                       // Ends Loading State
                       setState(() {
                         loadingPost = false;
                       });
+                      // Refreshes User's Feed with this new post
+                      //await feedProvider.refreshTopFeed(true);
                     }
                     // Pops CreatePostWidget
                     completed(true);
@@ -229,7 +284,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                             borderRadius: BorderRadius.zero,
                             side: BorderSide()))),
                 child: Text(
-                  'Comment',
+                  'Repost',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.titleMedium!.fontSize),
@@ -240,16 +295,18 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     );
   }
 
-  // Main Content Body
-  buildCommentBody() {
+  // Main Body (Input)
+  buildRepostBody() {
     return Card(
       color: cardColor,
       shape: const ContinuousRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(6))),
+        borderRadius: BorderRadius.all(Radius.circular(6)),
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -259,6 +316,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                 buildProfileImage(context),
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // User Identification
                       Row(
@@ -286,6 +344,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                         children: [
                           Expanded(
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 GestureDetector(
                                   onTap: () async {
@@ -298,7 +357,11 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                                   // Has Image
                                   child: imageBytes != null || imageFile != null
                                       ? Container(
-                                          height: 300,
+                                          clipBehavior: Clip.antiAlias,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              .25,
                                           decoration: BoxDecoration(
                                               image: DecorationImage(
                                                   image:
@@ -332,18 +395,16 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     );
   }
 
-  // Content Divider
+  // Divider Indicator
   buildReferenceDivider() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      margin: const EdgeInsets.all(4),
       child: Row(
         children: [
           Container(
             height: 3,
             width: 55,
-            margin: const EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
             color: Colors.white54,
           ),
           const Icon(
@@ -351,33 +412,27 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
             size: 18,
             color: Colors.white54,
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Text('Commenting'),
-          ),
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: const Text("Referencing Post")),
         ],
       ),
     );
   }
 
-  // Builds Reference Content
+  // Reference Post Content
   buildReferenceContent() {
     return Container(
-      margin: const EdgeInsets.all(8),
       child: Card(
         color: cardColor,
         shape: const ContinuousRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(6))),
+          borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-              ),
-              // BODY
+              padding: const EdgeInsets.all(4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,88 +453,75 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                             )
                           ],
                         ),
-                        Column(
+                        // Post
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    child: Column(
-                                      children: [
-                                        // Reference Post Statement
-                                        Row(
-                                          children: [
-                                            Flexible(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        widget.content[
-                                                            'statement'],
-                                                        style: TextStyle(
-                                                            fontSize: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .titleLarge!
-                                                                .fontSize),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        // Image or Media
-                                        // Checks if Post has media
-                                        widget.content['hasMedia'] == true
-                                            ? GestureDetector(
-                                                onTap: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return ViewContent(
-                                                            snap:
-                                                                widget.content);
-                                                      });
-                                                },
-                                                child: Container(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      .25,
-                                                  decoration: BoxDecoration(
-                                                      image: DecorationImage(
-                                                          image: CachedNetworkImageProvider(
-                                                              widget.content[
-                                                                  'media_url']),
-                                                          fit: BoxFit.cover),
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                              .all(
-                                                              Radius.circular(
-                                                                  6))),
-                                                ),
-                                                // ON DOUBLE TAP IT SHOULD LIKE THE POST IMAGE
-                                                onDoubleTap: () {},
-                                              )
-                                            : Container(),
-                                        //buildNonInteractiveIconSection(context, widget.content),
-                                      ],
+                            Flexible(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.content['statement'],
+                                      style: TextStyle(
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .fontSize),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
+                        // Image or Media
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: Column(
+                                  children: [
+                                    // Checks if Post has media
+                                    widget.content['hasMedia'] == true
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return ViewContent(
+                                                        snap: widget.content);
+                                                  });
+                                            },
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  .25,
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image:
+                                                          CachedNetworkImageProvider(
+                                                              widget.content[
+                                                                  'media_url']),
+                                                      fit: BoxFit.cover),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(6))),
+                                            ),
+                                            // ON DOUBLE TAP IT SHOULD LIKE THE POST IMAGE
+                                            onDoubleTap: () {},
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        buildNonInteractiveIconSection(context, widget.content)
                       ],
                     ),
                   ),
@@ -490,107 +532,5 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
         ),
       ),
     );
-  }
-
-  ///////////////////////////////////////////////////////////////////// Function
-  ///
-  // Web Image/File Picker using Uint8List bytes
-  Future pickWebImage() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['jpg', 'png', 'webm'],
-          allowMultiple: false);
-
-      Uint8List bytes;
-
-      if (result != null) {
-        bytes = result.files.first.bytes!;
-        imageBytes = bytes;
-        setState(() {
-          //imageGal = imagee;
-          imageBytes = bytes;
-        });
-
-        //imagee = await _cropWebImage(image: file);
-      } else {
-        // User canceled the picker
-        return;
-      }
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
-  // Mobile Image/File Picker using File
-  Future pickMobileImage() async {
-    try {
-      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (image == null) return;
-
-      File imageTemp = File(image.path);
-      imageTemp = await _cropImage(image: imageTemp);
-
-      setState(() => imageFile = imageTemp);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
-  // Might not implement since Web Image/File is in bytes and has no path
-  Future<File> _cropWebImage({required File image}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
-        uiSettings: [
-          WebUiSettings(
-            context: context,
-          )
-        ]);
-    if (croppedImage == null) return image;
-    return File(croppedImage.path);
-  }
-
-  // Mobile Image Cropper
-  Future<File> _cropImage({required File image}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
-        uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
-    if (croppedImage == null) return image;
-    return File(croppedImage.path);
-  }
-
-  postMessage(FeedProvider feedProvider) async {
-    // Starts Loading State
-    setState(() {
-      loadingPost = true;
-    });
-    await ContentServices()
-        .uploadMessagePost(createPostCaptionController.text, 'post', '');
-    await feedProvider.getUserFeed();
-    //await feedProvider.refreshTopFeed(true);
-    // Refreshes User's Feed with this new post
-    //await feedProvider.refreshTopFeed(true);
-    // Ends Loading State
-    setState(() {
-      loadingPost = false;
-    });
-  }
-
-  postMedia(FeedProvider feedProvider) async {
-    // Starts Loading State
-    setState(() {
-      loadingPost = true;
-    });
-    await ContentServices().uploadMediaPost(
-        createPostCaptionController.text, imageFile, imageBytes!, 'post', '');
-    await feedProvider.getUserFeed();
-    // Refreshes User's Feed with this new post
-    await feedProvider.refreshTopFeed(true);
-    // Ends Loading State
-    setState(() {
-      loadingPost = false;
-    });
   }
 }

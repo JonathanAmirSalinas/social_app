@@ -103,6 +103,8 @@ class _AuthPageState extends State<AuthPage> {
               if (snapshot.hasData) {
                 setSharedPreference();
                 context.router.pushNamed('/');
+              } else {
+                context.router.pushNamed('/login');
               }
             } else if (snapshot.hasError) {
               return const Center(child: Text("System Error"));

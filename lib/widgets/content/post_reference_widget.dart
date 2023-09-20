@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
-import 'package:social_app/pages/sub-navigation/post/create_repost_page.dart';
+import 'package:social_app/pages/sub-navigation/content/create_repost_page.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/view_content.dart';
 

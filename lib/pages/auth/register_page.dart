@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -30,36 +30,59 @@ class _RegisterPageState extends State<RegisterPage> {
   String name = '';
   final usernameController = TextEditingController();
   String username = '';
-  File? imageGal; // Mobile
-  Uint8List? imageBytes; // Web
+  // Profile Image
+  File? profileImageFile; // Mobile
+  Uint8List? profileImageBytes; // Web
+  // Banner
+  File? bannerImageFile; // Mobile
+  Uint8List? bannerImageBytes; // Web
 
   // Web Image/File Picker using Uint8List bytes
-  Future pickWebImage() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['jpg', 'png', 'webm'],
-          allowMultiple: false);
+  void pickWebImage(String section) async {
+    if (section == 'Profile') {
+      try {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: ['jpg', 'png', 'webm'],
+            allowMultiple: false);
 
-      Uint8List bytes;
-
-      if (result != null) {
-        bytes = result.files.first.bytes!;
-        imageBytes = bytes;
-        setState(() {
-          //imageGal = imagee;
-          imageBytes = bytes;
-        });
-
-        //imagee = await _cropWebImage(image: file);
-      } else {
-        // User canceled the picker
-        return;
+        if (result == null) {
+          profileImageBytes = null;
+        } else {
+          setState(() {
+            profileImageBytes = result.files.first.bytes!;
+          });
+        }
+      } on PlatformException catch (e) {
+        print('Failed to pick image: $e');
       }
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
+    } else {
+      try {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: ['jpg', 'png', 'webm'],
+            allowMultiple: false);
+
+        Uint8List bytes;
+
+        if (result != null) {
+          bytes = result.files.first.bytes!;
+          bannerImageBytes = bytes;
+          setState(() {
+            bannerImageBytes = bytes;
+          });
+        } else {
+          // User canceled the picker
+          return;
+        }
+      } on PlatformException catch (e) {
+        print('Failed to pick image: $e');
+      }
     }
   }
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
   // Mobile Image/File Picker using File
   Future pickMobileImage() async {
@@ -70,25 +93,11 @@ class _RegisterPageState extends State<RegisterPage> {
       File imageTemp = File(image.path);
       imageTemp = await _cropImage(image: imageTemp);
 
-      setState(() => imageGal = imageTemp);
+      setState(() => profileImageFile = imageTemp);
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
     }
   }
-
-  // Might not implement since Web Image/File is in bytes and has no path
-  /*Future<File> _cropWebImage({required File image}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
-        uiSettings: [
-          WebUiSettings(
-            context: context,
-          )
-        ]);
-    if (croppedImage == null) return image;
-    return File(croppedImage.path);
-  }*/
 
   // Mobile Image Cropper
   Future<File> _cropImage({required File image}) async {
@@ -98,6 +107,11 @@ class _RegisterPageState extends State<RegisterPage> {
         uiSettings: [WebUiSettings(context: context, showZoomer: true)]);
     if (croppedImage == null) return image;
     return File(croppedImage.path);
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -134,8 +148,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           passwordController.clear();
                           nameController.clear();
                           usernameController.clear();
-                          if (imageGal != null) {
-                            imageGal!.delete();
+                          if (profileImageFile != null) {
+                            profileImageFile!.delete();
                           }
                         });
                       },
@@ -179,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Row(
         children: [
           Container(
-            width: mobileScreenSize as double,
+            width: mobileScreenSize,
             padding: const EdgeInsets.all(28),
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -491,20 +505,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
   registerFormTwo() {
     return LayoutBuilder(builder: (context, constraints) {
-      return constraints.maxWidth > 830
-          ? buildWebRegisterFormTwo()
-          : buildMobileRegisterFormTwo();
+      return constraints.maxWidth > 1280
+          ? buildWebRegisterFormTwo(constraints.maxWidth)
+          : buildMobileRegisterFormTwo(constraints.maxWidth);
     });
   }
 
   /// Second register Step(Profile Image, Profile Name, Profile Username)
-  Widget buildWebRegisterFormTwo() {
+  Widget buildWebRegisterFormTwo(double constraints) {
     return Form(
       key: _formOneKey,
       child: Row(
         children: [
           Container(
-            width: mobileScreenSize as double,
+            width: mobileScreenSize,
             padding: const EdgeInsets.all(28),
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -515,33 +529,83 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  height: 200,
-                  width: 250,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    image: imageBytes != null
-                        ? DecorationImage(
-                            image: MemoryImage(imageBytes!), fit: BoxFit.cover)
-                        : const DecorationImage(
-                            image: AssetImage('lib/assets/default.png'),
-                            fit: BoxFit.cover),
-                    color: Colors.white,
-                  ),
-                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
-                      child: TextButton(
-                        child: const Text("Change profile picture"),
-                        onPressed: () {
-                          pickWebImage();
-                        },
-                      ),
-                    )
+                    // Profile
+                    Column(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: 200,
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(6),
+                            ),
+                            color: Colors.white,
+                            image: profileImageBytes != null
+                                ? DecorationImage(
+                                    image: MemoryImage(profileImageBytes!),
+                                    fit: BoxFit.cover)
+                                : profileImageFile != null
+                                    ? DecorationImage(
+                                        image: FileImage(profileImageFile!),
+                                        fit: BoxFit.cover)
+                                    : const DecorationImage(
+                                        image: AssetImage(
+                                            'lib/assets/default.png'),
+                                        fit: BoxFit.contain),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+                          child: TextButton(
+                            child: const Text("Change profile picture"),
+                            onPressed: () {
+                              pickWebImage('Profile');
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Banner
+                    Column(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: 200,
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(6),
+                            ),
+                            color: Colors.white,
+                            image: bannerImageBytes != null
+                                ? DecorationImage(
+                                    image: MemoryImage(bannerImageBytes!),
+                                    fit: BoxFit.cover)
+                                : profileImageFile != null
+                                    ? DecorationImage(
+                                        image: FileImage(bannerImageFile!),
+                                        fit: BoxFit.cover)
+                                    : const DecorationImage(
+                                        image: AssetImage(
+                                            'lib/assets/default.png'),
+                                        fit: BoxFit.contain),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+                          child: TextButton(
+                            child: const Text("Change banner picture"),
+                            onPressed: () {
+                              pickWebImage('Banner');
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 // Web Name TextField
@@ -654,66 +718,48 @@ class _RegisterPageState extends State<RegisterPage> {
                             fontWeight: FontWeight.w500),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 200,
-                              width: 250,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(10)),
-                                image: imageBytes != null
-                                    ? DecorationImage(
-                                        image: MemoryImage(imageBytes!),
-                                        fit: BoxFit.cover)
-                                    : const DecorationImage(
-                                        image: AssetImage(
-                                            'lib/assets/default.png'),
-                                        fit: BoxFit.contain),
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              nameController.text.isEmpty ? 'Name' : name,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .fontSize),
-                            ),
-                            Text(
-                              usernameController.text.isEmpty
-                                  ? '@username'
-                                  : '@$username',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .fontSize),
-                            ),
-                            Text(
-                              emailController.text,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize),
-                            ),
-                            Text(
-                              'Bio: ',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize),
-                            ),
-                          ],
-                        ),
+                    Flexible(
+                      child: Card(
+                        color: backgroundColorSolid,
+                        shape: const ContinuousRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(6))),
+                        child: Container(
+                            height: 400,
+                            width: 900,
+                            padding: const EdgeInsets.all(4),
+                            child: Stack(
+                              children: [
+                                Column(
+                                  children: [
+                                    // Banner
+                                    Container(
+                                      height: 300,
+                                      width: 900,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(6)),
+                                        color: Colors.white60,
+                                        image: bannerImageBytes != null
+                                            ? DecorationImage(
+                                                image: MemoryImage(
+                                                    bannerImageBytes!),
+                                                fit: BoxFit.cover)
+                                            : profileImageFile != null
+                                                ? DecorationImage(
+                                                    image: FileImage(
+                                                        bannerImageFile!),
+                                                    fit: BoxFit.cover)
+                                                : const DecorationImage(
+                                                    image: AssetImage(
+                                                        'lib/assets/default.png'),
+                                                    fit: BoxFit.contain),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                buildProfileSampleBackground(constraints),
+                              ],
+                            )),
                       ),
                     ),
                   ],
@@ -746,121 +792,298 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   // Mobile Register Form Two
-  buildMobileRegisterFormTwo() {
-    return SingleChildScrollView(
-      child: Form(
-          key: _formTwoKey,
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(emailController.text),
-              Container(
-                height: 200,
-                width: 250,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  image: imageBytes != null
-                      ? DecorationImage(
-                          image: MemoryImage(imageBytes!), fit: BoxFit.cover)
-                      : imageGal != null
-                          ? DecorationImage(
-                              image: FileImage(imageGal!), fit: BoxFit.cover)
-                          : const DecorationImage(
-                              image: AssetImage('lib/assets/default.png'),
-                              fit: BoxFit.contain),
-                  color: Colors.white,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
-                    child: TextButton(
-                      child: const Text("Change profile picture"),
-                      onPressed: () async {
-                        pickMobileImage();
-                      },
-                    ),
-                  )
-                ],
-              ),
-              // Mobile Name TextField
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                child: Row(
+  buildMobileRegisterFormTwo(double constraints) {
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          width: constraints > 958 ? 958 : constraints,
+          padding: const EdgeInsets.all(8),
+          child: Form(
+              key: _formTwoKey,
+              child: Column(
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Card(
+                    color: backgroundColorSolid,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                    child: Container(
+                        height: 400,
+                        padding: const EdgeInsets.all(2),
+                        child: Stack(
+                          children: [
+                            Column(
+                              children: [
+                                // Banner
+                                Container(
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(6)),
+                                    color: Colors.white60,
+                                    image: bannerImageBytes != null
+                                        ? DecorationImage(
+                                            image:
+                                                MemoryImage(bannerImageBytes!),
+                                            fit: BoxFit.cover)
+                                        : profileImageFile != null
+                                            ? DecorationImage(
+                                                image:
+                                                    FileImage(bannerImageFile!),
+                                                fit: BoxFit.cover)
+                                            : const DecorationImage(
+                                                image: AssetImage(
+                                                    'lib/assets/default.png'),
+                                                fit: BoxFit.contain),
+                                  ),
+                                )
+                              ],
+                            ),
+                            buildProfileSampleBackground(constraints),
+                          ],
+                        )),
+                  ),
+
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: nameController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: ((name) => name != null &&
-                                  name.length < 3 &&
-                                  name.length > 25
-                              ? 'Name must be between 3 and 25 characters'
-                              : null),
-                          decoration: const InputDecoration(
-                            labelText: 'Name',
-                            border: OutlineInputBorder(),
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              nameController.text = value;
-                            });
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+                        child: TextButton(
+                          child: const Text("Change profile picture"),
+                          onPressed: () async {
+                            if (kIsWeb) {
+                              pickWebImage('Profile');
+                            } else {
+                              pickMobileImage();
+                            }
                           },
                         ),
                       ),
-                    ]),
-              ),
-              // Mobile Username TextField
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        child: TextFormField(
-                          controller: usernameController,
-                          decoration: const InputDecoration(
-                            labelText: '@Username',
-                            border: OutlineInputBorder(),
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+                        child: TextButton(
+                          child: const Text("Change banner picture"),
+                          onPressed: () async {
+                            if (kIsWeb) {
+                              pickWebImage('Banner');
+                            } else {
+                              pickMobileImage();
+                            }
+                          },
                         ),
-                      ),
-                    ]),
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                      )
+                    ],
+                  ),
+                  // Mobile Name TextField
                   Padding(
-                    padding: EdgeInsets.fromLTRB(0, 2, 0, 8),
-                    child: Text(
-                        "Usernames are used to uniquly identify other users"),
-                  )
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Flexible(
+                            child: TextFormField(
+                              controller: nameController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: ((name) => name != null &&
+                                      name.length < 3 &&
+                                      name.length > 25
+                                  ? 'Name must be between 3 and 25 characters'
+                                  : null),
+                              decoration: const InputDecoration(
+                                labelText: 'Name',
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  name = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ]),
+                  ),
+                  // Mobile Username TextField
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Flexible(
+                            child: TextFormField(
+                              controller: usernameController,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp("[0-9a-zA-Z_]"))
+                              ],
+                              decoration: const InputDecoration(
+                                labelText: '@Username',
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  username = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ]),
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 2, 0, 8),
+                        child: Text(
+                            "Usernames are used to uniquly identify other users"),
+                      )
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * .1,
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        shape: const ContinuousRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(6))),
+                        minimumSize: const Size.fromHeight(50),
+                      ),
+                      icon: const Icon(Icons.align_horizontal_right_sharp),
+                      label: const Text(
+                        "Finish Account Setup",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      onPressed: () async {
+                        completeAccountSetup();
+
+                        // Return AuthScreen (Login)
+                        context.router.root.pushNamed('/');
+                      },
+                    ),
+                  ),
                 ],
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * .1,
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
+              )),
+        ),
+      ),
+    );
+  }
+
+  buildProfileSampleBackground(double constraints) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  height: 150,
+                  width: 200,
+                  margin: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 3, color: backgroundColorSolid),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(6),
+                    ),
+                    color: Colors.white,
+                    image: profileImageBytes != null
+                        ? DecorationImage(
+                            image: MemoryImage(profileImageBytes!),
+                            fit: BoxFit.cover)
+                        : profileImageFile != null
+                            ? DecorationImage(
+                                image: FileImage(profileImageFile!),
+                                fit: BoxFit.cover)
+                            : const DecorationImage(
+                                image: AssetImage('lib/assets/default.png'),
+                                fit: BoxFit.contain),
+                  ),
                 ),
-                icon: const Icon(Icons.align_horizontal_right_sharp),
-                label: const Text(
-                  "Finish Account Setup",
-                  style: TextStyle(fontSize: 20),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    height: 150,
+                    margin: const EdgeInsets.all(4),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          nameController.text.isEmpty ? 'Name' : name,
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall!
+                                  .fontSize),
+                        ),
+                        Text(
+                          usernameController.text.isEmpty
+                              ? '@username'
+                              : '@$username',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .fontSize),
+                        ),
+                        Text(
+                          emailController.text,
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize),
+                        ),
+                        Text(
+                          'Bio: ',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                onPressed: () async {
-                  completeAccountSetup();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("User is Signed In")));
-                  Navigator.of(context).pushReplacementNamed('/');
-                },
               ),
             ],
-          )),
+          ),
+        ),
+      ],
+    );
+  }
+
+  buildStats(String stat, String label) {
+    return Container(
+      padding: const EdgeInsets.only(right: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Text(
+              stat,
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+                fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
+          ),
+        ],
+      ),
     );
   }
 
@@ -883,9 +1106,11 @@ class _RegisterPageState extends State<RegisterPage> {
           email: emailController.text,
           password: passwordController.text,
           name: nameController.text,
-          username: usernameController.text,
-          imageFile: imageGal,
-          imageBytes: imageBytes);
+          username: '@${usernameController.text}',
+          profileImageFile: profileImageFile,
+          profileImageBytes: profileImageBytes,
+          bannerImageFile: bannerImageFile,
+          bannerImageBytes: bannerImageBytes);
       // Logout after account has been created
       await FirebaseAuth.instance.signOut();
     } on FirebaseException catch (e) {

@@ -6,6 +6,7 @@ class UserModel {
   final String name;
   final String username;
   final String profileUrl;
+  final String bannerUrl;
   final String bio;
   final String status;
   final String renown;
@@ -23,6 +24,7 @@ class UserModel {
     required this.name,
     required this.username,
     required this.profileUrl,
+    required this.bannerUrl,
     required this.bio,
     required this.status,
     required this.renown,
@@ -41,6 +43,7 @@ class UserModel {
         'name': name,
         'username': username,
         'profile_image': profileUrl,
+        'banner_image': bannerUrl,
         'bio': bio,
         'status': status,
         'renown': renown,
@@ -62,6 +65,7 @@ class UserModel {
       name: snapshot['name'],
       username: snapshot['username'],
       profileUrl: snapshot['profile_image'],
+      bannerUrl: snapshot['banner_image'],
       bio: snapshot['bio'],
       status: snapshot['status'],
       renown: snapshot['renown'],

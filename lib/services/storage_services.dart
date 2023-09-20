@@ -9,51 +9,122 @@ class StorageServices {
   final FirebaseStorage storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Upload Image File
   Future<String> uploadImageFileToStorage(
       String fileLocation, File file, String pid) async {
-    Reference ref = storage
-        .ref()
-        .child(fileLocation)
-        .child(_auth.currentUser!.uid); //// Change too Unique user/server ID
+    switch (fileLocation) {
+      case 'user_profile_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        ref = ref.child('profile_image');
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_banner_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        ref = ref.child('banner_image');
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_post_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        String pid = const Uuid().v1();
+        ref = ref.child(pid);
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_media':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        String pid = const Uuid().v1();
+        ref = ref.child(pid);
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
 
-    // File Organization
-    if (fileLocation == 'user_post_images') {
-      String pid = const Uuid().v1();
-      ref = ref.child(pid);
-    } else if (fileLocation == 'user_media') {
-      ref = ref.child(pid);
+      default:
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
     }
+  }
 
-    //
+  Future<String> updateBannerFile(File file) async {
+    Reference ref =
+        storage.ref().child('user_banner_images').child(_auth.currentUser!.uid);
+    ref.delete();
     UploadTask uploadTask = ref.putFile(file);
     TaskSnapshot snap = await uploadTask;
-
     String imageURL = await snap.ref.getDownloadURL();
-
     return imageURL;
   }
 
+  // Upload Image Bytes
   Future<String> uploadImageBytesToStorage(
       String fileLocation, Uint8List file, String pid) async {
-    Reference ref = storage
-        .ref()
-        .child(fileLocation)
-        .child(_auth.currentUser!.uid); //// Change too Unique user/server ID
+    switch (fileLocation) {
+      case 'user_profile_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        ref = ref.child('profile_image');
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_banner_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        ref = ref.child('banner_image');
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_post_images':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        String pid = const Uuid().v1();
+        ref = ref.child(pid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'user_media':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        String pid = const Uuid().v1();
+        ref = ref.child(pid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      default:
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
 
-    // File Organization
-    if (fileLocation == 'user_post_images') {
-      String uUid = const Uuid().v1();
-      ref = ref.child(uUid);
-    } else if (fileLocation == 'user_media') {
-      ref = ref.child(pid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
     }
+  }
 
-    //
-    UploadTask uploadTask = ref.putData(file);
+  Future<String> updateBannerBytes(Uint8List bytes) async {
+    Reference ref =
+        storage.ref().child('user_banner_images').child(_auth.currentUser!.uid);
+    ref.delete();
+    UploadTask uploadTask = ref.putData(bytes);
     TaskSnapshot snap = await uploadTask;
-
     String imageURL = await snap.ref.getDownloadURL();
-
     return imageURL;
   }
 }
