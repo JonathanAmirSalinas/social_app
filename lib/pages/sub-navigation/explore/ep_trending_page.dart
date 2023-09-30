@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:auto_route/annotations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 
@@ -14,23 +16,24 @@ class _TrendingPageState extends State<TrendingTabPage>
     with AutomaticKeepAliveClientMixin<TrendingTabPage> {
   @override
   bool get wantKeepAlive => true;
+  PageController trendingMediaController = PageController(viewportFraction: .8);
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                buildHeadline(),
-                buildTrending(),
-                buildTrendingTopics(),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Column(
+            children: [
+              buildHeadline(),
+              buildTrending(),
+              buildTrendingMedia(),
+              buildTrendingExtra(),
+            ],
           ),
         ),
       ),
@@ -40,33 +43,67 @@ class _TrendingPageState extends State<TrendingTabPage>
   // Trending Headline, built from the most "#'s" & searched topic
   //////////////////////////////////////////////////////////////////////////////
   buildHeadline() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "   Headline",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+    return GestureDetector(
+      onTap: () {},
+      child: AspectRatio(
+        aspectRatio: kIsWeb ? 1.8 : 1.2,
+        child: Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                      color: backgroundColor),
+                  child: const Placeholder(),
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Title",
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .fontSize,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'Subtitle',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .fontSize),
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(color: navBarColor),
+            ],
           ),
         ),
-        Card(
-          color: fillColor,
-          child: Container(
-            height: MediaQuery.of(context).size.height * .4,
-            width: MediaQuery.of(context).size.width * .8,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: const Column(
-              children: [],
-            ),
-          ),
-        ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
-      ],
+      ),
     );
   }
 
@@ -74,167 +111,271 @@ class _TrendingPageState extends State<TrendingTabPage>
   //////////////////////////////////////////////////////////////////////////////
   buildTrending() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "   Trending",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "Trending",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
           ),
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .9,
-          width: MediaQuery.of(context).size.width * .8,
-          child: ListView.builder(
-              itemCount: 8,
-              itemBuilder: ((context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
+        ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            itemBuilder: ((context, index) {
+              return GestureDetector(
+                onTap: () {},
+                child: AspectRatio(
+                  aspectRatio: kIsWeb ? 5 : 3.2,
                   child: Container(
-                    height: MediaQuery.of(context).size.height * .1,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(4)),
-                        color: fillColor),
-                    child: Text(index.toString()),
-                  ),
-                );
-              })),
-        ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 1.2,
+                            child: Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                  color: fillColor),
+                            ),
+                          ),
+                          Expanded(
+                              child: Container(
+                            padding: const EdgeInsets.all(4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'Title',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .fontSize,
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Text(
+                                      'Subtitles',
+                                      style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .fontSize,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
+                        ],
+                      )),
+                ),
+              );
+            })),
+        const Divider(color: navBarColor),
       ],
     );
   }
 
-  // Built from under top 10 trending topics
+  // Trending Media
   //////////////////////////////////////////////////////////////////////////////
-  buildTrendingTopics() {
+  buildTrendingMedia() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "   Trending Topics",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "News Media",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
           ),
         ),
-        Container(
-          height: MediaQuery.of(context).size.height * .6,
-          width: MediaQuery.of(context).size.width * .9,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+        SingleChildScrollView(
+            child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },
           ),
-          child: GridView.count(
-            childAspectRatio: 3,
-            crossAxisCount: 2,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 4,
-            children: [
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.purple,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Sports",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.red,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Politics",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.green,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "World News",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.pink,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Entertainment",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.orange,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Economy",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-            ],
+          child: AspectRatio(
+            aspectRatio: kIsWeb ? 4 : 2.8,
+            child: ListView.builder(
+                controller: trendingMediaController,
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                itemBuilder: (BuildContext context, int index) {
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: kIsWeb ? 1 : .9,
+                              child: Container(
+                                margin: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                    color: fillColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: kIsWeb ? 1 : .9,
+                              child: Container(
+                                margin: const EdgeInsets.all(4),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                child: const Icon(
+                                  Icons.play_arrow,
+                                  size: 32,
+                                  color: secondaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+          ),
+        )),
+        const Divider(color: navBarColor),
+      ],
+    );
+  }
+
+  /// Builds Extra Trending Stories/Topics
+  /////////////////////////////////////////////////////////////////////////////
+  buildTrendingExtra() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "Extra",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
           ),
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
+        ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 4,
+            itemBuilder: ((context, index) {
+              return GestureDetector(
+                onTap: () {},
+                child: AspectRatio(
+                  aspectRatio: kIsWeb ? 5 : 3.2,
+                  child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 1.2,
+                            child: Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                  color: fillColor),
+                            ),
+                          ),
+                          Expanded(
+                              child: Container(
+                            padding: const EdgeInsets.all(4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'Title',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .fontSize,
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Text(
+                                      'Subtitles',
+                                      style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .fontSize,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
+                        ],
+                      )),
+                ),
+              );
+            })),
+        const Divider(color: navBarColor),
       ],
     );
   }

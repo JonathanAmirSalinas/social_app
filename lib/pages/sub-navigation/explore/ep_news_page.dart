@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 
@@ -15,7 +16,10 @@ class _NewsPageState extends State<NewsTabPage>
     with AutomaticKeepAliveClientMixin<NewsTabPage> {
   @override
   bool get wantKeepAlive => true;
-  PageController controller = PageController(viewportFraction: .8);
+  PageController trendingNewsMediaController =
+      PageController(viewportFraction: .8);
+  PageController trendingNewsHeadlineController =
+      PageController(viewportFraction: .8);
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -27,14 +31,72 @@ class _NewsPageState extends State<NewsTabPage>
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
+                buildFilterBar(),
                 buildNewsHeadlines(),
+                buildTrendingNewsMedia(),
                 buildTrendingNews(),
-                buildHotNewsTopics(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Filter Bar (TODO: Convert To Tab-Like Functionality (Nested Navigation))
+  //////////////////////////////////////////////////////////////////////////////
+  buildFilterBar() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: fillColor,
+              size: 18,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildFilterButton('Home'),
+                    buildFilterButton('Sports'),
+                    buildFilterButton('Entertainment'),
+                    buildFilterButton('Economy'),
+                    buildFilterButton('Politics'),
+                    buildFilterButton('Weather'),
+                    buildFilterButton('Science'),
+                    buildFilterButton('Technology'),
+                    buildFilterButton('Trending'),
+                  ],
+                ),
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: fillColor,
+              size: 18,
+            ),
+          ],
+        ),
+        const Divider(color: navBarColor)
+      ],
+    );
+  }
+
+  // Filter Bar Button
+  buildFilterButton(String title) {
+    return Container(
+      margin: const EdgeInsets.all(4),
+      child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            shape: const ContinuousRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+          ),
+          child: Text(title)),
     );
   }
 
@@ -45,10 +107,14 @@ class _NewsPageState extends State<NewsTabPage>
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "   Headlines",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "Headlines",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
           ),
         ),
         SingleChildScrollView(
@@ -59,21 +125,111 @@ class _NewsPageState extends State<NewsTabPage>
                   PointerDeviceKind.mouse,
                 },
               ),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .5,
-                width: MediaQuery.of(context).size.width * .9,
-                child: PageView.builder(
-                    controller: controller,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 5,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildNewsHeadlineCard();
-                    }),
+              child: AspectRatio(
+                aspectRatio: kIsWeb ? 1.8 : 1.4,
+                child: SizedBox(
+                  child: PageView.builder(
+                      controller: trendingNewsHeadlineController,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 3,
+                      itemBuilder: (BuildContext context, int index) {
+                        return buildNewsHeadlineCard();
+                      }),
+                ),
               )),
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
+        const Divider(color: navBarColor),
+      ],
+    );
+  }
+
+  // Trending Media
+  //////////////////////////////////////////////////////////////////////////////
+  buildTrendingNewsMedia() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "News Media",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+            child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },
+          ),
+          child: AspectRatio(
+            aspectRatio: kIsWeb ? 4 : 2.8,
+            child: ListView.builder(
+                controller: trendingNewsMediaController,
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                itemBuilder: (BuildContext context, int index) {
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: kIsWeb ? 1 : .9,
+                              child: Container(
+                                margin: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                    color: fillColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: kIsWeb ? 1 : .9,
+                              child: Container(
+                                margin: const EdgeInsets.all(4),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                child: const Icon(
+                                  Icons.play_arrow,
+                                  size: 32,
+                                  color: secondaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+          ),
+        )),
+        const Divider(color: navBarColor),
       ],
     );
   }
@@ -82,182 +238,149 @@ class _NewsPageState extends State<NewsTabPage>
   //////////////////////////////////////////////////////////////////////////////
   buildTrendingNews() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "   Trending",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "News Topics",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
           ),
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .9,
-          width: MediaQuery.of(context).size.width * .8,
-          child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: ((context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * .08,
-                    alignment: Alignment.center,
-                    color: fillColor,
-                    child: Text(index.toString()),
-                  ),
-                );
-              })),
-        ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
-      ],
-    );
-  }
-
-  // Builds GridView of other news stories, from the use both Headlines and Trending
-  /////////////////////////////////////////////////////////////////////////////////
-  buildHotNewsTopics() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "   Recent News Stories",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
-          ),
-        ),
-        Container(
-          height: MediaQuery.of(context).size.height * .6,
-          width: MediaQuery.of(context).size.width * .9,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-          ),
-          child: GridView.count(
-            childAspectRatio: 3,
-            crossAxisCount: 2,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 4,
-            children: [
-              GridTile(
-                  child: Card(
+        ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 4,
+            itemBuilder: ((context, index) {
+              return AspectRatio(
+                aspectRatio: kIsWeb ? 5 : 3.2,
                 child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.purple,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Sports",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.red,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Politics",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.green,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "World News",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.pink,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Entertainment",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-              GridTile(
-                  child: Card(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Colors.orange,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Economy",
-                    style: TextStyle(
-                        fontSize: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .fontSize),
-                  ),
-                ),
-              )),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .02,
-        )
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 1.2,
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                                color: fillColor),
+                          ),
+                        ),
+                        Expanded(
+                            child: Container(
+                          padding: const EdgeInsets.all(4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'Title',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge!
+                                          .fontSize,
+                                      fontWeight: FontWeight.w500),
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Text(
+                                    'Subtitles',
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .fontSize,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ))
+                      ],
+                    )),
+              );
+            })),
+        const Divider(color: navBarColor),
       ],
     );
   }
 
   // Builds News Headline UI Card
   buildNewsHeadlineCard() {
-    return Card(
-      child: Container(
-        height: MediaQuery.of(context).size.height * .35,
-        width: MediaQuery.of(context).size.width * .7,
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: fillColor),
-        child: const Column(
-          children: [],
+    return Column(
+      children: [
+        AspectRatio(
+          aspectRatio: kIsWeb ? 1.5 : 1.15,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                    ),
+                    child: const Placeholder(),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Title",
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .fontSize,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'Subtitle',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .fontSize),
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
