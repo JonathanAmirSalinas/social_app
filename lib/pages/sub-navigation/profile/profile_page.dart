@@ -43,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              context.router.pushNamed('/');
+              context.router.pop();
             },
             icon: const Icon(Icons.arrow_back_ios_new),
           ),
