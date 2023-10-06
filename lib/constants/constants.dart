@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
 import 'package:social_app/pages/main-navigation/home_page.dart';
@@ -28,6 +29,10 @@ const errorColor = Color.fromARGB(255, 255, 75, 75);
 const double mobileScreenSize = 600;
 const double webScreenSize = 900;
 //Window width: ${MediaQuery.of(context).size.width.toString()
+
+// Content Loading Shimmer Animation
+const shimmerBase = Color.fromARGB(255, 142, 142, 142);
+const shimmerHighlight = Color.fromARGB(255, 115, 115, 115);
 
 // Bool true if Screen Size is meets Mobile Constraints
 bool isMobileScreen(double screenSize) {

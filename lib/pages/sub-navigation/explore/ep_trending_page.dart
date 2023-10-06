@@ -32,6 +32,7 @@ class _TrendingPageState extends State<TrendingTabPage>
               buildHeadline(),
               buildTrending(),
               buildTrendingMedia(),
+              buildTrendingTags(),
               buildTrendingExtra(),
             ],
           ),
@@ -229,7 +230,7 @@ class _TrendingPageState extends State<TrendingTabPage>
             child: ListView.builder(
                 controller: trendingMediaController,
                 scrollDirection: Axis.horizontal,
-                itemCount: 4,
+                itemCount: 2,
                 itemBuilder: (BuildContext context, int index) {
                   return Stack(
                     children: [
@@ -284,6 +285,68 @@ class _TrendingPageState extends State<TrendingTabPage>
                 }),
           ),
         )),
+        const Divider(color: navBarColor),
+      ],
+    );
+  }
+
+  // Builds Trending Tabs
+  buildTrendingTags() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8),
+            child: Text(
+              "Trending Tags",
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+        ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 5,
+            itemBuilder: ((context, index) {
+              return GestureDetector(
+                onTap: () {},
+                child: Container(
+                    margin: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        color: navBarColor),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 32),
+                              margin: const EdgeInsets.all(2),
+                              child: Text(
+                                '# Tags',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .fontSize,
+                                    fontWeight: FontWeight.w500),
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+              );
+            })),
         const Divider(color: navBarColor),
       ],
     );
