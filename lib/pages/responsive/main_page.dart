@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
 import 'package:social_app/pages/sub-navigation/content/create_post_page.dart';
+import 'package:social_app/providers/api/news/sports_news/bloc/sports_bloc.dart';
+import 'package:social_app/providers/api/news/sports_news/bloc/sports_event.dart';
 import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
@@ -48,6 +50,8 @@ class _MainPageState extends State<MainPage> {
       loadingState = true;
     });
     try {
+      SportsBloc sportProvider = Provider.of(context, listen: false);
+      sportProvider.add(GetSportsList());
       UserProvider userProvider = Provider.of(context, listen: false);
       await userProvider.refreshUser();
       FeedProvider feedProvider = Provider.of(context, listen: false);
