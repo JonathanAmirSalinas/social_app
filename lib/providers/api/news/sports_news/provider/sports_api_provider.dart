@@ -5,8 +5,8 @@ import 'package:social_app/providers/api/news/sports_news/model/sports_model.dar
 class SportsApiProvider {
   final Dio _dio = Dio();
   // api's URL
-  final String _url = "";
-  //'https://newsapi.org/v2/top-headlines?country=us&category=sports&apiKey='; // Missing Key
+  final String _url =
+      'https://newsapi.org/v2/top-headlines?country=us&category=sports&apiKey=927a3ba837e146faa2e8ad19d3fc3faa';
 
   // GET REQUEST for Sports News
   Future<SportsModel> getSportNews() async {

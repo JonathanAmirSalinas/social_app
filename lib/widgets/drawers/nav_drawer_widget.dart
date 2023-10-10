@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/constants/constants.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 /// MAIN NAVIGATION DRAWER                                                        ///
@@ -14,6 +15,7 @@ class SliverNavigationDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Drawer(
+        backgroundColor: navBarColor,
         width: MediaQuery.of(context).size.width * .6,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

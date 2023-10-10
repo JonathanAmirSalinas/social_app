@@ -64,7 +64,8 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Profile Image
-                buildUserProfileImage(context, widget.content),
+                buildUserProfileImage(
+                    context, widget.content['id_content_owner']),
                 Expanded(
                   child: Column(
                     children: [
@@ -87,16 +88,10 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      widget.content['statement'],
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .fontSize),
-                                      overflow: TextOverflow.visible,
-                                    ),
-                                  ),
+                                      child: buildDetectableStatement(
+                                          context,
+                                          widget.content['statement'],
+                                          TextOverflow.visible)),
                                 ],
                               ),
                             ),
@@ -196,7 +191,8 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Profile Image
-                buildUserProfileImage(context, widget.content),
+                buildUserProfileImage(
+                    context, widget.content['id_content_owner']),
                 Expanded(
                   child: Column(
                     children: [
@@ -220,16 +216,10 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      widget.content['statement'],
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .fontSize),
-                                      overflow: TextOverflow.visible,
-                                    ),
-                                  ),
+                                      child: buildDetectableStatement(
+                                          context,
+                                          widget.content['statement'],
+                                          TextOverflow.visible)),
                                 ],
                               ),
                             ),

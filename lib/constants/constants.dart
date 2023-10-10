@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/widgets/detectable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
 import 'package:social_app/pages/main-navigation/home_page.dart';
@@ -24,6 +25,7 @@ const backgroundColorSolid = Color.fromARGB(255, 0, 0, 0);
 const fillColor = Color.fromARGB(255, 85, 85, 85);
 const cardColor = Color.fromARGB(255, 5, 5, 5);
 const errorColor = Color.fromARGB(255, 255, 75, 75);
+final taggedColor = Colors.pink[300];
 
 // Screen
 const double mobileScreenSize = 600;
@@ -177,6 +179,28 @@ buildUserTile(
           return Container();
         }
       });
+}
+
+// Builds Detectabel Statement
+buildDetectableStatement(
+    BuildContext context, String statement, TextOverflow textOverflow) {
+  return DetectableText(
+    text: statement,
+    basicStyle: TextStyle(
+      fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+      fontWeight: FontWeight.w400,
+    ),
+    detectedStyle: TextStyle(
+      color: taggedColor,
+      fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+      fontWeight: FontWeight.w400,
+    ),
+    detectionRegExp: RegExp(
+      "(?!\\n)(?:^|\\s)([#@]([$detectionContentLetters]+))|$urlRegexContent",
+      multiLine: true,
+    ),
+    overflow: textOverflow,
+  );
 }
 
 /*

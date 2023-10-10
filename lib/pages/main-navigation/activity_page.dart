@@ -52,24 +52,31 @@ class _ActivityPageState extends State<ActivityPage> {
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverAppBar(
-                      pinned: true,
-                      floating: true,
-                      snap: true,
-                      scrolledUnderElevation: 0.0,
-                      backgroundColor: navBarColor,
-                      leading: isSmallPage(
-                        context,
-                        "Leading IconButton",
-                      ),
-                      centerTitle: true,
-                      title: Text(
-                        "Activity",
-                        style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineSmall!
-                                .fontSize),
-                      )),
+                    pinned: true,
+                    floating: true,
+                    snap: true,
+                    scrolledUnderElevation: 0.0,
+                    backgroundColor: navBarColor,
+                    leading: isSmallPage(
+                      context,
+                      "Leading IconButton",
+                    ),
+                    centerTitle: true,
+                    title: Text(
+                      "Activity",
+                      style: TextStyle(
+                          fontSize: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .fontSize),
+                    ),
+                    actions: [
+                      Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: IconButton(
+                              onPressed: () {}, icon: const Icon(Icons.menu)))
+                    ],
+                  ),
 
                   // TABBAR
                   SliverPersistentHeader(
@@ -81,7 +88,7 @@ class _ActivityPageState extends State<ActivityPage> {
                         unselectedLabelColor: Colors.grey,
                         tabs: const [
                           Tab(text: "Notifications"),
-                          Tab(text: "Messages"),
+                          Tab(text: "Mentions"),
                         ],
                       ),
                     ),
