@@ -312,7 +312,7 @@ class ContentServices {
             cid,
             referenceOwner,
             referencePostID,
-            'commented_post',
+            'commented_content',
             time);
       }
     } catch (e) {
@@ -361,7 +361,7 @@ class ContentServices {
           cid,
           referenceOwner,
           referencePostID,
-          'commented_post',
+          'commented_content',
           time,
         );
       }
@@ -396,7 +396,7 @@ class ContentServices {
           });
           // Send Notification of who like the user post
           await ActivityServices()
-              .likeNotification(sender, receiver, pid, 'liked_post');
+              .likeNotification(sender, receiver, pid, 'liked_content');
         }
       } else {
         if (isLiked) {
@@ -409,7 +409,7 @@ class ContentServices {
           });
           // Send Notification of who like the user post
           await ActivityServices()
-              .likeNotification(sender, receiver, pid, 'liked_post');
+              .likeNotification(sender, receiver, pid, 'liked_content');
         }
       }
     } catch (e) {

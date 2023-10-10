@@ -305,6 +305,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  detectable_text_field:
+    dependency: "direct main"
+    description:
+      name: detectable_text_field
+      sha256: "64c9892eec96d1944d07201afd982f4011564e7463fd79d14b6582a657b46455"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   dio:
     dependency: "direct main"
     description:

@@ -32,7 +32,7 @@ class BuildCommentContent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profile Image
-                  buildUserProfileImage(context, content),
+                  buildUserProfileImage(context, content['id_content_owner']),
                   Expanded(
                     child: Column(
                       children: [
@@ -55,16 +55,10 @@ class BuildCommentContent extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        content['statement'],
-                                        style: TextStyle(
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .fontSize),
-                                        overflow: TextOverflow.visible,
-                                      ),
-                                    ),
+                                        child: buildDetectableStatement(
+                                            context,
+                                            content['statement'],
+                                            TextOverflow.visible)),
                                   ],
                                 ),
                               ),

@@ -92,7 +92,7 @@ class _BuildPostReferenceContentState extends State<BuildPostReferenceContent>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Profile Image
-              buildUserProfileImage(context, reference),
+              buildUserProfileImage(context, reference['id_content_owner']),
               Expanded(
                 child: Column(
                   children: [
@@ -117,16 +117,10 @@ class _BuildPostReferenceContentState extends State<BuildPostReferenceContent>
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        reference['statement'],
-                                        style: TextStyle(
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .fontSize),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
+                                        child: buildDetectableStatement(
+                                            context,
+                                            reference['statement'],
+                                            TextOverflow.visible)),
                                   ],
                                 ),
                               ),
@@ -211,7 +205,7 @@ class _BuildPostReferenceContentState extends State<BuildPostReferenceContent>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Profile Image
-              buildUserProfileImage(context, reference),
+              buildUserProfileImage(context, reference['id_content_owner']),
               Expanded(
                 child: Column(
                   children: [
@@ -236,16 +230,10 @@ class _BuildPostReferenceContentState extends State<BuildPostReferenceContent>
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        reference['statement'],
-                                        style: TextStyle(
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .fontSize),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
+                                        child: buildDetectableStatement(
+                                            context,
+                                            reference['statement'],
+                                            TextOverflow.ellipsis)),
                                   ],
                                 ),
                               ),

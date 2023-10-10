@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/widgets/detectable_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -268,12 +270,27 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                         ],
                       ),
                       ////////////////////////////////////// Statement
-                      TextField(
+                      DetectableTextField(
                         controller: createPostCaptionController,
                         keyboardType: TextInputType.emailAddress,
                         textAlign: TextAlign.left,
                         maxLength: 256,
                         maxLines: null,
+                        basicStyle: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoratedStyle: TextStyle(
+                          color: taggedColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize:
+                              Theme.of(context).textTheme.titleMedium!.fontSize,
+                        ),
+                        detectionRegExp: RegExp(
+                          "(?!\\n)(?:^|\\s)([#@]([$detectionContentLetters]+))|$urlRegexContent",
+                          multiLine: true,
+                        ),
                         decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "Add Message...",
@@ -400,16 +417,10 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      widget.content['statement'],
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .fontSize),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
+                                      child: buildDetectableStatement(
+                                          context,
+                                          widget.content['statement'],
+                                          TextOverflow.ellipsis)),
                                 ],
                               ),
                             ),

@@ -145,7 +145,7 @@ class _ViewContentPageState extends State<ViewContentPage> {
                 Row(
                   children: [
                     // Profile Image
-                    buildUserProfileImage(context, content),
+                    buildUserProfileImage(context, content["id_content_owner"]),
                     Expanded(
                       child: buildUserInfo(context, content, false),
                     ),
@@ -164,16 +164,10 @@ class _ViewContentPageState extends State<ViewContentPage> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      content['statement'],
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .fontSize),
-                                      overflow: TextOverflow.visible,
-                                    ),
-                                  ),
+                                      child: buildDetectableStatement(
+                                          context,
+                                          content['statement'],
+                                          TextOverflow.visible)),
                                 ],
                               ),
                             ),

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/widgets/detectable_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -324,12 +326,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     ],
                   ),
                   ////////////////////////////////////// Statement
-                  TextField(
+                  DetectableTextField(
                     controller: createPostCaptionController,
                     keyboardType: TextInputType.emailAddress,
                     textAlign: TextAlign.left,
                     maxLength: 256,
                     maxLines: null,
+                    basicStyle: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.titleMedium!.fontSize,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    decoratedStyle: TextStyle(
+                      color: taggedColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize:
+                          Theme.of(context).textTheme.titleMedium!.fontSize,
+                    ),
+                    detectionRegExp: RegExp(
+                      "(?!\\n)(?:^|\\s)([#@]([$detectionContentLetters]+))|$urlRegexContent",
+                      multiLine: true,
+                    ),
                     decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Add Message...",

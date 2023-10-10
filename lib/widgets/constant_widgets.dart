@@ -313,19 +313,17 @@ buildNonInteractiveIconSection(
 
 ///////////////////////////////////////////////////////////// User Profile Image
 ///
-buildUserProfileImage(BuildContext context, Map<String, dynamic> data) {
+buildUserProfileImage(BuildContext context, String data) {
   return StreamBuilder(
-    stream: FirebaseFirestore.instance
-        .collection('users')
-        .doc(data['id_content_owner'])
-        .snapshots(),
+    stream:
+        FirebaseFirestore.instance.collection('users').doc(data).snapshots(),
     builder: (context,
         AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
       if (snapshot.hasData) {
         var user = snapshot.data!.data()!;
         return GestureDetector(
           onTap: () {
-            context.router.pushNamed('/profile/${data['id_content_owner']}');
+            context.router.pushNamed('/profile/${data}');
           },
           child: Container(
             height: 55,
@@ -535,7 +533,55 @@ buildReferenceUserInfo(BuildContext context, Map<String, dynamic> data) {
                         color: const Color.fromARGB(0, 255, 255, 255),
                       ),
                     )),
-                    buildContentMenu(context)
+                    //buildContentMenu(context)
+                  ],
+                ),
+              )),
+        );
+      } else {
+        return Container();
+      }
+    },
+  );
+}
+
+// Notification User's Info
+////////////////////////////////////////////////////////////////////////////////
+buildNotificationUserInfo(BuildContext context, String data) {
+  return StreamBuilder(
+    stream:
+        FirebaseFirestore.instance.collection('users').doc(data).snapshots(),
+    builder: (context,
+        AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+      if (snapshot.hasData) {
+        var user = snapshot.data!.data()!;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
+          child: GestureDetector(
+              onTap: () {
+                context.router.pushNamed('/profile/${data}');
+              },
+              child: SizedBox(
+                height: 55,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Text(
+                            user['name'],
+                            style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .fontSize,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               )),
