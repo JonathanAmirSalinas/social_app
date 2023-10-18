@@ -27,6 +27,18 @@ class AuthServices {
     return UserModel.dataFromDoc(snap);
   }
 
+  Future<Map<String, dynamic>> getMentionedUser(String mention) async {
+    var snap = await _firestore
+        .collection('users')
+        .where('username', isEqualTo: mention)
+        .get();
+
+    var mentionedUser = snap.docs.first.data();
+
+    // Returns Mentioned User uid
+    return mentionedUser;
+  }
+
   // Register User
   Future<void> registerUser({
     required String email,

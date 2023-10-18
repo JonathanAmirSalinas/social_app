@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/functions.dart';
 import 'package:detectable_text_field/widgets/detectable_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,8 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
   TextEditingController createPostCaptionController = TextEditingController();
   File? imageFile;
   Uint8List? imageBytes;
+  List<String> hashtags = [];
+  List<String> mentions = [];
 
   @override
   void initState() {
@@ -163,6 +166,10 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
             ),
             TextButton(
                 onPressed: () async {
+                  hashtags = extractDetections(
+                      createPostCaptionController.text, hashTagRegExp);
+                  mentions = extractDetections(
+                      createPostCaptionController.text, atSignRegExp);
                   if (imageFile != null ||
                       imageBytes != null ||
                       createPostCaptionController.text.isNotEmpty) {
@@ -176,6 +183,8 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                         widget.content['id_content'],
                         widget.content['type'],
                         createPostCaptionController.text,
+                        hashtags,
+                        mentions,
                       );
                       //await feedProvider.refreshPost(widget.content['id_content']);
                       //await feedProvider.refreshTopFeed(true);
@@ -188,13 +197,14 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                         loadingPost = true;
                       });
                       await ContentServices().uploadMediaComment(
-                        widget.content['id_content_owner'],
-                        widget.content['id_content'],
-                        createPostCaptionController.text,
-                        widget.content['type'],
-                        imageFile,
-                        imageBytes!,
-                      );
+                          widget.content['id_content_owner'],
+                          widget.content['id_content'],
+                          createPostCaptionController.text,
+                          widget.content['type'],
+                          imageFile,
+                          imageBytes!,
+                          hashtags,
+                          mentions);
                       //await feedProvider.refreshPost(widget.content['id_content']);
                       //await feedProvider.refreshTopFeed(true);
                       // Ends Loading State
@@ -559,8 +569,8 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     setState(() {
       loadingPost = true;
     });
-    await ContentServices()
-        .uploadMessagePost(createPostCaptionController.text, 'post', '');
+    await ContentServices().uploadMessagePost(
+        createPostCaptionController.text, 'post', '', hashtags, mentions);
     await feedProvider.getUserFeed();
     //await feedProvider.refreshTopFeed(true);
     // Refreshes User's Feed with this new post
@@ -576,8 +586,8 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     setState(() {
       loadingPost = true;
     });
-    await ContentServices().uploadMediaPost(
-        createPostCaptionController.text, imageFile, imageBytes!, 'post', '');
+    await ContentServices().uploadMediaPost(createPostCaptionController.text,
+        imageFile, imageBytes!, 'post', '', hashtags, mentions);
     await feedProvider.getUserFeed();
     // Refreshes User's Feed with this new post
     await feedProvider.refreshTopFeed(true);

@@ -38,7 +38,7 @@ class _NotificationPageState extends State<NotificationPage> {
               case ConnectionState.active:
                 return ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 0),
-                    physics: const BouncingScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: snapshot.data!.docs.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -50,8 +50,9 @@ class _NotificationPageState extends State<NotificationPage> {
                         case 'commented_content':
                           return buildCommentedNotification(
                               context, notification);
-                        case 'mentioned':
-                          return Container();
+                        case 'mention':
+                          return buildMentionNotification(
+                              context, notification);
                         default:
                           return Container();
                       }
@@ -60,7 +61,7 @@ class _NotificationPageState extends State<NotificationPage> {
               case ConnectionState.done:
                 return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
-                    physics: const BouncingScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       var notification = snapshot.data!.docs[index].data();
@@ -70,7 +71,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         case 'commented_content':
                           return Container();
 
-                        case 'mentioned':
+                        case 'mention':
                           return Container();
                         default:
                           return Container();
@@ -184,7 +185,7 @@ buildCommentedNotification(
                                     .fontSize),
                           )
                         ]),
-                    buildCommentedContentBuilder(
+                    buildNotificationContentBuilder(
                         context, notification['id_content'])
                   ],
                 ),
@@ -198,18 +199,18 @@ buildCommentedNotification(
 }
 
 // Comment Builder (Selects what collection the content is locateed in)
-buildCommentedContentBuilder(BuildContext context, String content) {
+buildNotificationContentBuilder(BuildContext context, String content) {
   return Builder(builder: (context) {
     switch (content[0]) {
       case 'p':
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 8),
-          child: buildCommentedContent(context, content, 'posts'),
+          child: buildNotificationContent(context, content, 'posts'),
         );
       case 'c':
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 8),
-          child: buildCommentedContent(context, content, 'comments'),
+          child: buildNotificationContent(context, content, 'comments'),
         );
       default:
         return Container();
@@ -218,7 +219,7 @@ buildCommentedContentBuilder(BuildContext context, String content) {
 }
 
 // Builds the Commented Content
-buildCommentedContent(
+buildNotificationContent(
     BuildContext context, String contentID, String collection) {
   return StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -238,4 +239,61 @@ buildCommentedContent(
           return Container();
         }
       }));
+}
+
+buildMentionNotification(
+    BuildContext context, Map<String, dynamic> notification) {
+  return Container(
+    decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+    child: Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+              color: backgroundColorSolid),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildUserProfileImage(context, notification['id_sender']),
+              Expanded(
+                child: Column(
+                  children: [
+                    // User Info (Sender)
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          buildNotificationUserInfo(
+                              context, notification['id_sender']),
+                          Text(
+                            'mentioned you...',
+                            style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .fontSize),
+                          ),
+                          // Timestamp
+                          Text(
+                            ' \u2022 ${timeAgoSinceDate(notification['timestamp'])}',
+                            style: TextStyle(
+                                color: Theme.of(context).disabledColor,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .fontSize),
+                          )
+                        ]),
+                    buildNotificationContentBuilder(
+                        context, notification['id_content'])
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }

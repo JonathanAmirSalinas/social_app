@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/functions.dart';
 import 'package:detectable_text_field/widgets/detectable_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -32,6 +33,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController createPostCaptionController = TextEditingController();
   File? imageFile;
   Uint8List? imageBytes;
+  List<String> hashtags = [];
+  List<String> mentions = [];
 
   // Web Image/File Picker using Uint8List bytes
   Future pickWebImage() async {
@@ -219,6 +222,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
             // Post
             TextButton(
                 onPressed: () async {
+                  hashtags = extractDetections(
+                      createPostCaptionController.text, hashTagRegExp);
+                  mentions = extractDetections(
+                      createPostCaptionController.text, atSignRegExp);
                   if (imageFile != null ||
                       imageBytes != null ||
                       createPostCaptionController.text.isNotEmpty) {
@@ -228,8 +235,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       setState(() {
                         loadingPost = true;
                       });
+
                       await ContentServices().uploadMessagePost(
-                          createPostCaptionController.text, 'post', '');
+                          createPostCaptionController.text,
+                          'post',
+                          '',
+                          hashtags,
+                          mentions);
 
                       ///await feedProvider.getUserFeed();
                       // Refreshes User's Feed with this new post
@@ -248,7 +260,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           imageFile,
                           imageBytes!,
                           'post',
-                          '');
+                          '',
+                          hashtags,
+                          mentions);
                       //await feedProvider.getUserFeed();
                       // Refreshes User's Feed with this new post
                       //await feedProvider.refreshTopFeed(true);

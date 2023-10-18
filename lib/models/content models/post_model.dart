@@ -10,6 +10,8 @@ class PostModel {
   final bool hasMedia;
   final List likes;
   final List<String> comments;
+  final List<String> hashtags;
+  final List<String> mentions;
 
   const PostModel({
     required this.contentOwnerID,
@@ -21,6 +23,8 @@ class PostModel {
     required this.hasMedia,
     required this.likes,
     required this.comments,
+    required this.hashtags,
+    required this.mentions,
   });
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +37,8 @@ class PostModel {
         'hasMedia': hasMedia,
         'likes': likes,
         'comments': comments,
+        'hashtags': hashtags,
+        'mentions': mentions,
       };
 
   static PostModel dataFromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
@@ -48,6 +54,8 @@ class PostModel {
       hasMedia: snapshot['hasMedia'],
       likes: snapshot['likes'],
       comments: snapshot['comments'],
+      hashtags: snapshot['hashtags'],
+      mentions: snapshot['mentions'],
     );
   }
 }
