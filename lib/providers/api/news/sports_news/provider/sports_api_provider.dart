@@ -5,13 +5,13 @@ import 'package:social_app/providers/api/news/sports_news/model/sports_model.dar
 class SportsApiProvider {
   final Dio _dio = Dio();
   // api's URL
-  final String _url =
-      'https://newsapi.org/v2/top-headlines?country=us&category=sports&apiKey=927a3ba837e146faa2e8ad19d3fc3faa';
+  final String _url = '';
 
   // GET REQUEST for Sports News
   Future<SportsModel> getSportNews() async {
     if (_url.isEmpty) {
-      return SportsModel.withError("Error occured. Url is empty.");
+      return SportsModel.withError(
+          "Error occured. Url is empty. providers/api/news/sports_news/provider/sports_api_provider.dart");
     } else {
       try {
         Response response = await _dio.get(_url);

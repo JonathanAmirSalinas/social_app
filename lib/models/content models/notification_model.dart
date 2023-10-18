@@ -171,3 +171,48 @@ class FriendRequestNotificationModel {
     );
   }
 }
+
+////////////////////////////////////////////////// Mention Notification Model ///
+class MentionNotificationModel {
+  final String nid; // notification id
+  final String pid; // target post/content
+  final String receiver; // target user
+  final String sender; // owner
+  final String type; // message
+  final bool seen;
+  final int timestamp;
+
+  MentionNotificationModel({
+    required this.nid,
+    required this.pid,
+    required this.receiver,
+    required this.sender,
+    required this.type,
+    required this.seen,
+    required this.timestamp,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id_notification': nid,
+        'id_content': pid,
+        'id_receiver': receiver,
+        'id_sender': sender,
+        'seen': seen,
+        'type': type,
+        'timestamp': timestamp,
+      };
+
+  static MentionNotificationModel dataFromSnap(DocumentSnapshot snap) {
+    var snapshot = snap.data() as Map<String, dynamic>;
+
+    return MentionNotificationModel(
+      nid: snapshot['id_notification'],
+      pid: snapshot['id_content'],
+      receiver: snapshot['id_receiver'],
+      sender: snapshot['sender'],
+      seen: snapshot['seen'],
+      type: snapshot['type'],
+      timestamp: snapshot['timestamp'],
+    );
+  }
+}

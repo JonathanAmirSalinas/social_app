@@ -11,6 +11,8 @@ class RePostModel {
   final bool hasMedia;
   final List likes;
   final List comments;
+  final List<String> hashtags;
+  final List<String> mentions;
 
   const RePostModel({
     required this.contentOwnerID,
@@ -23,6 +25,8 @@ class RePostModel {
     required this.hasMedia,
     required this.likes,
     required this.comments,
+    required this.hashtags,
+    required this.mentions,
   });
 
   Map<String, dynamic> toJson() => {
@@ -36,6 +40,8 @@ class RePostModel {
         'hasMedia': hasMedia,
         'likes': likes,
         'comments': comments,
+        'hashtags': hashtags,
+        'mentions': mentions,
       };
 
   static RePostModel dataFromSnap(DocumentSnapshot snap) {
@@ -52,6 +58,8 @@ class RePostModel {
       hasMedia: snapshot['hasMedia'],
       likes: snapshot['likes'],
       comments: snapshot['comments'],
+      hashtags: snapshot['hashtags'],
+      mentions: snapshot['mentions'],
     );
   }
 }

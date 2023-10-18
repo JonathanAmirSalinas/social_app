@@ -71,10 +71,12 @@ class _ActivityPageState extends State<ActivityPage> {
                               .fontSize),
                     ),
                     actions: [
-                      Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: IconButton(
-                              onPressed: () {}, icon: const Icon(Icons.menu)))
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.notifications_none_rounded)),
+                      )
                     ],
                   ),
 

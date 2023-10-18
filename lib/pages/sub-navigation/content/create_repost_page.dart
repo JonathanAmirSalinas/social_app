@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:detectable_text_field/detector/sample_regular_expressions.dart';
+import 'package:detectable_text_field/functions.dart';
 import 'package:detectable_text_field/widgets/detectable_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -35,6 +36,8 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
   TextEditingController createPostCaptionController = TextEditingController();
   File? imageFile;
   Uint8List? imageBytes;
+  List<String> hashtags = [];
+  List<String> mentions = [];
 
   // Web Image/File Picker using Uint8List bytes
   Future pickWebImage() async {
@@ -221,6 +224,10 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
             ),
             TextButton(
                 onPressed: () async {
+                  hashtags = extractDetections(
+                      createPostCaptionController.text, hashTagRegExp);
+                  mentions = extractDetections(
+                      createPostCaptionController.text, atSignRegExp);
                   if (imageFile != null ||
                       imageBytes != null ||
                       createPostCaptionController.text.isNotEmpty) {
@@ -232,7 +239,9 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                       await ContentServices().uploadMessagePost(
                           createPostCaptionController.text,
                           're_post',
-                          widget.content['id_content']);
+                          widget.content['id_content'],
+                          hashtags,
+                          mentions);
                       //await feedProvider.getUserFeed();
                       //await feedProvider.refreshTopFeed(true);
                       setState(() {
@@ -245,12 +254,13 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                         loadingPost = true;
                       });
                       await ContentServices().uploadMediaPost(
-                        createPostCaptionController.text,
-                        imageFile,
-                        imageBytes!,
-                        're_post',
-                        widget.content['id_content'],
-                      );
+                          createPostCaptionController.text,
+                          imageFile,
+                          imageBytes!,
+                          're_post',
+                          widget.content['id_content'],
+                          hashtags,
+                          mentions);
                       // Ends Loading State
                       setState(() {
                         loadingPost = false;

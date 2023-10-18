@@ -18,14 +18,14 @@ import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 const navBarColor = Color.fromARGB(255, 20, 20, 20);
 const navServerBar = Color.fromARGB(255, 40, 40, 40);
 const primaryColor = Color.fromARGB(125, 0, 0, 0);
-const secondaryColor = Color.fromARGB(255, 230, 200, 250);
-const secondaryColorSolid = Color.fromARGB(255, 245, 230, 253);
+const secondaryColor = Color.fromARGB(255, 250, 210, 255);
+const secondaryColorSolid = Color.fromARGB(255, 250, 210, 255);
 const backgroundColor = Color.fromARGB(165, 0, 0, 0);
 const backgroundColorSolid = Color.fromARGB(255, 0, 0, 0);
 const fillColor = Color.fromARGB(255, 85, 85, 85);
 const cardColor = Color.fromARGB(255, 5, 5, 5);
 const errorColor = Color.fromARGB(255, 255, 75, 75);
-final taggedColor = Colors.pink[300];
+const taggedColor = Color.fromARGB(255, 250, 210, 255);
 
 // Screen
 const double mobileScreenSize = 600;
@@ -187,13 +187,13 @@ buildDetectableStatement(
   return DetectableText(
     text: statement,
     basicStyle: TextStyle(
-      fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+      fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
       fontWeight: FontWeight.w400,
     ),
     detectedStyle: TextStyle(
       color: taggedColor,
       fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w500,
     ),
     detectionRegExp: RegExp(
       "(?!\\n)(?:^|\\s)([#@]([$detectionContentLetters]+))|$urlRegexContent",

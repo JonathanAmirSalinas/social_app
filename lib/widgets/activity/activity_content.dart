@@ -71,7 +71,7 @@ class _BuildActivityContentState extends State<BuildActivityContent>
                         ? Container()
                         : Flexible(
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
                               child: Row(
                                 children: [
                                   Expanded(

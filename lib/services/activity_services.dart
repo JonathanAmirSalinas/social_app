@@ -60,7 +60,30 @@ class ActivityServices {
   }
 
   // Mention Notification
-  Future<void> mentionNotification() async {}
+  Future<void> mentionNotification(String sender, String receiver,
+      String referenceID, String type, int time) async {
+    try {
+      // Sends Notification of a Mention
+      String nid = const Uuid().v1();
+      MentionNotificationModel notification = MentionNotificationModel(
+        nid: nid,
+        pid: referenceID,
+        receiver: receiver,
+        sender: sender,
+        seen: false,
+        type: type, // Type
+        timestamp: time,
+      );
+      // Sends Notification of a Comment
+      _firestore
+          .collection('users')
+          .doc(receiver)
+          .collection('notifications')
+          .doc(nid)
+          .set(notification.toJson());
+    } catch (e) {}
+  }
+
   // Friend Request Notification
   Future<void> friendRequestNotification() async {}
   // Accepted Friend Request Notification
