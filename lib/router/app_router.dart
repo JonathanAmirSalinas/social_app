@@ -11,10 +11,16 @@ import 'package:social_app/pages/responsive/main_page.dart';
 import 'package:social_app/pages/sub-navigation/activity/act_mentions_page.dart';
 import 'package:social_app/pages/sub-navigation/activity/act_notifications_page.dart';
 import 'package:social_app/pages/sub-navigation/bookmark_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_media_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_news_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_server_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_trending_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_hub_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_media_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_news_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_server_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_trending_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/search/ep_accounts_search_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/search/ep_recent_search_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/search/ep_search_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/search/ep_trending_search_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/search/ep_media_search_page.dart';
 import 'package:social_app/pages/sub-navigation/help_page.dart';
 import 'package:social_app/pages/sub-navigation/content/view_content_page.dart';
 import 'package:social_app/pages/sub-navigation/settings/account/settings_account_page.dart';
@@ -63,24 +69,49 @@ class AppRouter extends _$AppRouter {
                   page: Explore.page,
                   path: 'explore',
                   guards: [AuthGuard()],
+                  usesPathAsKey: true,
+                  keepHistory: true,
                   transitionsBuilder: TransitionsBuilders.noTransition,
                   children: [
-                    AutoRoute(
-                      page: Trending_tab.page,
-                      path: 'trending',
-                    ),
-                    AutoRoute(
-                      page: News_tab.page,
-                      path: 'news',
-                    ),
-                    AutoRoute(
-                      page: Media_tab.page,
-                      path: 'media',
-                    ),
-                    AutoRoute(
-                      page: Servers_tab.page,
-                      path: 'servers',
-                    )
+                    // Explore Hub Page
+                    AutoRoute(page: Hub.page, path: 'hub', children: [
+                      AutoRoute(
+                        page: Hub_trending_tab.page,
+                        path: 'trending',
+                      ),
+                      AutoRoute(
+                        page: Hub_news_tab.page,
+                        path: 'news',
+                      ),
+                      AutoRoute(
+                        page: Hub_media_tab.page,
+                        path: 'media',
+                      ),
+                      AutoRoute(
+                        page: Hub_servers_tab.page,
+                        path: 'servers',
+                      ),
+                    ]),
+
+                    // Explore Search //////////////////////////////////////////////////////////////
+                    AutoRoute(page: Search.page, path: 'search', children: [
+                      AutoRoute(
+                        page: Search_trending_tab.page,
+                        path: 'trending',
+                      ),
+                      AutoRoute(
+                        page: Search_account_tab.page,
+                        path: 'accounts',
+                      ),
+                      AutoRoute(
+                        page: Search_media_tab.page,
+                        path: 'media',
+                      ),
+                      AutoRoute(
+                        page: Search_recent_tab.page,
+                        path: 'recent',
+                      ),
+                    ]),
                   ]),
               // Activity
               AutoRoute(page: Activity.page, path: 'activity', guards: [
@@ -112,11 +143,13 @@ class AppRouter extends _$AppRouter {
               ]),
               RedirectRoute(path: '*', redirectTo: ''),
             ]),
+
         // Profile /////////////////////////////////////////////////////////////
         AutoRoute(
           page: Profile.page,
           path: '/profile/:uid',
           usesPathAsKey: true,
+          keepHistory: true,
         ),
         // View Post /////////////////////////////////////////////////////////////
         AutoRoute(

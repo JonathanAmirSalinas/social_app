@@ -41,12 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : buildProfileUserDrawerMenu(),
         endDrawerEnableOpenDragGesture: true,
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              context.router.pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new),
-          ),
+          leading: const AutoLeadingButton(),
           actions: [
             Builder(builder: (context) {
               return IconButton(

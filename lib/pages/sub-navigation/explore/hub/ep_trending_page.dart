@@ -1,20 +1,19 @@
 import 'dart:ui';
 import 'package:auto_route/annotations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 
-@RoutePage(name: 'trending_tab')
+@RoutePage(name: 'hub_trending_tab')
 class TrendingTabPage extends StatefulWidget {
   const TrendingTabPage({super.key});
 
   @override
-  State<TrendingTabPage> createState() => _TrendingPageState();
+  State<TrendingTabPage> createState() => _TrendingTabPageState();
 }
 
-class _TrendingPageState extends State<TrendingTabPage>
+class _TrendingTabPageState extends State<TrendingTabPage>
     with AutomaticKeepAliveClientMixin<TrendingTabPage> {
   @override
   bool get wantKeepAlive => true;
@@ -314,7 +313,7 @@ class _TrendingPageState extends State<TrendingTabPage>
                 .collection('hashtags')
                 .orderBy('posts', descending: false)
                 .snapshots()
-                .take(5),
+                .take(3),
             builder: ((context,
                 AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
               switch (snapshot.connectionState) {
@@ -392,7 +391,7 @@ class _TrendingPageState extends State<TrendingTabPage>
                       shrinkWrap: true,
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: snapshot.data!.docs.length,
+                      itemCount: 3,
                       itemBuilder: ((context, index) {
                         var tag = snapshot.data!.docs[index].data();
                         return GestureDetector(

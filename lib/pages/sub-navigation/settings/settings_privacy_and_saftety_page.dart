@@ -15,14 +15,7 @@ class _PrivacyAndSafetySettingsPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              context.router.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
-        title: const Text('Privacy and Safety'),
-      ),
+      appBar: AppBar(leading: const AutoLeadingButton()),
       body: Column(
         children: [
           Container(),

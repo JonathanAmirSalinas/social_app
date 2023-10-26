@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 
-@RoutePage(name: 'servers_tab')
+@RoutePage(name: 'hub_servers_tab')
 class ServersTabPage extends StatefulWidget {
   const ServersTabPage({super.key});
 

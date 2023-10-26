@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:social_app/constants/constants.dart';
 
-@RoutePage(name: 'media_tab')
+@RoutePage(name: 'hub_media_tab')
 class MediaTabPage extends StatefulWidget {
   const MediaTabPage({super.key});
 
