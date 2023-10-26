@@ -10,6 +10,7 @@ class UserModel {
   final String bio;
   final String status;
   final String renown;
+  final List recentlySearched;
   final Timestamp timeJoined;
   final List friends;
   final List following;
@@ -28,6 +29,7 @@ class UserModel {
     required this.bio,
     required this.status,
     required this.renown,
+    required this.recentlySearched,
     required this.timeJoined,
     required this.friends,
     required this.following,
@@ -47,6 +49,7 @@ class UserModel {
         'bio': bio,
         'status': status,
         'renown': renown,
+        'recentlySearched': recentlySearched,
         'timeJoined': timeJoined,
         'friends': friends,
         'following': following,
@@ -69,6 +72,7 @@ class UserModel {
       bio: snapshot['bio'],
       status: snapshot['status'],
       renown: snapshot['renown'],
+      recentlySearched: snapshot['recentlySearched'],
       timeJoined: snapshot['timeJoined'],
       friends: snapshot['friends'],
       following: snapshot['following'],

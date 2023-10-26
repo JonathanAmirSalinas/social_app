@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/widgets/explore/news_sports_widgets.dart';
 
-@RoutePage(name: 'news_tab')
+@RoutePage(name: 'hub_news_tab')
 class NewsTabPage extends StatefulWidget {
   const NewsTabPage({super.key});
 

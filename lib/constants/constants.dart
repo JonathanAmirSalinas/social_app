@@ -8,10 +8,10 @@ import 'package:social_app/pages/main-navigation/activity_page.dart';
 import 'package:social_app/pages/main-navigation/explore_page.dart';
 import 'package:social_app/pages/main-navigation/home_page.dart';
 import 'package:social_app/pages/main-navigation/server_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_media_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_news_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_server_page.dart';
-import 'package:social_app/pages/sub-navigation/explore/ep_trending_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_media_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_news_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_server_page.dart';
+import 'package:social_app/pages/sub-navigation/explore/hub/ep_trending_page.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
 // Colors

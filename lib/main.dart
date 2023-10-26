@@ -89,10 +89,10 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  setSharedPreference() async {
+  setSharedPreference(bool auth) async {
     // Save Auth State in pref
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setBool('authenticated', true);
+    pref.setBool('authenticated', auth);
   }
 
   @override
@@ -104,7 +104,7 @@ class _AuthPageState extends State<AuthPage> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.active) {
               if (snapshot.hasData) {
-                setSharedPreference();
+                setSharedPreference(true);
                 context.router.pushNamed('/');
               } else {
                 context.router.pushNamed('/login');

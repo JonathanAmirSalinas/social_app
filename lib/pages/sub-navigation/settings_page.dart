@@ -18,11 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: backgroundColorSolid,
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              context.router.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+        leading: const AutoLeadingButton(),
         centerTitle: true,
         title: const Text('Profile Settings'),
       ),

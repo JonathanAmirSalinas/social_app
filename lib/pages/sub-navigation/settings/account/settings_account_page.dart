@@ -25,11 +25,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     return Scaffold(
       backgroundColor: backgroundColorSolid,
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              context.router.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+        leading: const AutoLeadingButton(),
         title: const Text('Account'),
       ),
       body: LayoutBuilder(builder: (context, constraints) {

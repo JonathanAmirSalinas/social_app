@@ -15,10 +15,62 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
+    Search_account_tab.name: (routeData) {
+      final args = routeData.argsAs<Search_account_tabArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AccountSearchPage(
+          key: args.key,
+          keyword: args.keyword,
+        ),
+      );
+    },
+    Settings_Account.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AccountSettingsPage(),
+      );
+    },
+    Activity.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ActivityPage(),
+      );
+    },
     Auth.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const AuthPage(),
+      );
+    },
+    Bookmark.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const BookmarkPage(),
+      );
+    },
+    Explore.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ExplorePage(),
+      );
+    },
+    Help.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const HelpPage(),
+      );
+    },
+    Home.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const HomePage(),
+      );
+    },
+    Hub.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const HubPage(),
       );
     },
     Login.name: (routeData) {
@@ -31,45 +83,26 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
-    Register.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const RegisterPage(),
-      );
-    },
-    Activity.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const ActivityPage(),
-      );
-    },
-    Explore.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const ExplorePage(),
-      );
-    },
-    Home.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const HomePage(),
-      );
-    },
-    Servers.name: (routeData) {
-      final args =
-          routeData.argsAs<ServersArgs>(orElse: () => const ServersArgs());
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: ServersPage(
-          key: args.key,
-          sid: args.sid,
-        ),
-      );
-    },
     Main.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const MainPage(),
+      );
+    },
+    Search_media_tab.name: (routeData) {
+      final args = routeData.argsAs<Search_media_tabArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MediaSearchPage(
+          key: args.key,
+          keyword: args.keyword,
+        ),
+      );
+    },
+    Hub_media_tab.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MediaTabPage(),
       );
     },
     Mentions_tab.name: (routeData) {
@@ -78,46 +111,68 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const MentionsPage(),
       );
     },
+    Hub_news_tab.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const NewsTabPage(),
+      );
+    },
     Notification_tab.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const NotificationPage(),
       );
     },
-    Bookmark.name: (routeData) {
+    Settings_Privacy_And_Safety.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const BookmarkPage(),
+        child: const PrivacyAndSafetySettingsPage(),
       );
     },
-    Media_tab.name: (routeData) {
+    Profile.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<ProfileArgs>(
+          orElse: () => ProfileArgs(uid: pathParams.getString('uid')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const MediaTabPage(),
+        child: ProfilePage(
+          key: args.key,
+          uid: args.uid,
+        ),
       );
     },
-    News_tab.name: (routeData) {
+    Settings_Profiles.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const NewsTabPage(),
+        child: const ProfileSettingsPage(),
       );
     },
-    Servers_tab.name: (routeData) {
+    Search_recent_tab.name: (routeData) {
+      final args = routeData.argsAs<Search_recent_tabArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const ServersTabPage(),
+        child: RecentSearchPage(
+          key: args.key,
+          keyword: args.keyword,
+        ),
       );
     },
-    Trending_tab.name: (routeData) {
+    Register.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const TrendingTabPage(),
+        child: const RegisterPage(),
       );
     },
-    Help.name: (routeData) {
+    Search.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<SearchArgs>(
+          orElse: () => SearchArgs(keyword: pathParams.getString('keyword')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const HelpPage(),
+        child: SearchPage(
+          key: args.key,
+          keyword: args.keyword,
+        ),
       );
     },
     Server_chatroom.name: (routeData) {
@@ -144,10 +199,43 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const ServerMessagesPage(),
       );
     },
+    Servers.name: (routeData) {
+      final args =
+          routeData.argsAs<ServersArgs>(orElse: () => const ServersArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ServersPage(
+          key: args.key,
+          sid: args.sid,
+        ),
+      );
+    },
+    Hub_servers_tab.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ServersTabPage(),
+      );
+    },
     Settings.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const SettingsPage(),
+      );
+    },
+    Search_trending_tab.name: (routeData) {
+      final args = routeData.argsAs<Search_trending_tabArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: TrendingSearchPage(
+          key: args.key,
+          keyword: args.keyword,
+        ),
+      );
+    },
+    Hub_trending_tab.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const TrendingTabPage(),
       );
     },
     View_content.name: (routeData) {
@@ -162,37 +250,73 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
-    Profile.name: (routeData) {
-      final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<ProfileArgs>(
-          orElse: () => ProfileArgs(uid: pathParams.getString('uid')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: ProfilePage(
-          key: args.key,
-          uid: args.uid,
-        ),
-      );
-    },
-    Settings_Privacy_And_Safety.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const PrivacyAndSafetySettingsPage(),
-      );
-    },
-    Settings_Account.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const AccountSettingsPage(),
-      );
-    },
-    Settings_Profiles.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const ProfileSettingsPage(),
-      );
-    },
   };
+}
+
+/// generated route for
+/// [AccountSearchPage]
+class Search_account_tab extends PageRouteInfo<Search_account_tabArgs> {
+  Search_account_tab({
+    Key? key,
+    required String keyword,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Search_account_tab.name,
+          args: Search_account_tabArgs(
+            key: key,
+            keyword: keyword,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'Search_account_tab';
+
+  static const PageInfo<Search_account_tabArgs> page =
+      PageInfo<Search_account_tabArgs>(name);
+}
+
+class Search_account_tabArgs {
+  const Search_account_tabArgs({
+    this.key,
+    required this.keyword,
+  });
+
+  final Key? key;
+
+  final String keyword;
+
+  @override
+  String toString() {
+    return 'Search_account_tabArgs{key: $key, keyword: $keyword}';
+  }
+}
+
+/// generated route for
+/// [AccountSettingsPage]
+class Settings_Account extends PageRouteInfo<void> {
+  const Settings_Account({List<PageRouteInfo>? children})
+      : super(
+          Settings_Account.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Settings_Account';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ActivityPage]
+class Activity extends PageRouteInfo<void> {
+  const Activity({List<PageRouteInfo>? children})
+      : super(
+          Activity.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Activity';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -205,6 +329,76 @@ class Auth extends PageRouteInfo<void> {
         );
 
   static const String name = 'Auth';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [BookmarkPage]
+class Bookmark extends PageRouteInfo<void> {
+  const Bookmark({List<PageRouteInfo>? children})
+      : super(
+          Bookmark.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Bookmark';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ExplorePage]
+class Explore extends PageRouteInfo<void> {
+  const Explore({List<PageRouteInfo>? children})
+      : super(
+          Explore.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Explore';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [HelpPage]
+class Help extends PageRouteInfo<void> {
+  const Help({List<PageRouteInfo>? children})
+      : super(
+          Help.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Help';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [HomePage]
+class Home extends PageRouteInfo<void> {
+  const Home({List<PageRouteInfo>? children})
+      : super(
+          Home.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Home';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [HubPage]
+class Hub extends PageRouteInfo<void> {
+  const Hub({List<PageRouteInfo>? children})
+      : super(
+          Hub.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Hub';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -247,99 +441,6 @@ class LoginArgs {
 }
 
 /// generated route for
-/// [RegisterPage]
-class Register extends PageRouteInfo<void> {
-  const Register({List<PageRouteInfo>? children})
-      : super(
-          Register.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Register';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [ActivityPage]
-class Activity extends PageRouteInfo<void> {
-  const Activity({List<PageRouteInfo>? children})
-      : super(
-          Activity.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Activity';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [ExplorePage]
-class Explore extends PageRouteInfo<void> {
-  const Explore({List<PageRouteInfo>? children})
-      : super(
-          Explore.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Explore';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [HomePage]
-class Home extends PageRouteInfo<void> {
-  const Home({List<PageRouteInfo>? children})
-      : super(
-          Home.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Home';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [ServersPage]
-class Servers extends PageRouteInfo<ServersArgs> {
-  Servers({
-    Key? key,
-    String? sid,
-    List<PageRouteInfo>? children,
-  }) : super(
-          Servers.name,
-          args: ServersArgs(
-            key: key,
-            sid: sid,
-          ),
-          initialChildren: children,
-        );
-
-  static const String name = 'Servers';
-
-  static const PageInfo<ServersArgs> page = PageInfo<ServersArgs>(name);
-}
-
-class ServersArgs {
-  const ServersArgs({
-    this.key,
-    this.sid,
-  });
-
-  final Key? key;
-
-  final String? sid;
-
-  @override
-  String toString() {
-    return 'ServersArgs{key: $key, sid: $sid}';
-  }
-}
-
-/// generated route for
 /// [MainPage]
 class Main extends PageRouteInfo<void> {
   const Main({List<PageRouteInfo>? children})
@@ -349,6 +450,58 @@ class Main extends PageRouteInfo<void> {
         );
 
   static const String name = 'Main';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [MediaSearchPage]
+class Search_media_tab extends PageRouteInfo<Search_media_tabArgs> {
+  Search_media_tab({
+    Key? key,
+    required String keyword,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Search_media_tab.name,
+          args: Search_media_tabArgs(
+            key: key,
+            keyword: keyword,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'Search_media_tab';
+
+  static const PageInfo<Search_media_tabArgs> page =
+      PageInfo<Search_media_tabArgs>(name);
+}
+
+class Search_media_tabArgs {
+  const Search_media_tabArgs({
+    this.key,
+    required this.keyword,
+  });
+
+  final Key? key;
+
+  final String keyword;
+
+  @override
+  String toString() {
+    return 'Search_media_tabArgs{key: $key, keyword: $keyword}';
+  }
+}
+
+/// generated route for
+/// [MediaTabPage]
+class Hub_media_tab extends PageRouteInfo<void> {
+  const Hub_media_tab({List<PageRouteInfo>? children})
+      : super(
+          Hub_media_tab.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Hub_media_tab';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -368,6 +521,20 @@ class Mentions_tab extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [NewsTabPage]
+class Hub_news_tab extends PageRouteInfo<void> {
+  const Hub_news_tab({List<PageRouteInfo>? children})
+      : super(
+          Hub_news_tab.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Hub_news_tab';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [NotificationPage]
 class Notification_tab extends PageRouteInfo<void> {
   const Notification_tab({List<PageRouteInfo>? children})
@@ -382,87 +549,159 @@ class Notification_tab extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [BookmarkPage]
-class Bookmark extends PageRouteInfo<void> {
-  const Bookmark({List<PageRouteInfo>? children})
+/// [PrivacyAndSafetySettingsPage]
+class Settings_Privacy_And_Safety extends PageRouteInfo<void> {
+  const Settings_Privacy_And_Safety({List<PageRouteInfo>? children})
       : super(
-          Bookmark.name,
+          Settings_Privacy_And_Safety.name,
           initialChildren: children,
         );
 
-  static const String name = 'Bookmark';
+  static const String name = 'Settings_Privacy_And_Safety';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
-/// [MediaTabPage]
-class Media_tab extends PageRouteInfo<void> {
-  const Media_tab({List<PageRouteInfo>? children})
-      : super(
-          Media_tab.name,
+/// [ProfilePage]
+class Profile extends PageRouteInfo<ProfileArgs> {
+  Profile({
+    Key? key,
+    required String uid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Profile.name,
+          args: ProfileArgs(
+            key: key,
+            uid: uid,
+          ),
+          rawPathParams: {'uid': uid},
           initialChildren: children,
         );
 
-  static const String name = 'Media_tab';
+  static const String name = 'Profile';
+
+  static const PageInfo<ProfileArgs> page = PageInfo<ProfileArgs>(name);
+}
+
+class ProfileArgs {
+  const ProfileArgs({
+    this.key,
+    required this.uid,
+  });
+
+  final Key? key;
+
+  final String uid;
+
+  @override
+  String toString() {
+    return 'ProfileArgs{key: $key, uid: $uid}';
+  }
+}
+
+/// generated route for
+/// [ProfileSettingsPage]
+class Settings_Profiles extends PageRouteInfo<void> {
+  const Settings_Profiles({List<PageRouteInfo>? children})
+      : super(
+          Settings_Profiles.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Settings_Profiles';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
-/// [NewsTabPage]
-class News_tab extends PageRouteInfo<void> {
-  const News_tab({List<PageRouteInfo>? children})
-      : super(
-          News_tab.name,
+/// [RecentSearchPage]
+class Search_recent_tab extends PageRouteInfo<Search_recent_tabArgs> {
+  Search_recent_tab({
+    Key? key,
+    required String keyword,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Search_recent_tab.name,
+          args: Search_recent_tabArgs(
+            key: key,
+            keyword: keyword,
+          ),
           initialChildren: children,
         );
 
-  static const String name = 'News_tab';
+  static const String name = 'Search_recent_tab';
+
+  static const PageInfo<Search_recent_tabArgs> page =
+      PageInfo<Search_recent_tabArgs>(name);
+}
+
+class Search_recent_tabArgs {
+  const Search_recent_tabArgs({
+    this.key,
+    required this.keyword,
+  });
+
+  final Key? key;
+
+  final String keyword;
+
+  @override
+  String toString() {
+    return 'Search_recent_tabArgs{key: $key, keyword: $keyword}';
+  }
+}
+
+/// generated route for
+/// [RegisterPage]
+class Register extends PageRouteInfo<void> {
+  const Register({List<PageRouteInfo>? children})
+      : super(
+          Register.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Register';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
-/// [ServersTabPage]
-class Servers_tab extends PageRouteInfo<void> {
-  const Servers_tab({List<PageRouteInfo>? children})
-      : super(
-          Servers_tab.name,
+/// [SearchPage]
+class Search extends PageRouteInfo<SearchArgs> {
+  Search({
+    Key? key,
+    required String keyword,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Search.name,
+          args: SearchArgs(
+            key: key,
+            keyword: keyword,
+          ),
+          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 
-  static const String name = 'Servers_tab';
+  static const String name = 'Search';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<SearchArgs> page = PageInfo<SearchArgs>(name);
 }
 
-/// generated route for
-/// [TrendingTabPage]
-class Trending_tab extends PageRouteInfo<void> {
-  const Trending_tab({List<PageRouteInfo>? children})
-      : super(
-          Trending_tab.name,
-          initialChildren: children,
-        );
+class SearchArgs {
+  const SearchArgs({
+    this.key,
+    required this.keyword,
+  });
 
-  static const String name = 'Trending_tab';
+  final Key? key;
 
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
+  final String keyword;
 
-/// generated route for
-/// [HelpPage]
-class Help extends PageRouteInfo<void> {
-  const Help({List<PageRouteInfo>? children})
-      : super(
-          Help.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Help';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
+  @override
+  String toString() {
+    return 'SearchArgs{key: $key, keyword: $keyword}';
+  }
 }
 
 /// generated route for
@@ -533,6 +772,57 @@ class Server_messages extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ServersPage]
+class Servers extends PageRouteInfo<ServersArgs> {
+  Servers({
+    Key? key,
+    String? sid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Servers.name,
+          args: ServersArgs(
+            key: key,
+            sid: sid,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'Servers';
+
+  static const PageInfo<ServersArgs> page = PageInfo<ServersArgs>(name);
+}
+
+class ServersArgs {
+  const ServersArgs({
+    this.key,
+    this.sid,
+  });
+
+  final Key? key;
+
+  final String? sid;
+
+  @override
+  String toString() {
+    return 'ServersArgs{key: $key, sid: $sid}';
+  }
+}
+
+/// generated route for
+/// [ServersTabPage]
+class Hub_servers_tab extends PageRouteInfo<void> {
+  const Hub_servers_tab({List<PageRouteInfo>? children})
+      : super(
+          Hub_servers_tab.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Hub_servers_tab';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [SettingsPage]
 class Settings extends PageRouteInfo<void> {
   const Settings({List<PageRouteInfo>? children})
@@ -542,6 +832,58 @@ class Settings extends PageRouteInfo<void> {
         );
 
   static const String name = 'Settings';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [TrendingSearchPage]
+class Search_trending_tab extends PageRouteInfo<Search_trending_tabArgs> {
+  Search_trending_tab({
+    Key? key,
+    required String keyword,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Search_trending_tab.name,
+          args: Search_trending_tabArgs(
+            key: key,
+            keyword: keyword,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'Search_trending_tab';
+
+  static const PageInfo<Search_trending_tabArgs> page =
+      PageInfo<Search_trending_tabArgs>(name);
+}
+
+class Search_trending_tabArgs {
+  const Search_trending_tabArgs({
+    this.key,
+    required this.keyword,
+  });
+
+  final Key? key;
+
+  final String keyword;
+
+  @override
+  String toString() {
+    return 'Search_trending_tabArgs{key: $key, keyword: $keyword}';
+  }
+}
+
+/// generated route for
+/// [TrendingTabPage]
+class Hub_trending_tab extends PageRouteInfo<void> {
+  const Hub_trending_tab({List<PageRouteInfo>? children})
+      : super(
+          Hub_trending_tab.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'Hub_trending_tab';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -583,84 +925,4 @@ class View_contentArgs {
   String toString() {
     return 'View_contentArgs{key: $key, pid: $pid}';
   }
-}
-
-/// generated route for
-/// [ProfilePage]
-class Profile extends PageRouteInfo<ProfileArgs> {
-  Profile({
-    Key? key,
-    required String uid,
-    List<PageRouteInfo>? children,
-  }) : super(
-          Profile.name,
-          args: ProfileArgs(
-            key: key,
-            uid: uid,
-          ),
-          rawPathParams: {'uid': uid},
-          initialChildren: children,
-        );
-
-  static const String name = 'Profile';
-
-  static const PageInfo<ProfileArgs> page = PageInfo<ProfileArgs>(name);
-}
-
-class ProfileArgs {
-  const ProfileArgs({
-    this.key,
-    required this.uid,
-  });
-
-  final Key? key;
-
-  final String uid;
-
-  @override
-  String toString() {
-    return 'ProfileArgs{key: $key, uid: $uid}';
-  }
-}
-
-/// generated route for
-/// [PrivacyAndSafetySettingsPage]
-class Settings_Privacy_And_Safety extends PageRouteInfo<void> {
-  const Settings_Privacy_And_Safety({List<PageRouteInfo>? children})
-      : super(
-          Settings_Privacy_And_Safety.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Settings_Privacy_And_Safety';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [AccountSettingsPage]
-class Settings_Account extends PageRouteInfo<void> {
-  const Settings_Account({List<PageRouteInfo>? children})
-      : super(
-          Settings_Account.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Settings_Account';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [ProfileSettingsPage]
-class Settings_Profiles extends PageRouteInfo<void> {
-  const Settings_Profiles({List<PageRouteInfo>? children})
-      : super(
-          Settings_Profiles.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Settings_Profiles';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
 }

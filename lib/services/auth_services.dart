@@ -89,6 +89,7 @@ class AuthServices {
         bio: "Hello my name is $name!!!",
         status: "Online",
         renown: "No",
+        recentlySearched: [],
         timeJoined: Timestamp.now(),
         friends: [],
         followers: [],

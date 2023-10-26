@@ -35,7 +35,6 @@ class _ActivityPageState extends State<ActivityPage> {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-
         _focus.unfocus();
         setState(() {});
       },

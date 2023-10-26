@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/router/app_router.dart';
-import 'package:social_app/widgets/sliver_appbar_widget.dart';
 
 @RoutePage(name: 'explore')
 class ExplorePage extends StatefulWidget {
@@ -19,7 +18,8 @@ class ExplorePage extends StatefulWidget {
 class _ExplorePageState extends State<ExplorePage> {
   TextEditingController exploreController = TextEditingController();
   final FocusNode _focus = FocusNode();
-  late String name;
+  bool searched = false;
+  late String keyword;
 
   @override
   void dispose() {
@@ -31,89 +31,138 @@ class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter.tabBar(
-      routes: const [
-        Trending_tab(),
-        News_tab(),
-        Media_tab(),
-        Servers_tab(),
-      ],
-      builder: (context, child, tabController) {
-        final tabsRouter = AutoTabsRouter.of(context);
-        tabController.index = tabsRouter.activeIndex;
-        return _focus.hasFocus
-            ? buildSearchPage()
-            : buildExploreTabs(tabsRouter, child, tabController);
-      },
-    );
+        physics: const NeverScrollableScrollPhysics(),
+        routes: [
+          const Hub(),
+          Search(keyword: exploreController.text.trim()),
+        ],
+        builder: (context, child, tabController) {
+          final tabsRouter = AutoTabsRouter.of(context);
+          tabController.index = tabsRouter.activeIndex;
+          return Scaffold(
+              appBar: AppBar(
+                scrolledUnderElevation: 0.0,
+                backgroundColor: navBarColor,
+                leading: isSmallPage(
+                  context,
+                  "Leading IconButton",
+                ),
+                title: Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                      color: Theme.of(context).canvasColor,
+                    ),
+                    child: TextField(
+                      controller: exploreController,
+                      focusNode: _focus,
+                      decoration: InputDecoration(
+                          hintText: 'Explore the App',
+                          contentPadding: const EdgeInsets.all(8),
+                          enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12))),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _focus.hasFocus
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                      _focus.unfocus();
+                                      exploreController.clear();
+                                    });
+
+                                    tabsRouter.setActiveIndex(0);
+                                  },
+                                  splashRadius: 20,
+                                  icon: const Icon(Icons.clear))
+                              : null),
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _focus.unfocus();
+                          setState(() {
+                            keyword = value;
+                          });
+                          // Set Tab Index to 0 (Hub)
+                          tabsRouter.setActiveIndex(0);
+                        } else {
+                          setState(() {
+                            keyword = value;
+                          });
+                        }
+                      },
+                      onTap: () {
+                        setState(() {
+                          keyword = exploreController.text.trim();
+                        });
+                      },
+                      onSubmitted: (value) {
+                        if (value.isEmpty) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _focus.unfocus();
+                          setState(() {
+                            keyword = value;
+                          });
+                          // Set Tab Index to 0 (Hub)
+                          tabsRouter.setActiveIndex(0);
+                        } else {
+                          setState(() {
+                            keyword = value;
+                          });
+                          // Used to refresh Search url arguments (probably need a refresh of tab index 1 or route data)
+                          tabsRouter.setActiveIndex(0);
+                          // Set Tab Index to 1 (Search)
+                          tabsRouter.setActiveIndex(1);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                actions: [
+                  tabsRouter.activeIndex == 1
+                      ? TextButton(onPressed: () {}, child: Text('close'))
+                      : Container()
+                ],
+              ),
+              body: _focus.hasFocus ? buildSearchQuery() : child);
+        });
   }
 
-  // Builds Search Page (Search Bar)
-  //////////////////////////////////////////////////////////////////////////////
-  buildSearchPage() {
-    return Scaffold(
-        backgroundColor: backgroundColorSolid,
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                //exploreController.clear();
-                _focus.unfocus();
-                setState(() {});
-              },
-              icon: const Icon(Icons.arrow_back_ios_new_rounded)),
-          title: Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(12)),
-                color: Theme.of(context).canvasColor,
+  buildSearchQuery() {
+    return Builder(builder: (context) {
+      return GestureDetector(
+          onTap: () {
+            setState(() {
+              FocusManager.instance.primaryFocus?.unfocus();
+              _focus.unfocus();
+            });
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  color: backgroundColorSolid,
+                  child: keyword.isEmpty
+                      ? buildRecentlySearchItemList(context)
+                      : keyword.characters.elementAt(0) == '#'
+                          ? buildHashtagsSearchItemList(context)
+                          : keyword.characters.elementAt(0) == '@'
+                              ? buildUsernameSearchItemList(context)
+                              : buildNameSearchItemList(context, keyword),
+                ),
               ),
-              child: TextField(
-                controller: exploreController,
-                focusNode: _focus,
-                autofocus: true,
-                decoration: InputDecoration(
-                    hintText: 'Explore the App',
-                    contentPadding: const EdgeInsets.all(8),
-                    enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.all(Radius.circular(12))),
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _focus.hasFocus
-                        ? IconButton(
-                            onPressed: () {
-                              setState(() {
-                                exploreController.clear();
-                              });
-                            },
-                            splashRadius: 20,
-                            icon: const Icon(Icons.clear))
-                        : null),
-                onChanged: (value) {
-                  setState(() {
-                    name = value;
-                  });
-                },
-                onTap: () {
-                  setState(() {
-                    name = exploreController.text;
-                  });
-                },
-                onSubmitted: (value) {
-                  setState(() {
-                    name = value;
-                  });
-                },
-              ),
-            ),
-          ),
-        ),
-        body: buildSearchItemList(context));
+            ],
+          ));
+    });
   }
 
-  /// Build Searh Bar Item
-  buildSearchItemList(BuildContext context) {
+  /// Build Searh Bar Item For Name
+  buildNameSearchItemList(BuildContext context, String keyword) {
     return Builder(builder: (context) {
       return StreamBuilder(
           stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -132,16 +181,16 @@ class _ExplorePageState extends State<ExplorePage> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       // Empty Search bar
-                      if (name.isEmpty) {
-                        return Text(name);
+                      if (keyword.isEmpty) {
+                        return Text(keyword);
                       }
                       //
                       else if (snapshot.data!.docs[index]
                           .data()['name']
                           .toString()
                           .toLowerCase()
-                          .startsWith(name.toLowerCase())) {
-                        return buildSearchItemCard(
+                          .startsWith(keyword.toLowerCase())) {
+                        return buildSearchItemCardUser(
                             context, snapshot.data!.docs[index].data());
                       } else {
                         return Container();
@@ -152,7 +201,7 @@ class _ExplorePageState extends State<ExplorePage> {
                     itemCount: snapshot.data!.docs.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return buildSearchItemCard(
+                      return buildSearchItemCardUser(
                           context, snapshot.data!.docs[index].data());
                     });
             }
@@ -160,12 +209,172 @@ class _ExplorePageState extends State<ExplorePage> {
     });
   }
 
-  buildSearchItemCard(BuildContext context, Map<String, dynamic> data) {
+  /// Build Searh Bar Item 'Recently Searched'
+  buildRecentlySearchItemList(BuildContext context) {
+    return Builder(builder: (context) {
+      return StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('users').snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.active:
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      // Empty Search bar
+                      if (keyword.isEmpty) {
+                        return Text(keyword);
+                      }
+                      //
+                      else if (snapshot.data!.docs[index]
+                          .data()['name']
+                          .toString()
+                          .toLowerCase()
+                          .startsWith(keyword.toLowerCase())) {
+                        return buildSearchItemCardUser(
+                            context, snapshot.data!.docs[index].data());
+                      } else {
+                        return Container();
+                      }
+                    });
+              case ConnectionState.done:
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return buildSearchItemCardUser(
+                          context, snapshot.data!.docs[index].data());
+                    });
+            }
+          });
+    });
+  }
+
+  /// Build Search Bar Item For '@'s
+  buildUsernameSearchItemList(BuildContext context) {
+    return Builder(builder: (context) {
+      return StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('users').snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.active:
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      // Empty Search bar
+                      if (keyword.isEmpty) {
+                        return Text(keyword);
+                      }
+                      //
+                      else if (snapshot.data!.docs[index]
+                          .data()['username']
+                          .toString()
+                          .toLowerCase()
+                          .startsWith(keyword.toLowerCase())) {
+                        return buildSearchItemCardUser(
+                            context, snapshot.data!.docs[index].data());
+                      } else {
+                        return Container();
+                      }
+                    });
+              case ConnectionState.done:
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return buildSearchItemCardUser(
+                          context, snapshot.data!.docs[index].data());
+                    });
+            }
+          });
+    });
+  }
+
+  /// Build Searh Bar Item for '#'s
+  buildHashtagsSearchItemList(BuildContext context) {
+    return Builder(builder: (context) {
+      return StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('hashtags').snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.active:
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      // Empty Search bar
+                      if (keyword.isEmpty) {
+                        return Text(keyword);
+                      }
+                      //
+                      else if (snapshot.data!.docs[index]
+                          .data()['tag']
+                          .toString()
+                          .toLowerCase()
+                          .startsWith(keyword.toLowerCase())) {
+                        return buildSearchItemCard(
+                            context, snapshot.data!.docs[index].data());
+                      } else {
+                        return Container();
+                      }
+                    });
+              case ConnectionState.done:
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      // Empty Search bar
+                      if (keyword.isEmpty) {
+                        return Text(keyword);
+                      }
+                      //
+                      else if (snapshot.data!.docs[index]
+                          .data()['tag']
+                          .toString()
+                          .toLowerCase()
+                          .startsWith(keyword.toLowerCase())) {
+                        return buildSearchItemCard(
+                            context, snapshot.data!.docs[index].data());
+                      } else {
+                        return Container();
+                      }
+                    });
+            }
+          });
+    });
+  }
+
+  // Builds User Card
+  buildSearchItemCardUser(BuildContext context, Map<String, dynamic> data) {
     return GestureDetector(
       onTap: () {
         context.router.pushNamed('/profile/${data['uid']}');
       },
       child: Card(
+        color: navBarColor,
         shape: const ContinuousRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(6))),
         child: Container(
@@ -191,6 +400,7 @@ class _ExplorePageState extends State<ExplorePage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           data['name'],
@@ -201,6 +411,14 @@ class _ExplorePageState extends State<ExplorePage> {
                                   .fontSize),
                         ),
                         Text(data['username']),
+                        Row(
+                          children: [
+                            Text(
+                                'followers ${data['followers'].length.toString()}   '),
+                            Text(
+                                'following ${data['following'].length.toString()}'),
+                          ],
+                        )
                       ],
                     ),
                   )
@@ -213,108 +431,50 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  buildExploreTabs(
-      TabsRouter tabsRouter, Widget child, TabController tabController) {
+  // Search
+  buildSearchItemCard(BuildContext context, Map<String, dynamic> data) {
     return GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          //exploreController.clear();
-          _focus.unfocus();
-          setState(() {});
-        },
-        child: DefaultTabController(
-            length: 4,
-            initialIndex: tabController.index,
-            child: Scaffold(
-              backgroundColor: backgroundColor,
-              drawer: isSmallPage(context, "Drawer"),
-              resizeToAvoidBottomInset: false,
-              body: NestedScrollView(
-                  floatHeaderSlivers: true,
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverAppBar(
-                        pinned: true,
-                        floating: true,
-                        snap: true,
-                        scrolledUnderElevation: 0.0,
-                        backgroundColor: navBarColor,
-                        leading: isSmallPage(
-                          context,
-                          "Leading IconButton",
-                        ),
-                        title: Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(12)),
-                              color: Theme.of(context).canvasColor,
-                            ),
-                            child: TextField(
-                              controller: exploreController,
-                              focusNode: _focus,
-                              decoration: InputDecoration(
-                                  hintText: 'Explore the App',
-                                  contentPadding: const EdgeInsets.all(8),
-                                  enabledBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(12))),
-                                  border: const OutlineInputBorder(),
-                                  prefixIcon: const Icon(Icons.search),
-                                  suffixIcon: _focus.hasFocus
-                                      ? IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              exploreController.clear();
-                                            });
-                                          },
-                                          splashRadius: 20,
-                                          icon: const Icon(Icons.clear))
-                                      : null),
-                              onChanged: (value) {
-                                setState(() {
-                                  name = value;
-                                });
-                              },
-                              onTap: () {
-                                setState(() {
-                                  name = exploreController.text;
-                                });
-                              },
-                              onSubmitted: (value) {
-                                setState(() {
-                                  name = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // TABBAR
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: SliverAppBarDelegate(
-                          TabBar(
-                            controller: tabController,
-                            labelColor: Colors.white,
-                            unselectedLabelColor: Colors.grey,
-                            onTap: tabsRouter.setActiveIndex,
-                            tabs: const [
-                              Tab(text: "Trending"),
-                              Tab(text: "News"),
-                              Tab(text: "Media"),
-                              Tab(text: "Servers"),
-                            ],
-                          ),
-                        ),
-                      )
-                    ];
-                  },
-                  body: child),
-            )));
+      onTap: () {
+        String tag = data['tag'].toString().substring(1);
+        context.router.pushNamed('/search/$tag');
+      },
+      child: Card(
+        color: navBarColor,
+        shape: const ContinuousRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(6))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['tag'],
+                    style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.titleLarge!.fontSize),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    width: double.infinity,
+                    child: Text(
+                      '${data['posts'].length.toString()} tags',
+                      style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontSize: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .fontSize),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
