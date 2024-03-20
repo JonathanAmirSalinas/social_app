@@ -84,6 +84,40 @@ class ActivityServices {
     } catch (e) {}
   }
 
+  // Mention Notification
+  Future<void> serverMentionNotification(
+      String sender,
+      String receiver,
+      String messageID,
+      String server,
+      String channel,
+      String type,
+      int time) async {
+    try {
+      // Sends Notification of a Mention
+      String nid = const Uuid().v1();
+      ServerMentionNotificationModel notification =
+          ServerMentionNotificationModel(
+        nid: nid,
+        pid: messageID,
+        receiver: receiver,
+        sender: sender,
+        server: server,
+        channel: channel,
+        seen: false,
+        type: type,
+        timestamp: time,
+      );
+      // Sends Notification of a Comment
+      _firestore
+          .collection('users')
+          .doc(receiver)
+          .collection('notifications')
+          .doc(nid)
+          .set(notification.toJson());
+    } catch (e) {}
+  }
+
   // Friend Request Notification
   Future<void> friendRequestNotification() async {}
   // Accepted Friend Request Notification

@@ -64,7 +64,7 @@ buildProfilesSettingDialog(BuildContext context, String uid) {
             ),
           ),
           body: Container(
-            color: backgroundColorSolid,
+            color: mainBackgroundColor,
           ),
         );
       }));
@@ -85,7 +85,7 @@ buildPrivacyAndSafetySettingDialog(BuildContext context, String uid) {
             ),
           ),
           body: Container(
-            color: backgroundColorSolid,
+            color: mainBackgroundColor,
           ),
         );
       }));
@@ -125,7 +125,7 @@ buildAccountInformation(BuildContext context, String uid) {
                   width: 200,
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      border: Border.all(width: 3, color: backgroundColorSolid),
+                      border: Border.all(width: 3, color: mainBackgroundColor),
                       borderRadius: const BorderRadius.all(
                         Radius.circular(6),
                       ),

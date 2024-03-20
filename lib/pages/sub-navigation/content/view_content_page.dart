@@ -2,12 +2,15 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
+import 'package:social_app/pages/responsive/side_menu_page.dart';
 import 'package:social_app/services/content_services.dart';
 import 'package:social_app/services/time_services.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/content/comment_widget.dart';
+import 'package:social_app/widgets/main/main_web_navigation_rail.dart';
 import 'package:social_app/widgets/view_content.dart';
 
 // TO-DO ///////////////////////////////////////////////////////////////////////
@@ -29,6 +32,11 @@ class _ViewContentPageState extends State<ViewContentPage> {
   ScrollController scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     scrollController.dispose();
     super.dispose();
@@ -36,25 +44,43 @@ class _ViewContentPageState extends State<ViewContentPage> {
 
   @override
   Widget build(BuildContext context) {
-    //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
-    return Scaffold(
-        backgroundColor: cardColor,
-        appBar: AppBar(
-          backgroundColor: navBarColor,
-          leading: IconButton(
-              onPressed: () {
-                context.router.back();
-              },
-              icon: const Icon(Icons.arrow_back_ios_new)),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              buildMainContent(),
-              buildCommentsList(),
-            ],
+    return LayoutBuilder(builder: ((context, constraints) {
+      return Scaffold(
+          appBar: AppBar(
+            scrolledUnderElevation: 0.0,
+            backgroundColor: mainNavRailBackgroundColor,
+            leading: IconButton(
+                onPressed: (() {
+                  context.router.back();
+                }),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded)),
           ),
-        ));
+          backgroundColor: Colors.black87,
+          body: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildWebNavigationRail(context),
+              Flexible(
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                  decoration: const BoxDecoration(
+                      color: mainBackgroundColor,
+                      borderRadius: BorderRadius.all(Radius.circular(4))),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildMainContent(),
+                        buildCommentsList(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              constraints.maxWidth > 1280 ? const SideMenuPage() : Container(),
+            ],
+          ));
+    }));
   }
 
   // Main Content
@@ -69,6 +95,7 @@ class _ViewContentPageState extends State<ViewContentPage> {
         if (snapshot.hasData) {
           var content = snapshot.data!.data()!;
           return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Body
               buildContent(content),
@@ -85,6 +112,7 @@ class _ViewContentPageState extends State<ViewContentPage> {
     );
   }
 
+  // Builds Comment Sections
   buildCommentsList() {
     return StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -131,7 +159,7 @@ class _ViewContentPageState extends State<ViewContentPage> {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.all(4),
+            margin: const EdgeInsets.fromLTRB(4, 1, 4, 1),
             padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
             decoration: const BoxDecoration(
               color: Colors.transparent,
@@ -193,21 +221,20 @@ class _ViewContentPageState extends State<ViewContentPage> {
                                                       snap: content);
                                                 });
                                           },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .45,
-                                            decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                    image:
-                                                        CachedNetworkImageProvider(
-                                                            content[
-                                                                'media_url']),
-                                                    fit: BoxFit.cover),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(16))),
+                                          child: AspectRatio(
+                                            aspectRatio: kIsWeb ? 2 : 1.5,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image:
+                                                          CachedNetworkImageProvider(
+                                                              content[
+                                                                  'media_url']),
+                                                      fit: BoxFit.cover),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(16))),
+                                            ),
                                           ),
                                           // ON DOUBLE TAP IT SHOULD LIKE THE POST IMAGE
                                           onDoubleTap: () {},
@@ -263,8 +290,9 @@ class _ViewContentPageState extends State<ViewContentPage> {
           ),
           Container(
             decoration: const BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(width: 3, color: navBarColor))),
+                border: Border(
+                    bottom: BorderSide(
+                        width: 3, color: mainNavRailBackgroundColor))),
           ),
           Row(
             children: [
@@ -304,7 +332,9 @@ class _ViewContentPageState extends State<ViewContentPage> {
       children: [
         Container(
           decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+              border: Border(
+                  bottom:
+                      BorderSide(width: 3, color: mainNavRailBackgroundColor))),
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -384,7 +414,9 @@ class _ViewContentPageState extends State<ViewContentPage> {
         ),
         Container(
           decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+              border: Border(
+                  bottom:
+                      BorderSide(width: 3, color: mainNavRailBackgroundColor))),
         ),
       ],
     );

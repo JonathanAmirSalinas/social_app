@@ -216,3 +216,56 @@ class MentionNotificationModel {
     );
   }
 }
+
+////////////////////////////////////////// Server Mention Notification Model ///
+class ServerMentionNotificationModel {
+  final String nid; // notification id
+  final String pid; // target post/content
+  final String receiver; // target user
+  final String sender; // owner
+  final String server; // Server ID
+  final String channel; // Channel ID/Channel Name
+  final String type; // message
+  final bool seen;
+  final int timestamp;
+
+  ServerMentionNotificationModel({
+    required this.nid,
+    required this.pid,
+    required this.receiver,
+    required this.sender,
+    required this.server,
+    required this.channel,
+    required this.type,
+    required this.seen,
+    required this.timestamp,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id_notification': nid,
+        'id_content': pid,
+        'id_receiver': receiver,
+        'id_sender': sender,
+        'server': server,
+        'channel': channel,
+        'seen': seen,
+        'type': type,
+        'timestamp': timestamp,
+      };
+
+  static ServerMentionNotificationModel dataFromSnap(DocumentSnapshot snap) {
+    var snapshot = snap.data() as Map<String, dynamic>;
+
+    return ServerMentionNotificationModel(
+      nid: snapshot['id_notification'],
+      pid: snapshot['id_content'],
+      receiver: snapshot['id_receiver'],
+      sender: snapshot['sender'],
+      server: snapshot['server'],
+      channel: snapshot['channel'],
+      seen: snapshot['seen'],
+      type: snapshot['type'],
+      timestamp: snapshot['timestamp'],
+    );
+  }
+}

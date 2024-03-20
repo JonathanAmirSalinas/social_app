@@ -23,7 +23,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColorSolid,
+      backgroundColor: mainBackgroundColor,
       appBar: AppBar(
         leading: const AutoLeadingButton(),
         title: const Text('Account'),

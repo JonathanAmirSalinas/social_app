@@ -16,7 +16,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColorSolid,
+      backgroundColor: mainBackgroundColor,
       appBar: AppBar(
         leading: const AutoLeadingButton(),
         centerTitle: true,

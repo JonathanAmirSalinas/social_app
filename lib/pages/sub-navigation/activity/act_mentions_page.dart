@@ -17,7 +17,7 @@ class _MentionsPageState extends State<MentionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColorSolid,
+      backgroundColor: mainBackgroundColor,
       body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('users')

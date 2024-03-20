@@ -1,20 +1,15 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/responsive/side_menu_page.dart';
 import 'package:social_app/pages/sub-navigation/content/create_post_page.dart';
 import 'package:social_app/providers/api/news/sports_news/bloc/sports_bloc.dart';
 import 'package:social_app/providers/api/news/sports_news/bloc/sports_event.dart';
-import 'package:social_app/providers/feed_provider.dart';
+import 'package:social_app/providers/navigation_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
+import 'package:social_app/widgets/content/post_widget.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
 @RoutePage(name: 'main')
@@ -28,21 +23,22 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  bool _extended = false;
+  TextEditingController searchController = TextEditingController();
+  final FocusNode _focus = FocusNode();
+  late String keyword;
   bool loadingState = false;
-
-  checkExtended(double constraint) {
-    setState(() {
-      if (constraint < webScreenSize) {
-        _extended = false;
-      }
-    });
-  }
 
   @override
   void initState() {
     getData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    _focus.dispose();
+    super.dispose();
   }
 
   getData() async {
@@ -54,8 +50,8 @@ class _MainPageState extends State<MainPage> {
       sportProvider.add(GetSportsList());
       UserProvider userProvider = Provider.of(context, listen: false);
       await userProvider.refreshUser();
-      FeedProvider feedProvider = Provider.of(context, listen: false);
-      await feedProvider.getUserFeed();
+      //FeedProvider feedProvider = Provider.of(context, listen: false);
+      //await feedProvider.getUserFeed();
     } catch (e) {
       print(e);
     }
@@ -66,7 +62,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    checkExtended(MediaQuery.of(context).size.width);
     return loadingState
         ? const Center(
             child: CircularProgressIndicator(),
@@ -74,12 +69,11 @@ class _MainPageState extends State<MainPage> {
         : LayoutBuilder(builder: (context, constraints) {
             return AutoTabsRouter(
               routes: [
-                const Home(),
-                const Explore(),
-                const Activity(),
-                Servers(),
+                const Home(), // 0
+                const Explore(), // 1
+                const Activity(), // 2
+                Servers(), // 3
               ],
-              homeIndex: 0,
               duration: Duration.zero,
               builder: (context, child) {
                 final tabsRouter = AutoTabsRouter.of(context);
@@ -90,24 +84,27 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget buildRoute(TabsRouter tabsRouter, Widget child, double constraints) {
+    NavigationProvider navProvider = Provider.of<NavigationProvider>(context);
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.red,
+        appBar: buildAppBar(tabsRouter),
         drawer: const SliverNavigationDrawer(),
         body: Row(
           children: [
             !isMobileScreen(constraints)
-                ? buildNavigationRail(tabsRouter)
+                ? buildWebNavigationRail(
+                    tabsRouter) //buildNavigationRail(tabsRouter)
                 : Container(),
             Expanded(child: child),
             constraints > 1280
                 ? Container(
                     height: double.infinity,
                     width: 5,
-                    color: navBarColor,
+                    color: mainNavRailBackgroundColor,
                   )
                 : Container(),
             constraints > 1280 ? const SideMenuPage() : Container(),
@@ -120,8 +117,11 @@ class _MainPageState extends State<MainPage> {
                 currentIndex: tabsRouter.activeIndex,
                 type: BottomNavigationBarType.fixed,
                 selectedItemColor: Colors.white,
-                backgroundColor: navBarColor,
-                onTap: tabsRouter.setActiveIndex,
+                backgroundColor: mainNavRailBackgroundColor,
+                onTap: (value) {
+                  navProvider.changeRouterIndex(value);
+                  tabsRouter.setActiveIndex(value);
+                },
                 items: const [
                     BottomNavigationBarItem(
                         icon: Icon(Icons.home), label: "Home"),
@@ -138,150 +138,251 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-//////////////////////////////////////////////////////////////////////////////////
-//// NAVIGATION RAIL
-////////////////////////////////////////////////////////////////////////////////
-  buildNavigationRail(TabsRouter tabsRouter) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (MediaQuery.of(context).size.width > webScreenSize) {
-            _extended = !_extended;
-          }
-        });
-      },
-      child: NavigationRail(
-        selectedIndex: tabsRouter.activeIndex,
-        extended: _extended,
-        elevation: 2,
-        // NAVIGATION RAIL UI
-        backgroundColor: navBarColor,
-        selectedIconTheme: Theme.of(context).primaryIconTheme,
-        selectedLabelTextStyle: TextStyle(
-            color: Theme.of(context).primaryIconTheme.color,
-            fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-            fontWeight: FontWeight.w600),
-        unselectedIconTheme: Theme.of(context).iconTheme,
-        unselectedLabelTextStyle: TextStyle(
-            color: Theme.of(context).iconTheme.color,
-            fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
-        // LEADING WIDGET
-        leading: const LeadingExtendedRail(),
-        //TRAILING WIDGET
-        trailing: Expanded(
-            flex: 1,
-            child: SingleChildScrollView(
-              child: Stack(
-                children: [
-                  Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          children: [
-                            _extended
-                                ? Container(
-                                    width: 80,
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: Divider(
-                                      thickness: 2,
-                                      color: Theme.of(context)
-                                          .primaryIconTheme
-                                          .color,
-                                    ),
-                                  )
-                                : Container(
-                                    width: 20,
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: Divider(
-                                      thickness: 2,
-                                      color: Theme.of(context)
-                                          .primaryIconTheme
-                                          .color,
-                                    ),
-                                  ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: const ExtendedSubMenuRail(
-                                onlyOnExtended: false,
-                                menuItemIcon: Icons.account_box_rounded,
-                                menuLabel: "Profile",
-                                itemRoute: '/profile',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: const ExtendedSubMenuRail(
-                                onlyOnExtended: false,
-                                menuItemIcon: Icons.workspaces_filled,
-                                menuLabel: "Premium",
-                                itemRoute: '/premium',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: const ExtendedSubMenuRail(
-                                onlyOnExtended: false,
-                                menuItemIcon: Icons.settings,
-                                menuLabel: "Settings",
-                                itemRoute: '/settings',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: const ExtendedSubMenuRail(
-                                onlyOnExtended: true,
-                                menuItemIcon: Icons.help_center,
-                                menuLabel: "Help",
-                                itemRoute: '/help',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: const ExtendedSubMenuRail(
-                                onlyOnExtended: true,
-                                menuItemIcon: Icons.logout_rounded,
-                                menuLabel: "Logout",
-                                itemRoute: '',
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            )),
+  buildAppBar(TabsRouter tabsRouter) {
+    switch (tabsRouter.activeIndex) {
+      // Home Page AppBar
+      case 0:
+        return AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: mainNavRailBackgroundColor,
+          title: const Text('Home'),
+          actions: [
+            isMobileScreen(MediaQuery.of(context).size.width)
+                ? Container()
+                : Container(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                        onPressed: () {
+                          buildCreatePostDialog(context);
+                        },
+                        icon: const Icon(Icons.add))),
+          ],
+        );
+      // Explore Page AppBar
+      case 1:
+        return AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: mainNavRailBackgroundColor,
+          title: Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  color: mainServerRailBackgroundColor),
+              child: TextField(
+                controller: searchController,
+                focusNode: _focus,
+                decoration: InputDecoration(
+                    hintText: 'Explore the App',
+                    contentPadding: const EdgeInsets.all(8),
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.all(Radius.circular(12))),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _focus.hasFocus
+                        ? IconButton(
+                            onPressed: () {
+                              setState(() {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                _focus.unfocus();
+                                searchController.clear();
+                              });
 
-        // MAIN NAVIAGTION FUNCTIONALITY
-        onDestinationSelected: (int index) {
-          tabsRouter.setActiveIndex(index);
-        },
-        // NAVIGATION BUTTONS
-        destinations: const [
-          NavigationRailDestination(
-              padding: EdgeInsets.symmetric(vertical: 4),
-              icon: Icon(Icons.home),
-              label: Text("Home")),
-          NavigationRailDestination(
-              padding: EdgeInsets.symmetric(vertical: 4),
-              icon: Icon(Icons.search),
-              label: Text("Explore")),
-          NavigationRailDestination(
-              padding: EdgeInsets.symmetric(vertical: 4),
-              icon: Icon(Icons.notifications_active_rounded),
-              label: Text("Activity")),
-          NavigationRailDestination(
-              padding: EdgeInsets.symmetric(vertical: 4),
-              icon: Icon(Icons.space_dashboard),
-              label: Text("Servers")),
+                              tabsRouter.setActiveIndex(1);
+                            },
+                            splashRadius: 20,
+                            icon: const Icon(Icons.clear))
+                        : null),
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    _focus.unfocus();
+                    setState(() {
+                      keyword = value;
+                    });
+                  } else {
+                    setState(() {
+                      keyword = value;
+                    });
+                  }
+                },
+                onTap: () {
+                  setState(() {
+                    keyword = searchController.text.trim();
+                  });
+                },
+                onSubmitted: (value) {
+                  if (value.isEmpty) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    _focus.unfocus();
+                    setState(() {
+                      keyword = value;
+                    });
+                    // Set Tab Index to 0 (Hub)
+                    tabsRouter.setActiveIndex(1);
+                  } else {
+                    setState(() {
+                      keyword = value;
+                      context.router.navigate(Search(keyword: keyword));
+                    });
+                  }
+                },
+              ),
+            ),
+          ),
+        );
+      // Activity Page AppBar
+      case 2:
+        return AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: mainNavRailBackgroundColor,
+          title: const Text('Activity'),
+          actions: [
+            isMobileScreen(MediaQuery.of(context).size.width)
+                ? Container()
+                : Container(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications_active_outlined))),
+          ],
+        );
+      // Server Page AppBar
+      case 3:
+        return AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: mainNavRailBackgroundColor,
+        );
+
+      default:
+        return AppBar();
+    }
+  }
+
+  // Navigational Layout Builder
+  buildWebNavigationRail(TabsRouter tabsRouter) {
+    return LayoutBuilder(builder: ((context, constraints) {
+      return constraints.maxWidth < webScreenSize
+          ? buildExpandedRail(tabsRouter)
+          : buildCompressedRail(tabsRouter);
+    }));
+  }
+
+  // Expanded Vertical Navigation Rail
+  buildExpandedRail(TabsRouter tabsRouter) {
+    return Container(width: 250, color: Colors.red);
+  }
+
+  // Compressed Vertical Navigation Rail
+  buildCompressedRail(TabsRouter tabsRouter) {
+    return Container(
+      width: 60,
+      color: mainNavRailBackgroundColor,
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(6),
+            padding: const EdgeInsets.only(bottom: 2.0, top: 2.0),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  tabsRouter.setActiveIndex(0);
+                },
+                style: ElevatedButton.styleFrom(
+                    elevation: tabsRouter.activeIndex == 0 ? 2 : 0,
+                    backgroundColor: tabsRouter.activeIndex == 0
+                        ? mainServerRailBackgroundColor
+                        : mainNavRailBackgroundColor,
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                child: const Icon(
+                  Icons.home,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(6),
+            padding: const EdgeInsets.only(bottom: 2.0, top: 2.0),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  tabsRouter.setActiveIndex(1);
+                },
+                style: ElevatedButton.styleFrom(
+                    elevation: tabsRouter.activeIndex == 1 ? 2 : 0,
+                    backgroundColor: tabsRouter.activeIndex == 1
+                        ? mainServerRailBackgroundColor
+                        : mainNavRailBackgroundColor,
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                child: const Icon(
+                  Icons.search,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(6),
+            padding: const EdgeInsets.only(bottom: 2.0, top: 2.0),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  tabsRouter.setActiveIndex(2);
+                },
+                style: ElevatedButton.styleFrom(
+                    elevation: tabsRouter.activeIndex == 2 ? 2 : 0,
+                    backgroundColor: tabsRouter.activeIndex == 2
+                        ? mainServerRailBackgroundColor
+                        : mainNavRailBackgroundColor,
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                child: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(6),
+            padding: const EdgeInsets.only(bottom: 2.0, top: 2.0),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  tabsRouter.setActiveIndex(3);
+                },
+                style: ElevatedButton.styleFrom(
+                    elevation: tabsRouter.activeIndex == 3 ? 2 : 0,
+                    backgroundColor: tabsRouter.activeIndex == 3
+                        ? mainServerRailBackgroundColor
+                        : mainNavRailBackgroundColor,
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                child: const Icon(
+                  Icons.space_dashboard,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 // FloatingAction Button                                                     ///
 ////////////////////////////////////////////////////////////////////////////////
   generateFloatingActionButton() {
@@ -297,249 +398,11 @@ class _MainPageState extends State<MainPage> {
               }));
         },
         tooltip: "Create Post",
-        backgroundColor: navBarColor,
+        backgroundColor: mainNavRailBackgroundColor,
         shape:
             ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add),
       ),
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// LEADING RAIL WIDGET: HANDLES PROFILE RAIL UI                              ///
-////////////////////////////////////////////////////////////////////////////////
-class LeadingExtendedRail extends StatelessWidget {
-  const LeadingExtendedRail({
-    super.key,
-  });
-  @override
-  Widget build(BuildContext context) {
-    UserModel userProvider = Provider.of<UserProvider>(context).getUser;
-    final Animation<double> animation =
-        NavigationRail.extendedAnimation(context);
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        // The extended fab has a shorter height than the regular fab.
-        return animation.value == 0
-            ? Container(
-                height: 50,
-                width: 50,
-                padding: EdgeInsets.symmetric(
-                  horizontal: lerpDouble(0, 7, animation.value)!,
-                  vertical: lerpDouble(0, 7, animation.value)!,
-                ),
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: CachedNetworkImageProvider(
-                        userProvider.profileUrl,
-                      ),
-                      fit: BoxFit.cover),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(10),
-                  ),
-                ),
-              )
-            : Align(
-                alignment: AlignmentDirectional.centerStart,
-                widthFactor: animation.value,
-                child: Container(
-                    height: 160,
-                    width: 240,
-                    padding: const EdgeInsets.all(8),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 80,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(8)),
-                                image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                      userProvider.profileUrl,
-                                    ),
-                                    fit: BoxFit.cover),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.donut_large_rounded,
-                                      color: secondaryColorSolid,
-                                    )),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.account_circle_rounded,
-                                      color: secondaryColorSolid,
-                                    )),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Text(
-                          userProvider.name,
-                          style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .fontSize),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: Text(userProvider.username),
-                        ),
-                      ],
-                    )),
-              );
-      },
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// TRAILING SUB-MENU ITEMS WIDGETS
-////////////////////////////////////////////////////////////////////////////////
-class ExtendedSubMenuRail extends StatelessWidget {
-  final bool onlyOnExtended;
-  final IconData menuItemIcon;
-  final String menuLabel;
-  final String itemRoute;
-  const ExtendedSubMenuRail({
-    super.key,
-    required this.menuItemIcon,
-    required this.menuLabel,
-    required this.itemRoute,
-    required this.onlyOnExtended,
-  });
-  @override
-  Widget build(BuildContext context) {
-    final Animation<double> animation =
-        NavigationRail.extendedAnimation(context);
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        // The extended fab has a shorter height than the regular fab.
-        return Container(
-          height: 60,
-          padding: EdgeInsets.symmetric(
-            vertical: lerpDouble(6, 6, animation.value)!,
-          ),
-          child: animation.value == 0
-              ? !onlyOnExtended
-                  ? IconButton(
-                      onPressed: () async {
-                        if (menuLabel == 'Logout') {
-                          FirebaseAuth.instance.signOut();
-                          SharedPreferences pref =
-                              await SharedPreferences.getInstance();
-                          pref.clear();
-                          context.router.navigateNamed('/');
-                        } else if (menuLabel == 'Profile') {
-                          context.router.pushNamed(
-                              '/profile/${FirebaseAuth.instance.currentUser!.uid}');
-                        } else {
-                          context.router.pushNamed(itemRoute);
-                        }
-                      },
-                      icon: Icon(
-                        menuItemIcon,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                    )
-                  : Container()
-              : Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  widthFactor: animation.value,
-                  child: SizedBox(
-                    width: 200,
-                    child: ListTile(
-                      onTap: () async {
-                        // Logout
-                        if (menuLabel == 'Logout') {
-                          FirebaseAuth.instance.signOut();
-                          SharedPreferences pref =
-                              await SharedPreferences.getInstance();
-                          pref.clear();
-                          context.router.navigateNamed('/');
-                        } else if (menuLabel == 'Profile') {
-                          context.router.pushNamed(
-                              '/profile/${FirebaseAuth.instance.currentUser!.uid}');
-                        } else {
-                          context.router.pushNamed(itemRoute);
-                        }
-                      },
-                      titleAlignment: ListTileTitleAlignment.titleHeight,
-                      leading: Icon(menuItemIcon),
-                      title: Text(menuLabel),
-                    ),
-                  )),
-        );
-      },
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// BUTTON TAHT HANDLE THE EXTENDED STATE OF THE NAVIAGTION RAIL (TRUE/FALSE)
-////////////////////////////////////////////////////////////////////////////////
-class ExtendedRailController extends StatelessWidget {
-  const ExtendedRailController({super.key, required this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final Animation<double> animation =
-        NavigationRail.extendedAnimation(context);
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        // The extended fab has a shorter height than the regular fab.
-        return Container(
-          height: 50,
-          padding: EdgeInsets.symmetric(
-            vertical: lerpDouble(0, 6, animation.value)!,
-          ),
-          child: animation.value == 0
-              ? IconButton(
-                  onPressed: onPressed,
-                  icon: const Icon(Icons.keyboard_double_arrow_right_sharp),
-                  splashRadius: 25,
-                )
-              : Align(
-                  alignment: Alignment.centerRight,
-                  widthFactor: animation.value,
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 180),
-                    child: IconButton(
-                      onPressed: onPressed,
-                      icon: Icon(
-                        Icons.keyboard_double_arrow_left_sharp,
-                        color: Theme.of(context).primaryIconTheme.color,
-                      ),
-                      splashRadius: 25,
-                    ),
-                  ),
-                ),
-        );
-      },
     );
   }
 }

@@ -30,7 +30,7 @@ class _ServersTabState extends State<ServersTabPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -87,7 +87,7 @@ class _ServersTabState extends State<ServersTabPage>
                 ),
               )),
         ),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -131,7 +131,7 @@ class _ServersTabState extends State<ServersTabPage>
                 ),
               )),
         ),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }

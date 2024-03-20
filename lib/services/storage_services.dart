@@ -11,7 +11,7 @@ class StorageServices {
 
   // Upload Image File
   Future<String> uploadImageFileToStorage(
-      String fileLocation, File file, String pid) async {
+      String fileLocation, File file, String id) async {
     switch (fileLocation) {
       case 'user_profile_images':
         Reference ref =
@@ -47,11 +47,34 @@ class StorageServices {
         TaskSnapshot snap = await uploadTask;
         String imageURL = await snap.ref.getDownloadURL();
         return imageURL;
+      case 'server_image':
+        Reference ref = storage.ref().child(fileLocation).child(id);
+        String sid = const Uuid().v1();
+        ref = ref.child(sid);
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'server_banner':
+        Reference ref = storage.ref().child(fileLocation).child(id);
+        String sid = const Uuid().v1();
+        ref = ref.child(sid);
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'server_message_media':
+        Reference ref = storage.ref().child(fileLocation).child(id);
+        String mid = const Uuid().v1();
+        ref = ref.child(mid);
+        UploadTask uploadTask = ref.putFile(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
 
       default:
         Reference ref =
             storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
-
         UploadTask uploadTask = ref.putFile(file);
         TaskSnapshot snap = await uploadTask;
         String imageURL = await snap.ref.getDownloadURL();
@@ -103,6 +126,31 @@ class StorageServices {
             storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
         String pid = const Uuid().v1();
         ref = ref.child(pid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'server_image':
+        Reference ref = storage.ref().child(fileLocation).child(pid);
+        String sid = const Uuid().v1();
+        ref = ref.child(sid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'server_banner':
+        Reference ref = storage.ref().child(fileLocation).child(pid);
+        String sid = const Uuid().v1();
+        ref = ref.child(sid);
+        UploadTask uploadTask = ref.putData(file);
+        TaskSnapshot snap = await uploadTask;
+        String imageURL = await snap.ref.getDownloadURL();
+        return imageURL;
+      case 'server_message_media':
+        Reference ref =
+            storage.ref().child(fileLocation).child(_auth.currentUser!.uid);
+        String mid = const Uuid().v1();
+        ref = ref.child(mid);
         UploadTask uploadTask = ref.putData(file);
         TaskSnapshot snap = await uploadTask;
         String imageURL = await snap.ref.getDownloadURL();

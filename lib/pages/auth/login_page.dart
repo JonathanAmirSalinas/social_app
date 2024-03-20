@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.only(
                   topRight: Radius.circular(16),
                   bottomRight: Radius.circular(16)),
-              color: navServerBar),
+              color: mainNavRailBackgroundColor),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'Social Media App',
                           style: TextStyle(
-                              color: secondaryColor,
+                              color: mainSecondaryColor,
                               fontSize: Theme.of(context)
                                   .textTheme
                                   .headlineLarge!
@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'View, Chat, and Explore',
                             style: TextStyle(
-                                color: secondaryColor,
+                                color: mainSecondaryColor,
                                 fontSize: Theme.of(context)
                                     .textTheme
                                     .headlineMedium!
@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'version: 1',
                     style: TextStyle(
-                        color: secondaryColor,
+                        color: mainSecondaryColor,
                         fontSize:
                             Theme.of(context).textTheme.labelLarge!.fontSize,
                         fontStyle: FontStyle.italic),

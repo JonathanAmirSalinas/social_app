@@ -151,11 +151,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           if (profileImageFile != null) {
                             profileImageFile!.delete();
                           }
+                          profileImageBytes = null;
+                          bannerImageBytes = null;
                         });
                       },
                       icon: const Icon(Icons.arrow_back_rounded));
                 }),
-                title: Text(MediaQuery.of(context).size.width.toString()),
+                title: Text("Account Setup"),
               ),
         body: registerForm(),
       ),
@@ -199,7 +201,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(16),
                     bottomRight: Radius.circular(16)),
-                color: navServerBar),
+                color: mainServerRailBackgroundColor),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -331,7 +333,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Text(
                             'Register',
                             style: TextStyle(
-                                color: secondaryColor,
+                                color: mainSecondaryColor,
                                 fontSize: Theme.of(context)
                                     .textTheme
                                     .headlineLarge!
@@ -344,7 +346,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Text(
                               'and View, Chat, and Explore with friends',
                               style: TextStyle(
-                                  color: secondaryColor,
+                                  color: mainSecondaryColor,
                                   fontSize: Theme.of(context)
                                       .textTheme
                                       .headlineMedium!
@@ -367,7 +369,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Text(
                       'version: 1',
                       style: TextStyle(
-                          color: secondaryColor,
+                          color: mainSecondaryColor,
                           fontSize:
                               Theme.of(context).textTheme.labelLarge!.fontSize,
                           fontStyle: FontStyle.italic),
@@ -524,7 +526,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(16),
                     bottomRight: Radius.circular(16)),
-                color: navServerBar),
+                color: mainServerRailBackgroundColor),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -710,7 +712,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Text(
                         'Preview',
                         style: TextStyle(
-                            color: secondaryColor,
+                            color: mainSecondaryColor,
                             fontSize: Theme.of(context)
                                 .textTheme
                                 .headlineMedium!
@@ -720,7 +722,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Flexible(
                       child: Card(
-                        color: backgroundColorSolid,
+                        color: mainBackgroundColor,
                         shape: const ContinuousRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(6))),
                         child: Container(
@@ -773,7 +775,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text(
                         'version: 1',
                         style: TextStyle(
-                            color: secondaryColor,
+                            color: mainSecondaryColor,
                             fontSize: Theme.of(context)
                                 .textTheme
                                 .labelLarge!
@@ -804,7 +806,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 //mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Card(
-                    color: backgroundColorSolid,
+                    color: mainBackgroundColor,
                     shape: const ContinuousRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(6))),
                     child: Container(
@@ -987,7 +989,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: 200,
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    border: Border.all(width: 3, color: backgroundColorSolid),
+                    border: Border.all(width: 3, color: mainBackgroundColor),
                     borderRadius: const BorderRadius.all(
                       Radius.circular(6),
                     ),

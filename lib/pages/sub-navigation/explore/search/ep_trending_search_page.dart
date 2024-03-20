@@ -5,7 +5,8 @@ import 'package:social_app/constants/constants.dart';
 @RoutePage(name: 'search_trending_tab')
 class TrendingSearchPage extends StatefulWidget {
   final String keyword;
-  const TrendingSearchPage({super.key, required this.keyword});
+  const TrendingSearchPage(
+      {super.key, @PathParam('keyword') required this.keyword});
 
   @override
   State<TrendingSearchPage> createState() => _TrendingSearchPageState();
@@ -20,7 +21,7 @@ class _TrendingSearchPageState extends State<TrendingSearchPage>
     super.build(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: Center(child: Text(widget.keyword)),
     );
   }

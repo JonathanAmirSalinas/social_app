@@ -62,14 +62,14 @@ class _UpdateUserInformationState extends State<UpdateUserInformation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: Center(
         child: SizedBox(
           width: mobileScreenSize,
           child: Container(
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(6)),
-                color: backgroundColorSolid),
+                color: mainBackgroundColor),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -87,7 +87,7 @@ class _UpdateUserInformationState extends State<UpdateUserInformation> {
                           )
                         : const Divider(
                             thickness: 4,
-                            color: navBarColor,
+                            color: mainNavRailBackgroundColor,
                           ),
                     Flexible(
                       child: Container(
@@ -168,7 +168,7 @@ class _UpdateUserInformationState extends State<UpdateUserInformation> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
-        color: cardColor,
+        color: mainNavRailBackgroundColor,
         shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6)),
         ),

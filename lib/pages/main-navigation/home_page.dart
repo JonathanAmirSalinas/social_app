@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
-import 'package:social_app/pages/sub-navigation/content/create_post_page.dart';
 import 'package:social_app/widgets/content/re_post_widget.dart';
 import 'package:social_app/widgets/content/post_widget.dart';
 
@@ -19,30 +18,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     //FeedProvider feedProvider = Provider.of<FeedProvider>(context);
     return Scaffold(
-        backgroundColor: backgroundColorSolid,
+        backgroundColor: mainBackgroundColor,
         drawer: isSmallPage(context, "Drawer"),
-        appBar: AppBar(
-          scrolledUnderElevation: 0.0,
-          leading: isSmallPage(context, "Leading IconButton"),
-          backgroundColor: navBarColor,
-          centerTitle: true,
-          title: Text(
-            '${MediaQuery.of(context).size.width}',
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-          ),
-          actions: [
-            isMobileScreen(MediaQuery.of(context).size.width)
-                ? Container()
-                : Container(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: IconButton(
-                        onPressed: () {
-                          buildCreatePostDialog();
-                        },
-                        icon: const Icon(Icons.add))),
-          ],
-        ),
         body: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('posts')
@@ -66,19 +43,9 @@ class _HomePageState extends State<HomePage> {
                         var content = snapshot.data!.docs[index].data();
                         switch (content['type']) {
                           case 'post':
-                            return Container(
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            width: 3, color: navBarColor))),
-                                child: BuildPostContent(content: content));
+                            return BuildPostContent(content: content);
                           case 're_post':
-                            return Container(
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            width: 3, color: navBarColor))),
-                                child: BuildRePostContent(content: content));
+                            return BuildRePostContent(content: content);
                           case 'ad':
                             return Container();
                           case 'server_link':
@@ -114,15 +81,5 @@ class _HomePageState extends State<HomePage> {
                       });
               }
             }));
-  }
-
-  // Creates a Dialog Used to create a Post
-  buildCreatePostDialog() {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return const CreatePostPage();
-      },
-    );
   }
 }

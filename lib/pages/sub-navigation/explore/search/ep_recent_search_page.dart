@@ -5,7 +5,8 @@ import 'package:social_app/constants/constants.dart';
 @RoutePage(name: 'search_recent_tab')
 class RecentSearchPage extends StatefulWidget {
   final String keyword;
-  const RecentSearchPage({super.key, required this.keyword});
+  const RecentSearchPage(
+      {super.key, @PathParam('keyword') required this.keyword});
 
   @override
   State<RecentSearchPage> createState() => _RecentSearchPageState();
@@ -20,7 +21,7 @@ class _RecentSearchPageState extends State<RecentSearchPage>
     super.build(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: Center(child: Text(widget.keyword)),
     );
   }

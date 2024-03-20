@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:social_app/constants/constants.dart';
-import 'package:social_app/providers/feed_provider.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/content/post_reference_widget.dart';
 import 'package:social_app/widgets/view_content.dart';
@@ -31,76 +30,62 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        color: mainServerRailBackgroundColor,
         child: Column(
           children: [
-            MediaQuery.of(context).size.width > mobileScreenSize
-                ? buildWebContentBody()
-                : buildMobileContentBody()
-          ],
-        ));
-  }
-
-  buildWebContentBody() {
-    FeedProvider feedProvider = Provider.of<FeedProvider>(context);
-    return GestureDetector(
-      onTap: () {
-        feedProvider.refreshPost(widget.content['id_content']);
-      },
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(4),
-            padding: const EdgeInsets.fromLTRB(4, 4, 24, 0),
-            decoration: const BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            // BODY
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profile Image
-                buildUserProfileImage(
-                    context, widget.content['id_content_owner']),
-                Expanded(
-                  child: Column(
-                    children: [
-                      // User Identification
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: buildUserInfo(context, widget.content, true),
-                          )
-                        ],
-                      ),
-                      // Post
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      child: buildDetectableStatement(
-                                          context,
-                                          widget.content['statement'],
-                                          TextOverflow.visible)),
-                                ],
+            Container(
+              margin: const EdgeInsets.fromLTRB(4, 1, 4, 1),
+              padding: const EdgeInsets.fromLTRB(4, 4, 24, 0),
+              decoration: const BoxDecoration(
+                color: mainBackgroundColor,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              // BODY
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile Image
+                  buildUserProfileImage(
+                      context, widget.content['id_content_owner']),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // User Identification
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child:
+                                  buildUserInfo(context, widget.content, true),
+                            )
+                          ],
+                        ),
+                        // Post
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: buildDetectableStatement(
+                                            context,
+                                            widget.content['statement'],
+                                            TextOverflow.visible)),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      // Image or Media
-                      Row(
-                        children: [
+                          ],
+                        ),
+                        // Image or Media
+                        Row(children: [
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -117,31 +102,30 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
                                                       snap: widget.content);
                                                 });
                                           },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .45,
-                                            decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                    image:
-                                                        CachedNetworkImageProvider(
-                                                            widget.content[
-                                                                'media_url']),
-                                                    fit: BoxFit.cover),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(16))),
+                                          child: AspectRatio(
+                                            aspectRatio: kIsWeb ? 2 : 1.5,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image:
+                                                          CachedNetworkImageProvider(
+                                                              widget.content[
+                                                                  'media_url']),
+                                                      fit: BoxFit.cover),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(16))),
+                                            ),
                                           ),
                                           // ON DOUBLE TAP IT SHOULD LIKE THE POST IMAGE
                                           onDoubleTap: () {},
                                         )
                                       : Container(),
-                                  // Reference
+                                  // Reference ////////////////////////////////////
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Card(
-                                        color: cardColor,
+                                        color: mainNavRailBackgroundColor,
                                         shape: const ContinuousRectangleBorder(
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(6))),
@@ -149,7 +133,7 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
                                             reference: widget
                                                 .content['id_reference'])),
                                   ),
-                                  //BuildPostReferenceContent(content: reference)
+
                                   // Icons
                                   buildInteractiveIconSection(
                                       context, widget.content),
@@ -157,145 +141,15 @@ class _BuildRePostContentState extends State<BuildRePostContent> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
+                        ]),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  buildMobileContentBody() {
-    FeedProvider feedProvider = Provider.of<FeedProvider>(context);
-    return GestureDetector(
-      onTap: () {
-        feedProvider.refreshPost(widget.content['id_content']);
-      },
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(4),
-            padding: const EdgeInsets.fromLTRB(4, 4, 24, 0),
-            decoration: const BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            // BODY
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profile Image
-                buildUserProfileImage(
-                    context, widget.content['id_content_owner']),
-                Expanded(
-                  child: Column(
-                    children: [
-                      // User Identification
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child:
-                                buildUserInfo(context, widget.content, false),
-                          )
-                        ],
-                      ),
-                      // Post
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      child: buildDetectableStatement(
-                                          context,
-                                          widget.content['statement'],
-                                          TextOverflow.visible)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Image or Media
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Column(
-                                children: [
-                                  // Checks if Post has media
-                                  widget.content['hasMedia'] == true
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return ViewContent(
-                                                      snap: widget.content);
-                                                });
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .45,
-                                            decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                    image:
-                                                        CachedNetworkImageProvider(
-                                                            widget.content[
-                                                                'media_url']),
-                                                    fit: BoxFit.cover),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(16))),
-                                          ),
-                                          // ON DOUBLE TAP IT SHOULD LIKE THE POST IMAGE
-                                          onDoubleTap: () {},
-                                        )
-                                      : Container(),
-                                  // Reference
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                        color: cardColor,
-                                        shape: const ContinuousRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(6))),
-                                        child: BuildPostReferenceContent(
-                                            reference: widget
-                                                .content['id_reference'])),
-                                  ),
-                                  //BuildPostReferenceContent(content: reference)
-                                  // Icons
-                                  buildInteractiveIconSection(
-                                    context,
-                                    widget.content,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

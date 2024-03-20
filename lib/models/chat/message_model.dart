@@ -6,18 +6,21 @@ class MessageModel {
   final String message;
   final String media;
   final bool seen;
+  final bool hasMedia;
   final int timestamp;
   final String type;
+  final List mentions;
 
-  const MessageModel({
-    required this.from,
-    required this.messageID,
-    required this.message,
-    required this.media,
-    required this.seen,
-    required this.timestamp,
-    required this.type,
-  });
+  const MessageModel(
+      {required this.from,
+      required this.messageID,
+      required this.message,
+      required this.media,
+      required this.seen,
+      required this.hasMedia,
+      required this.timestamp,
+      required this.type,
+      required this.mentions});
 
   Map<String, dynamic> toJson() => {
         'from': from,
@@ -25,8 +28,10 @@ class MessageModel {
         'message': message,
         'media': media,
         'seen': seen,
+        'hasMedia': hasMedia,
         'timestamp': timestamp,
         'message_type': type,
+        'mentions': mentions
       };
 
   static MessageModel dataFromSnap(DocumentSnapshot snap) {
@@ -38,7 +43,9 @@ class MessageModel {
         message: snapshot['message'],
         media: snapshot['media'],
         seen: snapshot['seen'],
+        hasMedia: snapshot['hasMedia'],
         timestamp: snapshot['created_timestamp'],
-        type: snapshot['message_type']);
+        type: snapshot['message_type'],
+        mentions: snapshot['mentions']);
   }
 }

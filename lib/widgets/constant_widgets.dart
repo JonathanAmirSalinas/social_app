@@ -3,9 +3,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/pages/sub-navigation/content/create_comment_page.dart';
 import 'package:social_app/pages/sub-navigation/content/create_repost_page.dart';
-import 'package:social_app/router/app_router.dart';
+import 'package:social_app/providers/navigation_provider.dart';
 import 'package:social_app/services/content_services.dart';
 import 'package:social_app/services/time_services.dart';
 
@@ -314,6 +315,7 @@ buildNonInteractiveIconSection(
 ///////////////////////////////////////////////////////////// User Profile Image
 ///
 buildUserProfileImage(BuildContext context, String data) {
+  NavigationProvider navProvider = Provider.of<NavigationProvider>(context);
   return StreamBuilder(
     stream:
         FirebaseFirestore.instance.collection('users').doc(data).snapshots(),
@@ -323,7 +325,8 @@ buildUserProfileImage(BuildContext context, String data) {
         var user = snapshot.data!.data()!;
         return GestureDetector(
           onTap: () {
-            context.router.pushNamed('/profile/${data}');
+            navProvider.changeProfileID(user['uid']);
+            context.router.pushNamed('/profile/${user['uid']}');
           },
           child: Container(
             height: 55,
@@ -347,6 +350,7 @@ buildUserProfileImage(BuildContext context, String data) {
 }
 
 buildReferenceProfileImage(BuildContext context, Map<String, dynamic> data) {
+  NavigationProvider navProvider = Provider.of<NavigationProvider>(context);
   return StreamBuilder(
     stream: FirebaseFirestore.instance
         .collection('users')
@@ -357,8 +361,9 @@ buildReferenceProfileImage(BuildContext context, Map<String, dynamic> data) {
       if (snapshot.hasData) {
         var user = snapshot.data!.data()!;
         return GestureDetector(
-          onTap: () {
-            context.router.pushNamed('/profile/${data['id_content_owner']}');
+          onTap: () async {
+            await navProvider.changeProfileID(user['id_content_owner']);
+            context.tabsRouter.setActiveIndex(4);
           },
           child: Container(
             height: 55,
@@ -385,6 +390,7 @@ buildReferenceProfileImage(BuildContext context, Map<String, dynamic> data) {
 ///
 buildUserInfo(
     BuildContext context, Map<String, dynamic> data, bool interactive) {
+  //NavigationProvider navProvider = Provider.of<NavigationProvider>(context);
   return StreamBuilder(
     stream: FirebaseFirestore.instance
         .collection('users')
@@ -397,9 +403,8 @@ buildUserInfo(
         return Padding(
           padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
           child: GestureDetector(
-              onTap: () {
-                context.router
-                    .pushNamed('/profile/${data['id_content_owner']}');
+              onTap: () async {
+                context.router.pushNamed('/profile/${user['uid']}');
               },
               child: SizedBox(
                 height: 55,
@@ -443,7 +448,7 @@ buildUserInfo(
                     ),
                     Expanded(
                         child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (interactive) {
                           context.router
                               .pushNamed('/content/${data['id_content']}');
@@ -478,9 +483,8 @@ buildReferenceUserInfo(BuildContext context, Map<String, dynamic> data) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
           child: GestureDetector(
-              onTap: () {
-                context.router
-                    .pushNamed('/profile/${data['id_content_owner']}');
+              onTap: () async {
+                context.router.pushNamed('/profile/${user['uid']}');
               },
               child: SizedBox(
                 height: 55,
@@ -524,10 +528,9 @@ buildReferenceUserInfo(BuildContext context, Map<String, dynamic> data) {
                     ),
                     Expanded(
                         child: GestureDetector(
-                      onTap: () {
-                        context.router.push(View_content(
-                          pid: data['id_content'],
-                        ));
+                      onTap: () async {
+                        context.router
+                            .navigateNamed('/content/${data['id_content']}');
                       },
                       child: Container(
                         color: const Color.fromARGB(0, 255, 255, 255),

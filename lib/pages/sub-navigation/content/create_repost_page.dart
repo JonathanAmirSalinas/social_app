@@ -114,7 +114,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
           child: Container(
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: backgroundColorSolid),
+                color: mainBackgroundColor),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -134,7 +134,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                           )
                         : const Divider(
                             thickness: 4,
-                            color: navBarColor,
+                            color: mainNavRailBackgroundColor,
                           ),
                     // Body
                     Flexible(
@@ -188,7 +188,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.poll_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             IconButton(
@@ -196,7 +196,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.layers_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             // Add Image
@@ -211,7 +211,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.add_photo_alternate_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             Padding(
@@ -310,7 +310,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
   // Main Body (Input)
   buildRepostBody() {
     return Card(
-      color: cardColor,
+      color: mainNavRailBackgroundColor,
       shape: const ContinuousRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(6)),
       ),
@@ -451,7 +451,7 @@ class _CreateRePostPageState extends State<CreateRePostPage> {
   buildReferenceContent() {
     return Container(
       child: Card(
-        color: cardColor,
+        color: mainNavRailBackgroundColor,
         shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6)),
         ),
