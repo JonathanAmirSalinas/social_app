@@ -6,11 +6,12 @@ class ServerModel {
   final String serverLink;
   final String serverName;
   final String description;
-  final Timestamp timestamp;
-  final String serverBannerUrl;
-  final String serverProfileUrl;
+  final int timestamp;
+  final String serverBannerImage;
+  final String serverProfileImage;
   final String privacy;
   final List tags;
+  final List<String> channels;
   final List members;
   final List bannedMembers;
 
@@ -21,10 +22,11 @@ class ServerModel {
     required this.serverName,
     required this.description,
     required this.timestamp,
-    required this.serverBannerUrl,
-    required this.serverProfileUrl,
+    required this.serverBannerImage,
+    required this.serverProfileImage,
     required this.privacy,
     required this.tags,
+    required this.channels,
     required this.members,
     required this.bannedMembers,
   });
@@ -36,15 +38,16 @@ class ServerModel {
         'server_name': serverName,
         'description': description,
         'created_timestamp': timestamp,
-        'banner_image': serverBannerUrl,
-        'server_image': serverProfileUrl,
+        'banner_image': serverBannerImage,
+        'server_image': serverProfileImage,
         'privacy': privacy,
         'tags': tags,
+        'channels': channels,
         'members': members,
         'banned_members': bannedMembers,
       };
 
-  static ServerModel dataFromSnap(DocumentSnapshot snap) {
+  static ServerModel dataFromDoc(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
 
     return ServerModel(
@@ -54,10 +57,11 @@ class ServerModel {
       serverName: snapshot['server_name'],
       description: snapshot['description'],
       timestamp: snapshot['created_timestamp'],
-      serverBannerUrl: snapshot['banner_image'],
-      serverProfileUrl: snapshot['server_image'],
+      serverBannerImage: snapshot['banner_image'],
+      serverProfileImage: snapshot['server_image'],
       privacy: snapshot['privacy'],
       tags: snapshot['tags'],
+      channels: snapshot['channels'],
       members: snapshot['members'],
       bannedMembers: snapshot['banned_members'],
     );
@@ -68,15 +72,13 @@ class ServerModel {
 class ServerMemberModel {
   final String memberId;
   final String name;
-  final String memberImage;
   final String color;
   final String role;
-  final Timestamp timeJoined;
+  final int timeJoined;
 
   const ServerMemberModel({
     required this.memberId,
     required this.name,
-    required this.memberImage,
     required this.color,
     required this.role,
     required this.timeJoined,
@@ -85,7 +87,6 @@ class ServerMemberModel {
   Map<String, dynamic> toJson() => {
         'id_member': memberId,
         'member_name': name,
-        'member_image': memberImage,
         'member_color': color,
         'role': role,
         'timeJoined': timeJoined,
@@ -97,7 +98,6 @@ class ServerMemberModel {
     return ServerMemberModel(
       memberId: snapshot['id_member'],
       name: snapshot['member_name'],
-      memberImage: snapshot['member_image'],
       color: snapshot['member_color'],
       role: snapshot['role'],
       timeJoined: snapshot['timeJoined'],
@@ -105,33 +105,33 @@ class ServerMemberModel {
   }
 }
 
-////////////////////////////////////////////////////// Server Chatroom Model ///
-class ServerChatroomModel {
-  final String chatroomId;
+////////////////////////////////////////////////////// Server Channel Model ///
+class ServerChannelModel {
+  final String channelId;
   final String name;
   final bool empty;
   final int position;
 
-  const ServerChatroomModel({
-    required this.chatroomId,
+  const ServerChannelModel({
+    required this.channelId,
     required this.name,
     required this.empty,
     required this.position,
   });
 
   Map<String, dynamic> toJson() => {
-        'id_chatroom': chatroomId,
-        'chatroom_name': name,
+        'id_channel': channelId,
+        'channel_name': name,
         'empty': empty,
         'position': position,
       };
 
-  static ServerChatroomModel dataFromSnap(DocumentSnapshot snap) {
+  static ServerChannelModel dataFromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
 
-    return ServerChatroomModel(
-      chatroomId: snapshot['id_chatroom'],
-      name: snapshot['chatroom_name'],
+    return ServerChannelModel(
+      channelId: snapshot['id_channel'],
+      name: snapshot['channel_name'],
       empty: snapshot['empty'],
       position: snapshot['position'],
     );
@@ -141,7 +141,7 @@ class ServerChatroomModel {
 ////////////////////////////////////////////////////////// Server Role Model ///
 class ServerRolesModel {
   final bool deleteServer;
-  final String roleID;
+
   final String roleName;
   final bool manageServer;
   final bool manageMessages;
@@ -152,7 +152,6 @@ class ServerRolesModel {
 
   const ServerRolesModel({
     required this.deleteServer,
-    required this.roleID,
     required this.roleName,
     required this.manageMembers,
     required this.manageMessages,
@@ -164,7 +163,6 @@ class ServerRolesModel {
 
   Map<String, dynamic> toJson() => {
         'delete_server': deleteServer,
-        'id_role': roleID,
         'role_name': roleName,
         'manage_members': manageMembers,
         'manage_messages': manageMessages,
@@ -179,7 +177,6 @@ class ServerRolesModel {
 
     return ServerRolesModel(
       deleteServer: snapshot['delete_server'],
-      roleID: snapshot['id_role'],
       roleName: snapshot['role_name'],
       manageMembers: snapshot['manage_members'],
       manageMessages: snapshot['manage_messages'],

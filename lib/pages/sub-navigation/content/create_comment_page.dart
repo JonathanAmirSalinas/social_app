@@ -50,14 +50,14 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       body: Center(
         child: Container(
           width: mobileScreenSize,
           child: Container(
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(6)),
-                color: backgroundColorSolid),
+                color: mainBackgroundColor),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -75,7 +75,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                           )
                         : const Divider(
                             thickness: 4,
-                            color: navBarColor,
+                            color: mainNavRailBackgroundColor,
                           ),
                     Flexible(
                       child: Container(
@@ -130,7 +130,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.poll_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             IconButton(
@@ -138,7 +138,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.layers_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             // Add Image
@@ -153,7 +153,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.add_photo_alternate_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             Padding(
@@ -254,7 +254,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
   // Main Content Body
   buildCommentBody() {
     return Card(
-      color: cardColor,
+      color: mainNavRailBackgroundColor,
       shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6))),
       child: Container(
@@ -391,7 +391,7 @@ class _CreateCommentPageState extends State<CreateCommentPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
-        color: cardColor,
+        color: mainNavRailBackgroundColor,
         shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6)),
         ),

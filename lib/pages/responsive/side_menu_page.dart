@@ -16,11 +16,12 @@ class _SideMenuPageState extends State<SideMenuPage> {
       width: 380,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: navBarColor,
+          backgroundColor: mainNavRailBackgroundColor,
+          leading: Container(),
           title: const Text('Side Menu'),
           centerTitle: true,
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: mainBackgroundColor,
         body: Center(
             child: DragTarget(onAccept: (int data) {
           setState(() {
@@ -39,10 +40,11 @@ class _SideMenuPageState extends State<SideMenuPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Card(
-                      color: navBarColor,
+                      color: mainNavRailBackgroundColor,
                       child: Container(
                         height: 40,
-                        width: 150,
+                        width: 180,
+                        padding: const EdgeInsets.all(4),
                         alignment: Alignment.center,
                         child: Text(
                           "Side-Menu is Empty",

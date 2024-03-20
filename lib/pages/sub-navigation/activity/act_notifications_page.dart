@@ -19,7 +19,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColorSolid,
+      backgroundColor: mainBackgroundColor,
       body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('users')
@@ -88,7 +88,8 @@ buildLikedPostNotification(
     BuildContext context, Map<String, dynamic> notification) {
   return Container(
     decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+        border: Border(
+            bottom: BorderSide(width: 3, color: mainNavRailBackgroundColor))),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -97,7 +98,7 @@ buildLikedPostNotification(
           margin: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(4)),
-              color: backgroundColorSolid),
+              color: mainBackgroundColor),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -145,14 +146,15 @@ buildCommentedNotification(
     BuildContext context, Map<String, dynamic> notification) {
   return Container(
     decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+        border: Border(
+            bottom: BorderSide(width: 3, color: mainNavRailBackgroundColor))),
     child: Column(
       children: [
         Container(
           margin: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(4)),
-              color: backgroundColorSolid),
+              color: mainBackgroundColor),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -231,7 +233,7 @@ buildNotificationContent(
         if (snapshot.hasData) {
           var content = snapshot.data!.data()!;
           return Card(
-              color: navBarColor,
+              color: mainNavRailBackgroundColor,
               shape: const ContinuousRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(6))),
               child: BuildActivityContent(content: content));
@@ -245,14 +247,15 @@ buildMentionNotification(
     BuildContext context, Map<String, dynamic> notification) {
   return Container(
     decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+        border: Border(
+            bottom: BorderSide(width: 3, color: mainNavRailBackgroundColor))),
     child: Column(
       children: [
         Container(
           margin: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(4)),
-              color: backgroundColorSolid),
+              color: mainBackgroundColor),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

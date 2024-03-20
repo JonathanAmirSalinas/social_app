@@ -4,12 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/services/content_services.dart';
 import 'package:social_app/services/time_services.dart';
 import 'package:social_app/widgets/constant_widgets.dart';
 import 'package:social_app/widgets/content/post_widget.dart';
 import 'package:social_app/widgets/content/re_post_widget.dart';
+import 'package:social_app/widgets/main/main_web_navigation_rail.dart';
 import 'package:social_app/widgets/profile/profile_settings_widgets.dart';
 import 'package:social_app/widgets/sliver_appbar_widget.dart';
 
@@ -35,25 +37,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   buildProfileBody(double constraints) {
     return Scaffold(
-        backgroundColor: navBarColor,
+        appBar: AppBar(
+          backgroundColor: mainNavRailBackgroundColor,
+          scrolledUnderElevation: 0.0,
+          leading: Container(),
+        ),
         endDrawer: widget.uid == FirebaseAuth.instance.currentUser!.uid
             ? buildProfileEndDrawerMenu()
             : buildProfileUserDrawerMenu(),
         endDrawerEnableOpenDragGesture: true,
-        appBar: AppBar(
-          leading: const AutoLeadingButton(),
-          actions: [
-            Builder(builder: (context) {
-              return IconButton(
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                  },
-                  icon: const Icon(Icons.align_horizontal_right_rounded));
-            })
-          ],
-        ),
         body: Row(
           children: [
+            buildWebNavigationRail(context),
             constraints > 1600 ? Expanded(child: Container()) : Container(),
             Flexible(
               flex: 3,
@@ -69,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           return <Widget>[
                             SliverAppBar(
                               leading: Container(),
-                              backgroundColor: backgroundColor,
+                              backgroundColor: mainBackgroundColor,
                               expandedHeight: kIsWeb ? 400 : 300,
                               flexibleSpace: FlexibleSpaceBar(
                                   background:
@@ -137,7 +132,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(6),
                           bottomLeft: Radius.circular(6)),
-                      color: cardColor),
+                      color: mainNavRailBackgroundColor),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -291,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 margin: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        width: 3, color: backgroundColorSolid),
+                                        width: 3, color: mainBackgroundColor),
                                     borderRadius: const BorderRadius.all(
                                       Radius.circular(6),
                                     ),
@@ -404,7 +399,7 @@ class _ProfilePageState extends State<ProfilePage> {
               return Container(
                 width: kIsWeb ? 300 : 250,
                 padding: const EdgeInsets.all(2),
-                color: backgroundColorSolid,
+                color: mainBackgroundColor,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -448,7 +443,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                               IconButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    await FirebaseAuth.instance.signOut();
+                                    SharedPreferences pref =
+                                        await SharedPreferences.getInstance();
+                                    pref.setBool('authenticated', false);
+                                    //context.router.pushNamed('/login');
+                                  },
                                   constraints: const BoxConstraints(),
                                   icon: const Icon(
                                     Icons.logout,
@@ -486,7 +487,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(6)),
-                        color: navBarColor),
+                        color: mainNavRailBackgroundColor),
                     margin: const EdgeInsets.all(4),
                     padding: const EdgeInsets.all(4),
                     child: TextField(
@@ -500,7 +501,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(12))),
                           border: const OutlineInputBorder(),
-                          fillColor: secondaryColor,
+                          fillColor: mainSecondaryColor,
                           prefixIcon: const Icon(Icons.search),
                           suffixIcon: _focus.hasFocus
                               ? IconButton(
@@ -573,7 +574,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile Home Section
   buildHomeSection() {
     return Container(
-      color: backgroundColor,
+      color: mainBackgroundColor,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,7 +738,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile Posts Section Tab
   buildPostsSection() {
     return Container(
-      color: backgroundColor,
+      color: mainBackgroundColor,
       child: Column(
         children: [
           Expanded(
@@ -810,7 +811,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile Posts & Replies Section Tab
   buildPostsAndRepliesSection() {
     return Container(
-      color: backgroundColor,
+      color: mainBackgroundColor,
       child: Column(
         children: [
           Expanded(
@@ -883,7 +884,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile Media Section Tab
   buildMediaSection() {
     return Container(
-      color: backgroundColor,
+      color: mainBackgroundColor,
       child: Column(
         children: [
           Expanded(
@@ -956,7 +957,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile Likes Section Tab
   buildLikesSection() {
     return Container(
-      color: backgroundColor,
+      color: mainBackgroundColor,
       child: Column(
         children: [
           Expanded(
@@ -1066,7 +1067,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
               Container(
                 padding: const EdgeInsets.all(4),
@@ -1096,7 +1097,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
             ],
           ),
@@ -1107,7 +1108,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
               Container(
                 padding: const EdgeInsets.all(4),
@@ -1136,7 +1137,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
             ],
           ),
@@ -1160,7 +1161,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
               Container(
                 padding: const EdgeInsets.all(4),
@@ -1177,7 +1178,7 @@ class _ProfileEndDrawerMenuState extends State<ProfileEndDrawerMenu> {
                   child: Container(
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
-                    color: navServerBar,
+                    color: mainServerRailBackgroundColor,
                   )),
             ],
           ),

@@ -25,7 +25,7 @@ class _NewsPageState extends State<NewsTabPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -82,7 +82,7 @@ class _NewsPageState extends State<NewsTabPage>
             ),
           ],
         ),
-        const Divider(color: navBarColor)
+        const Divider(color: mainNavRailBackgroundColor)
       ],
     );
   }
@@ -139,7 +139,7 @@ class _NewsPageState extends State<NewsTabPage>
                 ),
               )),
         ),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -218,7 +218,7 @@ class _NewsPageState extends State<NewsTabPage>
                                 child: const Icon(
                                   Icons.play_arrow,
                                   size: 32,
-                                  color: secondaryColor,
+                                  color: mainSecondaryColor,
                                 ),
                               ),
                             ),
@@ -230,7 +230,7 @@ class _NewsPageState extends State<NewsTabPage>
                 }),
           ),
         )),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -261,7 +261,7 @@ class _NewsPageState extends State<NewsTabPage>
             itemBuilder: ((context, index) {
               return buildSportNewsTopics(context, index + 3);
             })),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }

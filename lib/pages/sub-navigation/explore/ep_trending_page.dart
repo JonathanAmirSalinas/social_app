@@ -24,7 +24,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
     super.build(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(2.0),
@@ -62,7 +62,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                         topLeft: Radius.circular(8),
                         topRight: Radius.circular(8),
                       ),
-                      color: backgroundColor),
+                      color: mainBackgroundColor),
                   child: const Placeholder(),
                 ),
               ),
@@ -101,7 +101,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                   ),
                 ),
               ),
-              const Divider(color: navBarColor),
+              const Divider(color: mainNavRailBackgroundColor),
             ],
           ),
         ),
@@ -195,7 +195,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                 ),
               );
             })),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -274,7 +274,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                                 child: const Icon(
                                   Icons.play_arrow,
                                   size: 32,
-                                  color: secondaryColor,
+                                  color: mainSecondaryColor,
                                 ),
                               ),
                             ),
@@ -286,7 +286,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                 }),
           ),
         )),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -337,7 +337,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                               decoration: const BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(4)),
-                                  color: navBarColor),
+                                  color: mainNavRailBackgroundColor),
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 child: Row(
@@ -401,7 +401,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                               decoration: const BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(4)),
-                                  color: navBarColor),
+                                  color: mainNavRailBackgroundColor),
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 child: Column(
@@ -449,7 +449,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                       }));
               }
             })),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }
@@ -540,7 +540,7 @@ class _TrendingTabPageState extends State<TrendingTabPage>
                 ),
               );
             })),
-        const Divider(color: navBarColor),
+        const Divider(color: mainNavRailBackgroundColor),
       ],
     );
   }

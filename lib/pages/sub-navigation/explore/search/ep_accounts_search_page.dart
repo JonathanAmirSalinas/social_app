@@ -7,7 +7,8 @@ import 'package:social_app/constants/constants.dart';
 @RoutePage(name: 'search_account_tab')
 class AccountSearchPage extends StatefulWidget {
   final String keyword;
-  const AccountSearchPage({super.key, required this.keyword});
+  const AccountSearchPage(
+      {super.key, @PathParam('keyword') required this.keyword});
 
   @override
   State<AccountSearchPage> createState() => _AccountSearchPageState();
@@ -22,7 +23,7 @@ class _AccountSearchPageState extends State<AccountSearchPage>
     super.build(context);
 
     return Scaffold(
-        backgroundColor: backgroundColorSolid,
+        backgroundColor: mainBackgroundColor,
         body: StreamBuilder(
             stream: FirebaseFirestore.instance.collection('users').snapshots(),
             builder: (context,
@@ -74,7 +75,7 @@ class _AccountSearchPageState extends State<AccountSearchPage>
         context.router.pushNamed('/profile/${data['uid']}');
       },
       child: Card(
-        color: navBarColor,
+        color: mainNavRailBackgroundColor,
         shape: const ContinuousRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(6))),
         child: Container(

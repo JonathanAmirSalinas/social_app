@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/providers/api/news/sports_news/bloc/sports_bloc.dart';
-import 'package:social_app/providers/feed_provider.dart';
+import 'package:social_app/providers/navigation_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 
@@ -51,7 +51,9 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider<UserProvider>(
               create: (context) => UserProvider()),
-          ChangeNotifierProvider<FeedProvider>.value(value: FeedProvider()),
+          ChangeNotifierProvider<NavigationProvider>(
+              create: (context) => NavigationProvider()),
+          //ChangeNotifierProvider<FeedProvider>.value(value: FeedProvider()),
           BlocProvider<SportsBloc>(create: (context) => SportsBloc())
         ],
         child: MaterialApp.router(

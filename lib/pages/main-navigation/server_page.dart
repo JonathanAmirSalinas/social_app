@@ -1,12 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/constants/constants.dart';
+import 'package:social_app/pages/sub-navigation/server/create_server.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/router/app_router.dart';
 import 'package:social_app/widgets/drawers/nav_drawer_widget.dart';
 
 @RoutePage(name: 'servers')
 class ServersPage extends StatefulWidget {
-  final String? sid; // <- Get from provider
+  final String? sid;
   const ServersPage({super.key, this.sid});
 
   @override
@@ -14,125 +18,74 @@ class ServersPage extends StatefulWidget {
 }
 
 class _ServersPageState extends State<ServersPage> {
-  late String serverRailController;
   TextEditingController searchDrawerController = TextEditingController();
-  List sid = [
-    "first",
-    "second",
-    "third",
-    "first",
-    "second",
-    "third",
-    "first",
-    "second",
-    "third",
-    "first",
-    "second",
-    "third",
-    "first",
-    "second",
-    "third",
-    "first",
-    "second",
-    "third"
-  ];
 
   @override
   void initState() {
-    serverRailController = sid[0];
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: AutoTabsRouter.tabBar(
-        routes: [
-          const Server_home(),
-          const Server_messages(),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-          Server_chatroom(sid: sid[0]),
-          Server_chatroom(sid: sid[1]),
-          Server_chatroom(sid: sid[2]),
-        ],
-        animatePageTransition: false,
-        builder: (context, child, tabController) {
-          final tabsRouter = AutoTabsRouter.of(context);
-          tabController.index = tabsRouter.activeIndex;
-          return buildServerRoom(tabsRouter, child, tabController);
-        },
-      ),
-    );
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+    return Builder(builder: (context) {
+      return SafeArea(
+        child: AutoTabsRouter.tabBar(
+          routes: [
+            const Server_messages(),
+            for (String servers in userProvider.getUser.servers)
+              Server_chatroom(sid: servers),
+          ],
+          physics: const NeverScrollableScrollPhysics(),
+          animatePageTransition: false,
+          builder: (context, child, tabController) {
+            final tabsRouter = AutoTabsRouter.of(context);
+            tabController.index = tabsRouter.activeIndex;
+            return buildServerRoom(tabsRouter, child, tabController);
+          },
+        ),
+      );
+    });
   }
 
   buildServerRoom(
       TabsRouter tabsRouter, Widget child, TabController tabController) {
-    return GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          setState(() {});
-        },
-        child: Row(
-          children: [buildServerRail(tabsRouter), Expanded(child: child)],
-        ));
+    return Scaffold(
+        body: Row(
+      children: [
+        buildServerRail(tabsRouter),
+        Expanded(child: child),
+      ],
+    ));
   }
 
   //////////////////////////////////////////////////////////////////////////////
   /// Builds The Server Navigation Rail
   //////////////////////////////////////////////////////////////////////////////
   buildServerRail(TabsRouter tabsRouter) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: 60,
-      color: navServerBar,
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: SingleChildScrollView(
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+    return Builder(builder: (context) {
+      return Container(
+        height: MediaQuery.of(context).size.height,
+        width: 60,
+        color: mainServerRailBackgroundColor,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: Column(children: [
-            // Server Home Menu
             GestureDetector(
               onTap: () {
                 tabsRouter.setActiveIndex(0);
               },
               child: Container(
-                height: 50,
-                width: 50,
+                height: 52,
+                width: 52,
                 margin: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.black,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(10),
-                  ),
-                ),
-                child: const Icon(Icons.dashboard),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                tabsRouter.setActiveIndex(1);
-              },
-              child: Container(
-                height: 50,
-                width: 50,
-                margin: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.all(
+                  border: tabsRouter.activeIndex == 0
+                      ? Border.all(color: Colors.white54, width: 2)
+                      : null,
+                  borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
                 ),
@@ -146,32 +99,35 @@ class _ServersPageState extends State<ServersPage> {
               endIndent: 10,
             ),
             /////////////////////////////////////////////////////////////////////////////
-            SizedBox(
-              height: MediaQuery.of(context).size.height * .78,
-              child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: sid.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        tabsRouter.setActiveIndex(index + 2);
-                      },
-                      child: Container(
-                        height: 50,
-                        width: 50,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 2),
-                        decoration: const BoxDecoration(
-                          color: secondaryColorSolid,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
+            Expanded(
+                child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: userProvider.getServers.length,
+                    itemBuilder: ((context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          tabsRouter.setActiveIndex(index + 1);
+                        },
+                        child: Container(
+                          height: 52,
+                          width: 52,
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            border: tabsRouter.activeIndex == index + 1
+                                ? Border.all(color: Colors.white54, width: 2)
+                                : null,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(6)),
+                            image: DecorationImage(
+                                image: CachedNetworkImageProvider(userProvider
+                                    .getServers[index]['server_image']),
+                                fit: BoxFit.cover),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-            ),
+                      );
+                    }))),
             const Divider(
               thickness: 3,
               color: Colors.black,
@@ -190,15 +146,17 @@ class _ServersPageState extends State<ServersPage> {
                 ),
               ),
               child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    buildCreateServerDialog(context);
+                  },
                   tooltip: "Create Server",
                   splashRadius: 20,
                   icon: const Icon(Icons.add)),
             ),
           ]),
         ),
-      ),
-    );
+      );
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -440,6 +398,16 @@ class _ServersPageState extends State<ServersPage> {
         ],
       ),
     ));
+  }
+
+  // Creates a Dialog Used to create a Post
+  buildCreateServerDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return const CreateServer();
+      },
+    );
   }
 
 ////////////////

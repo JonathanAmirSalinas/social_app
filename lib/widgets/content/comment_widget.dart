@@ -16,7 +16,9 @@ class BuildCommentContent extends StatelessWidget {
       },
       child: Container(
         decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(width: 3, color: navBarColor))),
+            border: Border(
+                bottom:
+                    BorderSide(width: 3, color: mainNavRailBackgroundColor))),
         child: Column(
           children: [
             Container(

@@ -42,7 +42,7 @@ class _ActivityPageState extends State<ActivityPage> {
           initialIndex: tabsRouter.activeIndex,
           length: 2,
           child: Scaffold(
-            backgroundColor: backgroundColor,
+            backgroundColor: mainBackgroundColor,
             drawer: isSmallPage(context, "Drawer"),
             resizeToAvoidBottomInset: false,
             body: NestedScrollView(
@@ -50,35 +50,6 @@ class _ActivityPageState extends State<ActivityPage> {
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
-                  SliverAppBar(
-                    pinned: true,
-                    floating: true,
-                    snap: true,
-                    scrolledUnderElevation: 0.0,
-                    backgroundColor: navBarColor,
-                    leading: isSmallPage(
-                      context,
-                      "Leading IconButton",
-                    ),
-                    centerTitle: true,
-                    title: Text(
-                      "Activity",
-                      style: TextStyle(
-                          fontSize: Theme.of(context)
-                              .textTheme
-                              .headlineSmall!
-                              .fontSize),
-                    ),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.notifications_none_rounded)),
-                      )
-                    ],
-                  ),
-
                   // TABBAR
                   SliverPersistentHeader(
                     pinned: true,
@@ -86,6 +57,7 @@ class _ActivityPageState extends State<ActivityPage> {
                       TabBar(
                         controller: tabController,
                         labelColor: Colors.white,
+                        indicatorColor: mainSecondaryColor,
                         unselectedLabelColor: Colors.grey,
                         tabs: const [
                           Tab(text: "Notifications"),

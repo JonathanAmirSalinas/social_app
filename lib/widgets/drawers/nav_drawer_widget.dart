@@ -2,8 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constants/constants.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,8 +16,8 @@ class SliverNavigationDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Drawer(
-        backgroundColor: navBarColor,
-        width: MediaQuery.of(context).size.width * .6,
+        backgroundColor: navDrawerBackgroundColor,
+        width: kIsWeb ? 280 : 220,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -27,6 +27,7 @@ class SliverNavigationDrawer extends StatelessWidget {
         ),
       );
 
+  // Builds Profile Header (User Info)
   Widget buildHeader(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -44,53 +45,70 @@ class SliverNavigationDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 155,
-                  width: MediaQuery.of(context).size.width * .6,
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: CachedNetworkImageProvider(
-                                  user['profile_image']),
-                              fit: BoxFit.cover),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(10),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Container(
+                      height: 160,
+                      width: 280,
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8)),
+                                  image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          user['profile_image']),
+                                      fit: BoxFit.cover),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.donut_large_rounded,
+                                        color: mainSecondaryColor,
+                                      )),
+                                  IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.account_circle_rounded,
+                                        color: mainSecondaryColor,
+                                      )),
+                                ],
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Text(
-                          user['name'],
-                          style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall!
-                                  .fontSize),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: Text(
-                          user['username'],
-                          style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .fontSize),
-                        ),
-                      ),
-                    ],
-                  ),
+                          Text(
+                            user['name'],
+                            style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .fontSize),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Text(user['username']),
+                          ),
+                        ],
+                      )),
                 ),
               ],
             ),
@@ -102,98 +120,176 @@ class SliverNavigationDrawer extends StatelessWidget {
     );
   }
 
+  // Build NAvigation Drawer Menu
   Widget buildMenuItems(BuildContext context) {
     return Flexible(
         child: SingleChildScrollView(
       child: Wrap(
         runSpacing: 0,
+        alignment: WrapAlignment.center,
         children: [
           const Divider(
             color: Colors.white30,
             thickness: 2,
           ),
-          Card(
-            child: ListTile(
-                leading: const Icon(
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+                onPressed: () {
+                  context.router.navigateNamed('/main/home');
+                  Scaffold.of(context).closeDrawer();
+                },
+                style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    iconColor: navDrawerItemColor,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                icon: const Icon(
                   Icons.home_outlined,
-                  size: 24,
+                  size: 28,
                 ),
-                title: const Text(
-                  "Home",
-                  style: TextStyle(fontSize: 18),
-                ),
-                onTap: () async {}),
+                label: Text(
+                  'Home  ',
+                  style: TextStyle(
+                      color: navDrawerItemColor,
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
+                )),
           ),
-          Card(
-            child: ListTile(
-                leading: const Icon(
-                  Icons.account_box_outlined,
-                  size: 24,
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+                onPressed: () {
+                  context.router.navigateNamed('/main/explore/trending');
+                  Scaffold.of(context).closeDrawer();
+                },
+                style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    iconColor: navDrawerItemColor,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                icon: const Icon(
+                  Icons.search,
+                  size: 28,
                 ),
-                title: const Text(
-                  "Profile",
-                  style: TextStyle(fontSize: 18),
-                ),
-                onTap: () {}),
+                label: Text(
+                  'Explore',
+                  style: TextStyle(
+                      color: navDrawerItemColor,
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
+                )),
           ),
-          Card(
-            child: ListTile(
-                leading: const Icon(
-                  Icons.bookmark_border_rounded,
-                  size: 24,
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+                onPressed: () {
+                  context.router.navigateNamed('/main/activity/notifications');
+                  Scaffold.of(context).closeDrawer();
+                },
+                style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    iconColor: navDrawerItemColor,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                icon: const Icon(
+                  Icons.notifications_none_outlined,
+                  size: 28,
                 ),
-                title: const Text(
-                  "Bookmarked",
-                  style: TextStyle(fontSize: 18),
-                ),
-                onTap: () {}),
+                label: Text(
+                  'Activity',
+                  style: TextStyle(
+                      color: navDrawerItemColor,
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
+                )),
           ),
-          Divider(),
-          Card(
-            child: ListTile(
-                leading: const Icon(Icons.help_center),
-                title: const Text(
-                  "Help",
-                  style: TextStyle(fontSize: 18),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+                onPressed: () {
+                  context.router.navigateNamed('/main/servers');
+                  Scaffold.of(context).closeDrawer();
+                },
+                style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    iconColor: navDrawerItemColor,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)))),
+                icon: const Icon(
+                  Icons.space_dashboard_rounded,
+                  size: 28,
                 ),
-                onTap: () {}),
+                label: Text(
+                  'Servers',
+                  style: TextStyle(
+                      color: navDrawerItemColor,
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
+                )),
           ),
-          Card(
-            child: ListTile(
-                leading: const Icon(
-                  Icons.settings_outlined,
-                  size: 24,
-                ),
-                title: const Text(
-                  "Settings",
-                  style: TextStyle(fontSize: 18),
-                ),
-                onTap: () {}),
+          const Divider(),
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.red),
           ),
-          Card(
-            child: ListTile(
-              leading: const Icon(
-                Icons.logout_outlined,
-                size: 24,
-              ),
-              title: const Text(
-                "Logout",
-                style: TextStyle(fontSize: 18),
-              ),
-              onTap: () async {
-                // Save Auth State in pref too false
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.clear();
-                // Signout of FirebaseAuth
-                FirebaseAuth.instance.signOut();
-                context.router.navigateNamed('/');
-              },
-            ),
-          )
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.blue),
+          ),
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.green),
+          ),
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.orange),
+          ),
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.purple),
+          ),
         ],
       ),
     ));
   }
+}
+
+// Build
+buildFooter() {
+  return Expanded(
+      child: Column(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      Container(
+        height: 50,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8),
+        width: double.infinity,
+        child: const Icon(Icons.logout),
+      )
+    ],
+  ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,78 +335,73 @@ buildServerChatEndDrawer(
                       children: [
                         // Header Body
                         Expanded(
-                            child: Container(
-                          child: Column(children: [
-                            Row(
-                              children: [
-                                Container(
-                                  height: 60,
-                                  width: 110,
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 2,
-                                          color: const Color.fromARGB(
-                                              255, 15, 67, 17)),
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      color: Theme.of(context).canvasColor),
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('Active Members'),
-                                      Text('1')
-                                    ],
-                                  ),
+                            child: Column(children: [
+                          Row(
+                            children: [
+                              Container(
+                                height: 60,
+                                width: 110,
+                                margin: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2,
+                                        color: const Color.fromARGB(
+                                            255, 15, 67, 17)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(4)),
+                                    color: Theme.of(context).canvasColor),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [Text('Active Members'), Text('1')],
                                 ),
-                                Container(
-                                  height: 60,
-                                  width: 70,
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      color: Theme.of(context).canvasColor),
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [Text('Members'), Text('1')],
-                                  ),
+                              ),
+                              Container(
+                                height: 60,
+                                width: 70,
+                                margin: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(4)),
+                                    color: Theme.of(context).canvasColor),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [Text('Members'), Text('1')],
                                 ),
-                                Container(
-                                  height: 60,
-                                  width: 60,
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      color: Theme.of(context).canvasColor),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  height: 60,
-                                  width: 60,
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      color: Theme.of(context).canvasColor),
-                                ),
-                                Container(
-                                  height: 60,
-                                  width: 60,
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      color: Theme.of(context).canvasColor),
-                                ),
-                              ],
-                            )
-                          ]),
-                        )),
+                              ),
+                              Container(
+                                height: 60,
+                                width: 60,
+                                margin: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(4)),
+                                    color: Theme.of(context).canvasColor),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                height: 60,
+                                width: 60,
+                                margin: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(4)),
+                                    color: Theme.of(context).canvasColor),
+                              ),
+                              Container(
+                                height: 60,
+                                width: 60,
+                                margin: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(4)),
+                                    color: Theme.of(context).canvasColor),
+                              ),
+                            ],
+                          )
+                        ])),
                         const VerticalDivider(
                           thickness: 2,
                         ),

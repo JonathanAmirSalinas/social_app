@@ -123,7 +123,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 child: Container(
                   decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
-                      color: backgroundColorSolid),
+                      color: mainBackgroundColor),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +140,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             )
                           : const Divider(
                               thickness: 4,
-                              color: navBarColor,
+                              color: mainNavRailBackgroundColor,
                             ),
                       Container(
                         padding: const EdgeInsets.all(4),
@@ -185,7 +185,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.poll_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             IconButton(
@@ -193,7 +193,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.layers_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             // Add Image
@@ -208,7 +208,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(
                   Icons.add_photo_alternate_outlined,
-                  color: secondaryColor,
+                  color: mainSecondaryColor,
                   size: 18,
                 )),
             Padding(
@@ -314,7 +314,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   buildPostBody() {
     return Card(
-      color: cardColor,
+      color: mainNavRailBackgroundColor,
       shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6))),
       child: Container(

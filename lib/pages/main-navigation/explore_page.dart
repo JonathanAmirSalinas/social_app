@@ -1,139 +1,83 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/router/app_router.dart';
+import 'package:social_app/widgets/sliver_appbar_widget.dart';
 
 @RoutePage(name: 'explore')
 class ExplorePage extends StatefulWidget {
-  const ExplorePage({
-    super.key,
-  });
+  const ExplorePage({super.key});
 
   @override
   State<ExplorePage> createState() => _ExplorePageState();
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  TextEditingController exploreController = TextEditingController();
-  final FocusNode _focus = FocusNode();
-  bool searched = false;
-  late String keyword;
-
-  @override
-  void dispose() {
-    _focus.dispose();
-    exploreController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter.tabBar(
-        physics: const NeverScrollableScrollPhysics(),
-        routes: [
-          const Hub(),
-          Search(keyword: exploreController.text.trim()),
-        ],
-        builder: (context, child, tabController) {
-          final tabsRouter = AutoTabsRouter.of(context);
-          tabController.index = tabsRouter.activeIndex;
-          return Scaffold(
-              appBar: AppBar(
-                scrolledUnderElevation: 0.0,
-                backgroundColor: navBarColor,
-                leading: isSmallPage(
-                  context,
-                  "Leading IconButton",
-                ),
-                title: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      color: Theme.of(context).canvasColor,
-                    ),
-                    child: TextField(
-                      controller: exploreController,
-                      focusNode: _focus,
-                      decoration: InputDecoration(
-                          hintText: 'Explore the App',
-                          contentPadding: const EdgeInsets.all(8),
-                          enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12))),
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: _focus.hasFocus
-                              ? IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                      _focus.unfocus();
-                                      exploreController.clear();
-                                    });
-
-                                    tabsRouter.setActiveIndex(0);
-                                  },
-                                  splashRadius: 20,
-                                  icon: const Icon(Icons.clear))
-                              : null),
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _focus.unfocus();
-                          setState(() {
-                            keyword = value;
-                          });
-                          // Set Tab Index to 0 (Hub)
-                          tabsRouter.setActiveIndex(0);
-                        } else {
-                          setState(() {
-                            keyword = value;
-                          });
-                        }
-                      },
-                      onTap: () {
-                        setState(() {
-                          keyword = exploreController.text.trim();
-                        });
-                      },
-                      onSubmitted: (value) {
-                        if (value.isEmpty) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _focus.unfocus();
-                          setState(() {
-                            keyword = value;
-                          });
-                          // Set Tab Index to 0 (Hub)
-                          tabsRouter.setActiveIndex(0);
-                        } else {
-                          setState(() {
-                            keyword = value;
-                          });
-                          // Used to refresh Search url arguments (probably need a refresh of tab index 1 or route data)
-                          tabsRouter.setActiveIndex(0);
-                          // Set Tab Index to 1 (Search)
-                          tabsRouter.setActiveIndex(1);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                actions: [
-                  tabsRouter.activeIndex == 1
-                      ? TextButton(onPressed: () {}, child: Text('close'))
-                      : Container()
-                ],
-              ),
-              body: _focus.hasFocus ? buildSearchQuery() : child);
-        });
+      routes: const [
+        Hub_trending_tab(),
+        Hub_news_tab(),
+        Hub_media_tab(),
+        Hub_servers_tab(),
+      ],
+      builder: (context, child, tabController) {
+        final tabsRouter = AutoTabsRouter.of(context);
+        tabController.index = tabsRouter.activeIndex;
+        return buildExploreTabs(tabsRouter, child, tabController);
+      },
+    );
   }
 
-  buildSearchQuery() {
+  // Main Explore Page
+  buildExploreTabs(
+      TabsRouter tabsRouter, Widget child, TabController tabController) {
+    return GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          setState(() {});
+        },
+        child: DefaultTabController(
+            length: 4,
+            initialIndex: tabController.index,
+            child: Scaffold(
+              backgroundColor: mainBackgroundColor,
+              drawer: isSmallPage(context, "Drawer"),
+              resizeToAvoidBottomInset: false,
+              body: NestedScrollView(
+                  floatHeaderSlivers: true,
+                  headerSliverBuilder:
+                      (BuildContext context, bool innerBoxIsScrolled) {
+                    return <Widget>[
+                      // TABBAR
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: SliverAppBarDelegate(
+                          TabBar(
+                            controller: tabController,
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: mainSecondaryColor,
+                            onTap: tabsRouter.setActiveIndex,
+                            tabs: const [
+                              Tab(text: "Trending"),
+                              Tab(text: "News"),
+                              Tab(text: "Media"),
+                              Tab(text: "Servers"),
+                            ],
+                          ),
+                        ),
+                      )
+                    ];
+                  },
+                  body: child),
+            )));
+  }
+}
+
+
+/* buildSearchQuery() {
     return Builder(builder: (context) {
       return GestureDetector(
           onTap: () {
@@ -476,5 +420,4 @@ class _ExplorePageState extends State<ExplorePage> {
         ),
       ),
     );
-  }
-}
+  } */

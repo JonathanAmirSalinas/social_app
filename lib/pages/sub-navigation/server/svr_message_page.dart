@@ -14,9 +14,10 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: mainBackgroundColor,
       drawer: buildServerMessagesEndDrawer(),
       appBar: AppBar(
-        backgroundColor: navServerBar,
+        backgroundColor: mainServerRailBackgroundColor,
         leading: Builder(builder: (context) {
           return IconButton(
               onPressed: () {
@@ -37,6 +38,9 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
               padding: const EdgeInsets.all(8),
               child: TextButton(
                 onPressed: () {},
+                style: TextButton.styleFrom(
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(6)))),
                 child: Container(
                   height: 50,
                   width: 100,
@@ -53,37 +57,46 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
     );
   }
 
+  // Builds Server
   buildServerMessagesEndDrawer() {
-    return Container(
-      width: 320,
-      color: navServerBar,
-      padding: const EdgeInsets.all(4),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 120,
-            child: const Column(
-              children: [
-                Row(
+    return Row(
+      children: [
+        Container(
+          width: 2,
+          color: Colors.transparent,
+        ),
+        Container(
+          width: 320,
+          color: mainServerRailBackgroundColor,
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 120,
+                child: const Column(
                   children: [
-                    Icon(Icons.group),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Text('0'),
-                    )
+                    Row(
+                      children: [
+                        Icon(Icons.group),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Text('0'),
+                        )
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              const Divider(
+                thickness: 2,
+                color: Colors.white,
+              )
+            ],
           ),
-          const Divider(
-            thickness: 2,
-            color: Colors.white,
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -96,7 +109,7 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
               child: Container(
                 height: 2,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                color: navServerBar,
+                color: mainServerRailBackgroundColor,
               ),
             ),
             Container(
@@ -113,7 +126,7 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
               child: Container(
                 height: 2,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                color: navServerBar,
+                color: mainServerRailBackgroundColor,
               ),
             ),
           ],
@@ -124,7 +137,7 @@ class _ServerMessagesPageState extends State<ServerMessagesPage> {
               child: Container(
                 height: 2,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                color: navServerBar,
+                color: mainServerRailBackgroundColor,
               ),
             )
           ],

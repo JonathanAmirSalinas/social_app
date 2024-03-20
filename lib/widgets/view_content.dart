@@ -39,7 +39,7 @@ class _ViewContentState extends State<ViewContent> {
         },
         child: Builder(builder: (context) {
           return Scaffold(
-            backgroundColor: backgroundColorSolid,
+            backgroundColor: mainBackgroundColor,
             body: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Stack(

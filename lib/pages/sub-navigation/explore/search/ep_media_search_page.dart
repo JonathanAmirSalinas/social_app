@@ -5,7 +5,8 @@ import 'package:social_app/constants/constants.dart';
 @RoutePage(name: 'search_media_tab')
 class MediaSearchPage extends StatefulWidget {
   final String keyword;
-  const MediaSearchPage({super.key, required this.keyword});
+  const MediaSearchPage(
+      {super.key, @PathParam('keyword') required this.keyword});
 
   @override
   State<MediaSearchPage> createState() => _MediaSearchPageState();
@@ -20,7 +21,7 @@ class _MediaSearchPageState extends State<MediaSearchPage>
     super.build(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: mainBackgroundColor,
       body: Center(child: Text(widget.keyword)),
     );
   }

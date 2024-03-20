@@ -16,7 +16,10 @@ abstract class _$AppRouter extends RootStackRouter {
   @override
   final Map<String, PageFactory> pagesMap = {
     Search_account_tab.name: (routeData) {
-      final args = routeData.argsAs<Search_account_tabArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<Search_account_tabArgs>(
+          orElse: () =>
+              Search_account_tabArgs(keyword: pathParams.getString('keyword')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: AccountSearchPage(
@@ -67,12 +70,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const HomePage(),
       );
     },
-    Hub.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const HubPage(),
-      );
-    },
     Login.name: (routeData) {
       final args = routeData.argsAs<LoginArgs>();
       return AutoRoutePage<dynamic>(
@@ -90,7 +87,10 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Search_media_tab.name: (routeData) {
-      final args = routeData.argsAs<Search_media_tabArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<Search_media_tabArgs>(
+          orElse: () =>
+              Search_media_tabArgs(keyword: pathParams.getString('keyword')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: MediaSearchPage(
@@ -148,7 +148,10 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Search_recent_tab.name: (routeData) {
-      final args = routeData.argsAs<Search_recent_tabArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<Search_recent_tabArgs>(
+          orElse: () =>
+              Search_recent_tabArgs(keyword: pathParams.getString('keyword')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: RecentSearchPage(
@@ -164,14 +167,23 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Search.name: (routeData) {
-      final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<SearchArgs>(
-          orElse: () => SearchArgs(keyword: pathParams.getString('keyword')));
+      final args = routeData.argsAs<SearchArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: SearchPage(
           key: args.key,
           keyword: args.keyword,
+        ),
+      );
+    },
+    Server_channel.name: (routeData) {
+      final args = routeData.argsAs<Server_channelArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ServerChannel(
+          key: args.key,
+          channel: args.channel,
+          sid: args.sid,
         ),
       );
     },
@@ -185,12 +197,6 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           sid: args.sid,
         ),
-      );
-    },
-    Server_home.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const ServerHomePage(),
       );
     },
     Server_messages.name: (routeData) {
@@ -223,7 +229,10 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     Search_trending_tab.name: (routeData) {
-      final args = routeData.argsAs<Search_trending_tabArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<Search_trending_tabArgs>(
+          orElse: () => Search_trending_tabArgs(
+              keyword: pathParams.getString('keyword')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: TrendingSearchPage(
@@ -266,6 +275,7 @@ class Search_account_tab extends PageRouteInfo<Search_account_tabArgs> {
             key: key,
             keyword: keyword,
           ),
+          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 
@@ -390,20 +400,6 @@ class Home extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [HubPage]
-class Hub extends PageRouteInfo<void> {
-  const Hub({List<PageRouteInfo>? children})
-      : super(
-          Hub.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Hub';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
 /// [LoginPage]
 class Login extends PageRouteInfo<LoginArgs> {
   Login({
@@ -467,6 +463,7 @@ class Search_media_tab extends PageRouteInfo<Search_media_tabArgs> {
             key: key,
             keyword: keyword,
           ),
+          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 
@@ -627,6 +624,7 @@ class Search_recent_tab extends PageRouteInfo<Search_recent_tabArgs> {
             key: key,
             keyword: keyword,
           ),
+          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 
@@ -679,7 +677,6 @@ class Search extends PageRouteInfo<SearchArgs> {
             key: key,
             keyword: keyword,
           ),
-          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 
@@ -701,6 +698,50 @@ class SearchArgs {
   @override
   String toString() {
     return 'SearchArgs{key: $key, keyword: $keyword}';
+  }
+}
+
+/// generated route for
+/// [ServerChannel]
+class Server_channel extends PageRouteInfo<Server_channelArgs> {
+  Server_channel({
+    Key? key,
+    required String channel,
+    required String sid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          Server_channel.name,
+          args: Server_channelArgs(
+            key: key,
+            channel: channel,
+            sid: sid,
+          ),
+          rawPathParams: {'channel': channel},
+          initialChildren: children,
+        );
+
+  static const String name = 'Server_channel';
+
+  static const PageInfo<Server_channelArgs> page =
+      PageInfo<Server_channelArgs>(name);
+}
+
+class Server_channelArgs {
+  const Server_channelArgs({
+    this.key,
+    required this.channel,
+    required this.sid,
+  });
+
+  final Key? key;
+
+  final String channel;
+
+  final String sid;
+
+  @override
+  String toString() {
+    return 'Server_channelArgs{key: $key, channel: $channel, sid: $sid}';
   }
 }
 
@@ -741,20 +782,6 @@ class Server_chatroomArgs {
   String toString() {
     return 'Server_chatroomArgs{key: $key, sid: $sid}';
   }
-}
-
-/// generated route for
-/// [ServerHomePage]
-class Server_home extends PageRouteInfo<void> {
-  const Server_home({List<PageRouteInfo>? children})
-      : super(
-          Server_home.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'Server_home';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -849,6 +876,7 @@ class Search_trending_tab extends PageRouteInfo<Search_trending_tabArgs> {
             key: key,
             keyword: keyword,
           ),
+          rawPathParams: {'keyword': keyword},
           initialChildren: children,
         );
 

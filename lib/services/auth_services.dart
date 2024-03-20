@@ -39,6 +39,22 @@ class AuthServices {
     return mentionedUser;
   }
 
+  Future<bool> checkUniqueServerID(String serverID) async {
+    try {
+      var snap = await _firestore
+          .collection('servers')
+          .where('sid', isEqualTo: serverID)
+          .get();
+      if (snap.docs.isNotEmpty) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
+
   // Register User
   Future<void> registerUser({
     required String email,
