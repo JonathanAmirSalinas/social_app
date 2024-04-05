@@ -58,7 +58,7 @@ Social Media App.
 ## Profile Page (Likes Tab) ---------------------------
 ![image](https://github.com/JonathanAmirSalinas/social_app/assets/126116839/f8cb3911-cc72-4c4b-9782-56888454bf34)
 
-## Explore Page (Trending Tab) Note* Missing Data Sturcture
+## Explore Page (Trending Tab) Note* Missing Data Structure
 ![image](https://github.com/JonathanAmirSalinas/social_app/assets/126116839/f49d4a51-5286-4e19-840b-fecc205837e5)
 ![image](https://github.com/JonathanAmirSalinas/social_app/assets/126116839/ec02dd11-0eb4-43c3-9a5d-c59d9d09b0e1)
 ![image](https://github.com/JonathanAmirSalinas/social_app/assets/126116839/51e93b11-8296-41c5-b2a8-ab38721257e6)
